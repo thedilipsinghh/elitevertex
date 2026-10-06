@@ -10,7 +10,17 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: env.FRONTEND_URL,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (
+      origin === env.FRONTEND_URL ||
+      origin.endsWith(".vercel.app") ||
+      process.env.NODE_ENV !== "production"
+    ) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
   credentials: true,
 }));
 app.use(express.json());
@@ -24,7 +34,10 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
-// Health check
+// Base route & Health check
+app.get("/", (req: Request, res: Response) => {
+  res.json({ success: true, message: "EliteVertex API is running on Vercel" });
+});
 app.get("/api/health", (req: Request, res: Response) => {
   res.json({ success: true, message: "API is healthy" });
 });
@@ -35,6 +48,12 @@ app.use("/api/v1", apiRoutes);
 // Error Handling
 app.use(errorHandler);
 
-app.listen(env.PORT, () => {
-  console.log(`🚀 Server running on port ${env.PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(env.PORT, () => {
+    console.log(`🚀 Server running on port ${env.PORT}`);
+  });
+}
+
+export default app;
+
+

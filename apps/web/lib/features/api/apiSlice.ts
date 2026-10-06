@@ -6,7 +6,7 @@ export const apiSlice = createApi({
     baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1',
     credentials: 'include',
   }),
-  tagTypes: ['Courses', 'Course', 'Gallery', 'Testimonials', 'Faqs'],
+  tagTypes: ['Courses', 'Course', 'Gallery', 'Testimonials', 'Faqs', 'Settings'],
   endpoints: (builder) => ({
     // Public Endpoints
     getCourses: builder.query({
@@ -24,6 +24,10 @@ export const apiSlice = createApi({
     getFaqs: builder.query({
       query: () => '/faqs',
       providesTags: ['Faqs'],
+    }),
+    getWebsiteSettings: builder.query({
+      query: () => '/website-settings',
+      providesTags: ['Settings'],
     }),
 
     // Admin Endpoints
@@ -97,6 +101,20 @@ export const apiSlice = createApi({
       invalidatesTags: ['Testimonials'],
     }),
 
+    // Admin Settings CRM
+    getAdminSettings: builder.query({
+      query: () => '/admin/settings',
+      providesTags: ['Settings'],
+    }),
+    updateSettings: builder.mutation({
+      query: (body) => ({
+        url: '/admin/settings',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Settings'],
+    }),
+
     // Auth Endpoints
     login: builder.mutation({
       query: (credentials) => ({
@@ -113,6 +131,7 @@ export const {
   useGetGalleryQuery,
   useGetTestimonialsQuery,
   useGetFaqsQuery,
+  useGetWebsiteSettingsQuery,
   useGetAdminCoursesQuery,
   useCreateCourseMutation,
   useUpdateCourseMutation,
@@ -123,5 +142,7 @@ export const {
   useGetAdminTestimonialsQuery,
   useCreateTestimonialMutation,
   useDeleteTestimonialMutation,
+  useGetAdminSettingsQuery,
+  useUpdateSettingsMutation,
   useLoginMutation,
 } = apiSlice;

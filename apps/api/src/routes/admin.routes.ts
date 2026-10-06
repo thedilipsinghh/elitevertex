@@ -29,4 +29,9 @@ router.post("/testimonials", adminCtrl.createTestimonial);
 router.patch("/testimonials/:id", adminCtrl.updateTestimonial);
 router.delete("/testimonials/:id", adminCtrl.deleteTestimonial);
 
+// CMS: Website Settings & Homepage CRM
+router.get("/settings", adminCtrl.getAdminWebsiteSettings);
+router.post("/settings", adminCtrl.updateWebsiteSettings);
+router.patch("/settings", adminCtrl.updateWebsiteSettings);
+
 export default router;

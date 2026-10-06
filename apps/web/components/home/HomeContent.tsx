@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useGetFaqsQuery, useGetTestimonialsQuery, useGetGalleryQuery } from "@/lib/features/api/apiSlice";
+import { useGetFaqsQuery, useGetTestimonialsQuery, useGetGalleryQuery, useGetWebsiteSettingsQuery } from "@/lib/features/api/apiSlice";
 
 export function HomeContent() {
   const [openFaqId, setOpenFaqId] = useState<string | number | null>(null);
@@ -10,10 +10,12 @@ export function HomeContent() {
   const { data: faqResponse } = useGetFaqsQuery({});
   const { data: testimonialsResponse } = useGetTestimonialsQuery({});
   const { data: galleryResponse } = useGetGalleryQuery({});
+  const { data: settingsResponse } = useGetWebsiteSettingsQuery({});
 
   const apiFaqs = faqResponse?.data || [];
   const apiTestimonials = testimonialsResponse?.data || [];
   const apiGallery = galleryResponse?.data || [];
+  const siteSettings = settingsResponse?.data || {};
 
   // Fallback defaults if database tables are empty
   const defaultFaqs = [
@@ -67,13 +69,13 @@ export function HomeContent() {
             {/* Text Narrative */}
             <div className="lg:col-span-6 flex flex-col items-start">
               <span className="font-label-md text-label-md uppercase tracking-widest text-secondary font-semibold mb-space-xs">
-                Spoken English • Communication • Career Skills
+                {siteSettings.heroTagline || "Spoken English • Communication • Career Skills"}
               </span>
               <h1 className="font-display text-display text-primary tracking-tight leading-none mb-space-md">
-                Speak With Confidence. Go Further.
+                {siteSettings.heroTitle || "Speak With Confidence. Go Further."}
               </h1>
               <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl mb-space-xl leading-relaxed">
-                Build the English, communication skills, and executive confidence you need for classrooms, global careers, and everyday influence.
+                {siteSettings.heroSubtitle || "Build the English, communication skills, and executive confidence you need for classrooms, global careers, and everyday influence."}
               </p>
               <div className="flex flex-wrap items-center gap-space-sm w-full sm:w-auto">
                 <Link className="inline-flex items-center justify-center bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-md text-label-md uppercase tracking-wider px-space-lg py-space-xs rounded-lg transition-colors duration-150" href="/book-counselling">
@@ -87,7 +89,11 @@ export function HomeContent() {
             {/* Hero Documentary Photo */}
             <div className="lg:col-span-6 w-full">
               <div className="relative overflow-hidden rounded-xl bg-surface-container shadow-sm aspect-[16/11]">
-                <img alt="Learners collaborating actively in executive seminar hall at Elite Vertex" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1XUmQebC7cWdgP8rjmnfdqiY3TWTBNoYsfMaSYI7n3xfYNILdru7siueSJaT3rMs4i4yPJNbvZvfikMQY3F9R2qu9KcA-IJpgJKfBgkmFG_E5MXmadYRgWJ_6PhUHhZrCm8UV-zLzfi7YQS7zuXK6r0MjulQm5z6SjXV14VWLoizz-xs76JsWDExBfm2OMZySxsZVg3HIpEMQlOhdIgz88ZuQ4xbfsXjeGRuCDxyYgFYtotlQBLMiC4mi6i"/>
+                <img
+                  alt="Learners collaborating actively in executive seminar hall at Elite Vertex"
+                  className="w-full h-full object-cover"
+                  src={siteSettings.heroImage || "https://lh3.googleusercontent.com/aida/AEtjO1XUmQebC7cWdgP8rjmnfdqiY3TWTBNoYsfMaSYI7n3xfYNILdru7siueSJaT3rMs4i4yPJNbvZvfikMQY3F9R2qu9KcA-IJpgJKfBgkmFG_E5MXmadYRgWJ_6PhUHhZrCm8UV-zLzfi7YQS7zuXK6r0MjulQm5z6SjXV14VWLoizz-xs76JsWDExBfm2OMZySxsZVg3HIpEMQlOhdIgz88ZuQ4xbfsXjeGRuCDxyYgFYtotlQBLMiC4mi6i"}
+                />
               </div>
             </div>
           </div>
@@ -447,10 +453,10 @@ export function HomeContent() {
           <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
             <span className="font-label-md text-label-md uppercase tracking-widest text-on-primary-container mb-space-2xs">Admissions Open For Next Cohort</span>
             <h2 className="font-headline-lg text-headline-lg text-on-primary tracking-tight mb-space-md">
-              Your Next Opportunity Starts With Better Communication.
+              {siteSettings.callToActionTitle || "Your Next Opportunity Starts With Better Communication."}
             </h2>
             <p className="font-body-lg text-body-lg text-on-primary-container max-w-xl mb-space-xl leading-relaxed">
-              Schedule an in-person or virtual speech evaluation with our academic directors. Discover your baseline fluency score and receive a personalized curriculum path.
+              {siteSettings.callToActionSubtitle || "Schedule an in-person or virtual speech evaluation with our academic directors. Discover your baseline fluency score and receive a personalized curriculum path."}
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-space-sm">
               <Link className="w-full sm:w-auto inline-flex items-center justify-center bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-md text-label-md uppercase tracking-wider px-space-xl py-space-xs rounded-lg transition-colors duration-150" href="/book-counselling">

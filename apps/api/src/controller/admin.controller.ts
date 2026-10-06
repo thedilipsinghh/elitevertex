@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { db } from "../config/db";
-import { courses, galleryItems, faqs, testimonials, certificates } from "../db/schema";
+import { courses, galleryItems, faqs, testimonials, certificates, websiteSettings } from "../db/schema";
 import { sql } from "drizzle-orm";
 
 // === COURSES ===
@@ -104,4 +104,26 @@ export const deleteTestimonial = async (req: Request, res: Response, next: NextF
     return res.status(200).json({ success: true, message: "Review deleted" });
   } catch (error) { next(error); }
 };
+
+// === WEBSITE SETTINGS / HOME CRM ===
+export const getAdminWebsiteSettings = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const settings = await db.query.websiteSettings.findFirst();
+    return res.status(200).json({ success: true, data: settings || null });
+  } catch (error) { next(error); }
+};
+
+export const updateWebsiteSettings = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const existing = await db.query.websiteSettings.findFirst();
+    if (existing) {
+      const updated = await db.update(websiteSettings).set(req.body).where(sql`id = ${existing.id}`).returning();
+      return res.status(200).json({ success: true, message: "Settings updated", data: updated[0] });
+    } else {
+      const created = await db.insert(websiteSettings).values(req.body).returning();
+      return res.status(201).json({ success: true, message: "Settings created", data: created[0] });
+    }
+  } catch (error) { next(error); }
+};
+
 

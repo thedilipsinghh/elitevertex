@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname === '/admin') {
+    return NextResponse.redirect(new URL('/eliteadmin4393/login', request.url));
+  }
+
   const isAdminPath = request.nextUrl.pathname.startsWith('/eliteadmin4393');
   const isLoginPage = request.nextUrl.pathname === '/eliteadmin4393/login';
 
@@ -24,5 +28,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/eliteadmin4393/:path*'],
+  matcher: ['/admin', '/eliteadmin4393/:path*'],
 };

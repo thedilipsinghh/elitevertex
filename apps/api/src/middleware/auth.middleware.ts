@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { env } from "../config/env";
 
 export interface AuthenticatedRequest extends Request {
+  cookies: any;
   admin?: {
     id: string;
     email: string;

@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname === '/admin') {
-    return NextResponse.redirect(new URL('/eliteadmin4393/login', request.url));
+  if (request.nextUrl.pathname === '/admin' || request.nextUrl.pathname === '/eliteadmin4393') {
+    const hasToken = request.cookies.has('admin_token');
+    return NextResponse.redirect(new URL(hasToken ? '/eliteadmin4393/dashboard' : '/eliteadmin4393/login', request.url));
   }
 
   const isAdminPath = request.nextUrl.pathname.startsWith('/eliteadmin4393');
@@ -19,8 +20,8 @@ export function middleware(request: NextRequest) {
     }
 
     if (hasToken && isLoginPage) {
-      // Redirect to courses dashboard if already logged in
-      return NextResponse.redirect(new URL('/eliteadmin4393/courses', request.url));
+      // Redirect to dashboard if already logged in
+      return NextResponse.redirect(new URL('/eliteadmin4393/dashboard', request.url));
     }
   }
 
@@ -28,5 +29,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin', '/eliteadmin4393/:path*'],
+  matcher: ['/admin', '/eliteadmin4393', '/eliteadmin4393/:path*'],
 };

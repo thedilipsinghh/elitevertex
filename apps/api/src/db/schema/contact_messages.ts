@@ -8,6 +8,8 @@ export const contactMessages = pgTable("contact_messages", {
   email: varchar("email", { length: 255 }).notNull(),
   phone: varchar("phone", { length: 100 }),
   subject: varchar("subject", { length: 255 }),
+  program: varchar("program", { length: 255 }),
+  mode: varchar("mode", { length: 50 }),
   message: text("message").notNull(),
   status: contactMessageStatusEnum("status").default("unread").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),

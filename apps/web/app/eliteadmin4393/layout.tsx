@@ -20,12 +20,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const menuItems = [
     { name: "Dashboard", path: "/eliteadmin4393/dashboard", icon: "dashboard" },
     { name: "Courses", path: "/eliteadmin4393/courses", icon: "school" },
-    { name: "Gallery", path: "/eliteadmin4393/gallery", icon: "collections" },
+    { name: "Mentors & Faculty", path: "/eliteadmin4393/mentors", icon: "person" },
+    { name: "About Page", path: "/eliteadmin4393/about", icon: "info" },
     { name: "Testimonials", path: "/eliteadmin4393/testimonials", icon: "reviews" },
+    { name: "Gallery", path: "/eliteadmin4393/gallery", icon: "collections" },
     { name: "FAQ", path: "/eliteadmin4393/faq", icon: "help" },
-    { name: "Contact Messages", path: "/eliteadmin4393/messages", icon: "mail" },
-    { name: "Certificates", path: "/eliteadmin4393/certificates", icon: "verified" },
-    { name: "Settings", path: "/eliteadmin4393/settings", icon: "settings" },
+    { name: "Campus Network", path: "/eliteadmin4393/campuses", icon: "location_city" },
+    { name: "Student Leads", path: "/eliteadmin4393/messages", icon: "contact_mail" },
+    { name: "Home & Settings", path: "/eliteadmin4393/settings", icon: "settings" },
   ];
 
   return (

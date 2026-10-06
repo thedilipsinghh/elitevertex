@@ -10,7 +10,9 @@ const contactSchema = z.object({
   email: z.string().email(),
   phone: z.string().optional(),
   subject: z.string().optional(),
-  message: z.string().min(10),
+  program: z.string().optional(),
+  mode: z.string().optional(),
+  message: z.string().min(2),
 });
 
 export const submitContactForm = async (req: Request, res: Response, next: NextFunction) => {
@@ -32,6 +34,8 @@ export const submitContactForm = async (req: Request, res: Response, next: NextF
       email: data.email,
       phone: data.phone,
       subject: data.subject,
+      program: data.program,
+      mode: data.mode,
       message: data.message,
     });
 

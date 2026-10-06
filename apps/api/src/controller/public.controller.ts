@@ -84,3 +84,29 @@ export const getWebsiteSettings = async (req: Request, res: Response, next: Next
     next(error);
   }
 };
+
+export const getMentors = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const items = await db.query.mentors.findMany({
+      where: sql`is_published = true`,
+    });
+    return res.status(200).json({ success: true, data: items });
+  } catch (error) { next(error); }
+};
+
+export const getAboutPage = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const page = await db.query.aboutPage.findFirst();
+    return res.status(200).json({ success: true, data: page || null });
+  } catch (error) { next(error); }
+};
+
+export const getCampuses = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const list = await db.query.campuses.findMany({
+      where: sql`is_published = true`,
+    });
+    return res.status(200).json({ success: true, data: list });
+  } catch (error) { next(error); }
+};
+

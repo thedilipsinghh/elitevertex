@@ -1,7 +1,25 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useGetAboutPageQuery, useGetMentorsQuery } from "@/lib/features/api/apiSlice";
 
 export function AboutContent() {
+  const { data: aboutResponse } = useGetAboutPageQuery({});
+  const { data: mentorsResponse } = useGetMentorsQuery({});
+
+  const aboutData = aboutResponse?.data || {};
+  const mentorsList = mentorsResponse?.data || [];
+
+  const leadMentor = mentorsList[0] || {
+    name: "Dr. Meenakshi Sundaram",
+    designation: "Chief Linguist & Academic Dean",
+    accreditation: "British Council Accredited Fellow",
+    quote: "We do not teach you to impersonate a native speaker. We coach you to speak with total clarity, natural gravitas, and unflinching presence.",
+    bio: "With over 22 years of forensic linguistic research and corporate communication advisory across Oxford, Singapore, and India, Dr. Sundaram directs the curriculum standards at Elite Vertex.",
+    profileImage: "https://lh3.googleusercontent.com/aida/AEtjO1VxRPTogt0A57N14457KucT3rxqNKRPPEb1qPm-CIFuw1wiSHSbHElScSJfENkOfdFaJADBnZTmQJ3ZWim1ZL82hh6-iAqn9ATFm4QPXJ2B63y699ZfTPjJvUQ3SMK6sN-F0AtI0zgS4-YFYqaJVyc4Wu7ACiSpt9EmlbyhLppBRFv6aan4TTgQU3aICLKS1C9VGvExCM7cClYc1bNGkvgwYHQWjGDxmJXda8d5ntxI3AORC2RZtuTfV1AQ"
+  };
+
   return (
     <div className="flex flex-col w-full">
       {/* 1. Compact Editorial Header */}
@@ -13,10 +31,10 @@ export function AboutContent() {
               <span className="font-label-md text-label-md uppercase tracking-widest text-secondary">About Elite Vertex</span>
             </div>
             <h1 className="font-display text-headline-lg-mobile md:text-headline-lg lg:text-display text-on-surface tracking-tight leading-[1.08] mt-space-3xs">
-              More Than English.<br className="hidden sm:inline" />We Build Confidence.
+              {aboutData.headerTitle || "More Than English. We Build Confidence."}
             </h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mt-space-xs">
-              Founded on the conviction that spoken language is mastered through psychological safety, active voice mechanics, and deliberate physical practice.
+              {aboutData.headerSubtitle || "Founded on the conviction that spoken language is mastered through psychological safety, active voice mechanics, and deliberate physical practice."}
             </p>
           </div>
         </div>
@@ -32,27 +50,24 @@ export function AboutContent() {
                 <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">01 / Origin &amp; Paradigm</span>
               </div>
               <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight">
-                Fluency is a physical and psychological habit.
+                {aboutData.paradigmTitle || "Fluency is a physical and psychological habit."}
               </h2>
               <div className="flex flex-col gap-space-sm text-on-surface-variant font-body-md text-body-md">
                 <p>
-                  Traditional language pedagogy treats communication as a silent written exercise. For decades, classrooms across India drilled parsing syntax, memorizing verb tenses, and filling blanks—leaving adult professionals articulate on paper, yet gripped with crippling hesitation the moment they speak.
+                  {aboutData.paradigmParagraph1 || "Traditional language pedagogy treats communication as a silent written exercise. For decades, classrooms across India drilled parsing syntax, memorizing verb tenses, and filling blanks—leaving adult professionals articulate on paper, yet gripped with crippling hesitation the moment they speak."}
                 </p>
                 <p>
-                  Elite Vertex was founded to reverse this obsolete hierarchy. Language fluency is not theoretical knowledge; it is muscular conditioning and nervous system calibration. Under sustained acoustic guidance, vocal cord hesitation dissolves only when students are liberated from fear of judgment.
-                </p>
-                <p>
-                  By replacing quiet note-taking with continuous roundtable deliberation and immediate acoustic critique, we transform self-conscious translators into decisive, authoritative speakers.
+                  {aboutData.paradigmParagraph2 || "Elite Vertex was founded to reverse this obsolete hierarchy. Language fluency is not theoretical knowledge; it is muscular conditioning and nervous system calibration. Under sustained acoustic guidance, vocal cord hesitation dissolves only when students are liberated from fear of judgment."}
                 </p>
               </div>
               <div className="pt-space-xs flex items-center gap-space-lg">
                 <div className="flex flex-col">
-                  <span className="font-headline-md text-headline-md text-primary font-bold">70%</span>
+                  <span className="font-headline-md text-headline-md text-primary font-bold">{aboutData.airtimeStat || "70%"}</span>
                   <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Acoustic Airtime Per Learner</span>
                 </div>
                 <div className="w-px h-10 bg-surface-container-highest"></div>
                 <div className="flex flex-col">
-                  <span className="font-headline-md text-headline-md text-secondary font-bold">1:12</span>
+                  <span className="font-headline-md text-headline-md text-secondary font-bold">{aboutData.ratioStat || "1:12"}</span>
                   <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Strict Cohort Ratio</span>
                 </div>
               </div>
@@ -61,14 +76,10 @@ export function AboutContent() {
             <div className="lg:col-span-6">
               <div className="relative bg-surface-container-low p-space-xs rounded-xl shadow-sm">
                 <img
-                  alt="Elite Vertex interactive roundtable workshop where students engage in live communicative practice under faculty supervision"
+                  alt="Elite Vertex interactive workshop"
                   className="w-full aspect-[4/3] object-cover rounded-lg"
-                  src="https://lh3.googleusercontent.com/aida/AEtjO1XUmQebC7cWdgP8rjmnfdqiY3TWTBNoYsfMaSYI7n3xfYNILdru7siueSJaT3rMs4i4yPJNbvZvfikMQY3F9R2qu9KcA-IJpgJKfBgkmFG_E5MXmadYRgWJ_6PhUHhZrCm8UV-zLzfi7YQS7zuXK6r0MjulQm5z6SjXV14VWLoizz-xs76JsWDExBfm2OMZySxsZVg3HIpEMQlOhdIgz88ZuQ4xbfsXjeGRuCDxyYgFYtotlQBLMiC4mi6i"
+                  src={aboutData.paradigmImage || "https://lh3.googleusercontent.com/aida/AEtjO1XUmQebC7cWdgP8rjmnfdqiY3TWTBNoYsfMaSYI7n3xfYNILdru7siueSJaT3rMs4i4yPJNbvZvfikMQY3F9R2qu9KcA-IJpgJKfBgkmFG_E5MXmadYRgWJ_6PhUHhZrCm8UV-zLzfi7YQS7zuXK6r0MjulQm5z6SjXV14VWLoizz-xs76JsWDExBfm2OMZySxsZVg3HIpEMQlOhdIgz88ZuQ4xbfsXjeGRuCDxyYgFYtotlQBLMiC4mi6i"}
                 />
-                <div className="p-space-sm bg-surface-container-lowest rounded-b-lg mt-space-2xs flex items-center justify-between">
-                  <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide">Bengaluru Executive Seminar Room 04</span>
-                  <span className="font-label-sm text-label-sm text-secondary font-semibold">Active Debate Studio</span>
-                </div>
               </div>
             </div>
           </div>
@@ -90,10 +101,10 @@ export function AboutContent() {
               <div className="flex flex-col gap-space-sm">
                 <span className="font-label-md text-label-md uppercase tracking-wider text-secondary">The Institutional Vision</span>
                 <h3 className="font-headline-md text-headline-md text-primary tracking-tight">
-                  Eradicating speech anxiety and language hesitation across India’s rising talent.
+                  {aboutData.visionTitle || "Eradicating speech anxiety and language hesitation across India’s rising talent."}
                 </h3>
                 <p className="font-body-md text-body-md text-on-surface-variant mt-space-2xs">
-                  To build a culture where no engineer, founder, educator, or graduate is held back by vocal diffidence. We envision Indian professional voices commanding global auditoriums, boardrooms, and academic symposia with unmatched clarity, gravitas, and poise.
+                  {aboutData.visionBody || "To build a culture where no engineer, founder, educator, or graduate is held back by vocal diffidence. We envision Indian professional voices commanding global auditoriums, boardrooms, and academic symposia with unmatched clarity, gravitas, and poise."}
                 </p>
               </div>
               <div className="pt-space-lg mt-space-lg flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm">
@@ -106,10 +117,10 @@ export function AboutContent() {
               <div className="flex flex-col gap-space-sm">
                 <span className="font-label-md text-label-md uppercase tracking-wider text-secondary-fixed">The Core Mission</span>
                 <h3 className="font-headline-md text-headline-md text-surface-container-lowest tracking-tight">
-                  Acoustic immersion, personalized vocal diagnostics, and CEFR-verified advancement.
+                  {aboutData.missionTitle || "Acoustic immersion, personalized vocal diagnostics, and CEFR-verified advancement."}
                 </h3>
                 <p className="font-body-md text-body-md text-primary-fixed-dim mt-space-2xs">
-                  Deploying small-group seminar pedagogy strictly capped at 12 participants per studio. Every student receives phoneme-level acoustic feedback, daily impromptu podium time, and psychologically fortified speaking drills mapped directly to Cambridge CEFR standards.
+                  {aboutData.missionBody || "Deploying small-group seminar pedagogy strictly capped at 12 participants per studio. Every student receives phoneme-level acoustic feedback, daily impromptu podium time, and psychologically fortified speaking drills mapped directly to Cambridge CEFR standards."}
                 </p>
               </div>
               <div className="pt-space-lg mt-space-lg flex items-center gap-space-xs text-primary-fixed-dim font-label-sm text-label-sm">
@@ -198,13 +209,13 @@ export function AboutContent() {
             <div className="lg:col-span-5">
               <div className="bg-surface-container-lowest p-space-xs rounded-xl shadow-sm">
                 <img
-                  alt="Portrait of Dr. Meenakshi Sundaram, Chief Linguist and Academic Dean at Elite Vertex Institute"
+                  alt={leadMentor.name}
                   className="w-full aspect-[4/5] object-cover rounded-lg"
-                  src="https://lh3.googleusercontent.com/aida/AEtjO1VxRPTogt0A57N14457KucT3rxqNKRPPEb1qPm-CIFuw1wiSHSbHElScSJfENkOfdFaJADBnZTmQJ3ZWim1ZL82hh6-iAqn9ATFm4QPXJ2B63y699ZfTPjJvUQ3SMK6sN-F0AtI0zgS4-YFYqaJVyc4Wu7ACiSpt9EmlbyhLppBRFv6aan4TTgQU3aICLKS1C9VGvExCM7cClYc1bNGkvgwYHQWjGDxmJXda8d5ntxI3AORC2RZtuTfV1AQ"
+                  src={leadMentor.profileImage || "https://lh3.googleusercontent.com/aida/AEtjO1VxRPTogt0A57N14457KucT3rxqNKRPPEb1qPm-CIFuw1wiSHSbHElScSJfENkOfdFaJADBnZTmQJ3ZWim1ZL82hh6-iAqn9ATFm4QPXJ2B63y699ZfTPjJvUQ3SMK6sN-F0AtI0zgS4-YFYqaJVyc4Wu7ACiSpt9EmlbyhLppBRFv6aan4TTgQU3aICLKS1C9VGvExCM7cClYc1bNGkvgwYHQWjGDxmJXda8d5ntxI3AORC2RZtuTfV1AQ"}
                 />
                 <div className="p-space-sm flex flex-col gap-space-3xs">
-                  <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">Dr. Meenakshi Sundaram</span>
-                  <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Chief Linguist &amp; Academic Dean</span>
+                  <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">{leadMentor.name}</span>
+                  <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">{leadMentor.designation}</span>
                 </div>
               </div>
             </div>
@@ -212,13 +223,13 @@ export function AboutContent() {
             <div className="lg:col-span-7 flex flex-col gap-space-lg">
               <div className="flex flex-col gap-space-sm">
                 <div className="inline-flex items-center gap-space-xs px-space-xs py-space-3xs bg-secondary-fixed text-on-secondary-fixed rounded text-label-sm font-label-sm uppercase tracking-wider w-fit">
-                  British Council Accredited Fellow
+                  {leadMentor.accreditation || "British Council Accredited Fellow"}
                 </div>
                 <h3 className="font-headline-md text-headline-md text-on-surface tracking-tight">
-                  &quot;We do not teach you to impersonate a native speaker. We coach you to speak with total clarity, natural gravitas, and unflinching presence.&quot;
+                  &quot;{leadMentor.quote || "We do not teach you to impersonate a native speaker. We coach you to speak with total clarity, natural gravitas, and unflinching presence."}&quot;
                 </h3>
                 <p className="font-body-md text-body-md text-on-surface-variant">
-                  With over 22 years of forensic linguistic research and corporate communication advisory across Oxford, Singapore, and India, Dr. Sundaram directs the curriculum standards at Elite Vertex. Under her governance, every module prioritizes psychological comfort, pragmatic phonetics, and real-world professional resonance over artificial diction.
+                  {leadMentor.bio}
                 </p>
               </div>
               {/* Physical Features Grid */}

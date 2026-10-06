@@ -34,4 +34,26 @@ router.get("/settings", adminCtrl.getAdminWebsiteSettings);
 router.post("/settings", adminCtrl.updateWebsiteSettings);
 router.patch("/settings", adminCtrl.updateWebsiteSettings);
 
+// CMS: Mentors
+router.get("/mentors", adminCtrl.getAdminMentors);
+router.post("/mentors", adminCtrl.createMentor);
+router.patch("/mentors/:id", adminCtrl.updateMentor);
+router.delete("/mentors/:id", adminCtrl.deleteMentor);
+
+// CMS: About Page
+router.get("/about", adminCtrl.getAdminAboutPage);
+router.post("/about", adminCtrl.updateAboutPage);
+router.patch("/about", adminCtrl.updateAboutPage);
+
+// CMS: Campuses
+router.get("/campuses", adminCtrl.getAdminCampuses);
+router.post("/campuses", adminCtrl.createCampus);
+router.patch("/campuses/:id", adminCtrl.updateCampus);
+router.delete("/campuses/:id", adminCtrl.deleteCampus);
+
+// Leads / Contact Enquiries CRM
+router.get("/messages", adminCtrl.getAdminMessages);
+router.patch("/messages/:id", adminCtrl.updateMessageStatus);
+router.delete("/messages/:id", adminCtrl.deleteMessage);
+
 export default router;

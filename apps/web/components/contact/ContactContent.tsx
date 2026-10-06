@@ -2,13 +2,48 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useGetCampusesQuery, useSubmitContactMutation, useGetWebsiteSettingsQuery } from "@/lib/features/api/apiSlice";
 
 export function ContactContent() {
+  const { data: campusesResponse } = useGetCampusesQuery({});
+  const { data: settingsResponse } = useGetWebsiteSettingsQuery({});
+  const [submitContact, { isLoading: isSubmitting }] = useSubmitContactMutation();
+
+  const apiCampuses = campusesResponse?.data || [];
+  const siteSettings = settingsResponse?.data || {};
+
+  const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [emailAddress, setEmailAddress] = useState("");
+  const [program, setProgram] = useState("");
+  const [mode, setMode] = useState("campus");
+  const [briefNote, setBriefNote] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
+    if (!fullName || !emailAddress) return;
+
+    try {
+      await submitContact({
+        name: fullName,
+        email: emailAddress,
+        phone: phoneNumber,
+        subject: `Admissions Lead: ${program || 'General'} (${mode})`,
+        program,
+        mode,
+        message: briefNote || "Callback requested for course counselling.",
+      }).unwrap();
+
+      setIsSubmitted(true);
+      setFullName("");
+      setPhoneNumber("");
+      setEmailAddress("");
+      setProgram("");
+      setBriefNote("");
+    } catch (err) {
+      console.error("Enquiry Submission Error:", err);
+    }
   };
 
   return (
@@ -105,33 +140,55 @@ export function ContactContent() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-space-sm">
-              <div className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
-                <div className="flex flex-col">
-                  <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-bold mb-1">Centre 01</span>
-                  <h4 className="font-headline-sm text-headline-sm font-bold text-primary mb-space-3xs">Bengaluru</h4>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    Ground &amp; 2nd Floor, Apex Tower, M.G. Road, Bengaluru 560001
-                  </p>
-                </div>
-                <div className="mt-space-md pt-space-xs flex items-center gap-1.5 text-on-surface-variant font-label-sm text-label-sm">
-                  <span className="material-symbols-outlined text-[16px] text-primary">directions_subway</span>
-                  <span>120m from M.G. Road Metro</span>
-                </div>
-              </div>
-              
-              <div className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
-                <div className="flex flex-col">
-                  <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-bold mb-1">Centre 02</span>
-                  <h4 className="font-headline-sm text-headline-sm font-bold text-primary mb-space-3xs">New Delhi</h4>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    Statesman House, Barakhamba Road, Connaught Place, New Delhi 110001
-                  </p>
-                </div>
-                <div className="mt-space-md pt-space-xs flex items-center gap-1.5 text-on-surface-variant font-label-sm text-label-sm">
-                  <span className="material-symbols-outlined text-[16px] text-primary">directions_subway</span>
-                  <span>Direct Barakhamba Gate 4 Access</span>
-                </div>
-              </div>
+              {apiCampuses.length > 0 ? (
+                apiCampuses.map((item: any, idx: number) => (
+                  <div key={item.id} className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
+                    <div className="flex flex-col">
+                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-bold mb-1">Centre 0{idx + 1}</span>
+                      <h4 className="font-headline-sm text-headline-sm font-bold text-primary mb-space-3xs">{item.name}</h4>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant">
+                        {item.address}
+                      </p>
+                    </div>
+                    {item.metroAccess && (
+                      <div className="mt-space-md pt-space-xs flex items-center gap-1.5 text-on-surface-variant font-label-sm text-label-sm">
+                        <span className="material-symbols-outlined text-[16px] text-primary">directions_subway</span>
+                        <span>{item.metroAccess}</span>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <>
+                  <div className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
+                    <div className="flex flex-col">
+                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-bold mb-1">Centre 01</span>
+                      <h4 className="font-headline-sm text-headline-sm font-bold text-primary mb-space-3xs">Bengaluru</h4>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant">
+                        Ground &amp; 2nd Floor, Apex Tower, M.G. Road, Bengaluru 560001
+                      </p>
+                    </div>
+                    <div className="mt-space-md pt-space-xs flex items-center gap-1.5 text-on-surface-variant font-label-sm text-label-sm">
+                      <span className="material-symbols-outlined text-[16px] text-primary">directions_subway</span>
+                      <span>120m from M.G. Road Metro</span>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
+                    <div className="flex flex-col">
+                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-bold mb-1">Centre 02</span>
+                      <h4 className="font-headline-sm text-headline-sm font-bold text-primary mb-space-3xs">New Delhi</h4>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant">
+                        Statesman House, Barakhamba Road, Connaught Place, New Delhi 110001
+                      </p>
+                    </div>
+                    <div className="mt-space-md pt-space-xs flex items-center gap-1.5 text-on-surface-variant font-label-sm text-label-sm">
+                      <span className="material-symbols-outlined text-[16px] text-primary">directions_subway</span>
+                      <span>Direct Barakhamba Gate 4 Access</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           
@@ -156,13 +213,31 @@ export function ContactContent() {
                     <label className="font-label-md text-label-md uppercase tracking-wider text-on-surface font-semibold" htmlFor="fullName">
                       Full Name <span className="text-secondary">*</span>
                     </label>
-                    <input className="w-full bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 rounded text-body-md font-body-md text-on-surface placeholder:text-outline-variant outline-none transition-all duration-150 focus:shadow-inner" id="fullName" name="fullName" placeholder="e.g. Dr. Alistair Menon" required type="text"/>
+                    <input
+                      className="w-full bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 rounded text-body-md font-body-md text-on-surface placeholder:text-outline-variant outline-none transition-all duration-150 focus:shadow-inner"
+                      id="fullName"
+                      name="fullName"
+                      placeholder="e.g. Dr. Alistair Menon"
+                      required
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                    />
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="font-label-md text-label-md uppercase tracking-wider text-on-surface font-semibold" htmlFor="phoneNumber">
                       Phone Number <span className="text-secondary">*</span>
                     </label>
-                    <input className="w-full bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 rounded text-body-md font-body-md text-on-surface placeholder:text-outline-variant outline-none transition-all duration-150 focus:shadow-inner" id="phoneNumber" name="phoneNumber" placeholder="+91 90000 00000" required type="tel"/>
+                    <input
+                      className="w-full bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 rounded text-body-md font-body-md text-on-surface placeholder:text-outline-variant outline-none transition-all duration-150 focus:shadow-inner"
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      placeholder="+91 90000 00000"
+                      required
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                    />
                   </div>
                 </div>
                 
@@ -170,7 +245,16 @@ export function ContactContent() {
                   <label className="font-label-md text-label-md uppercase tracking-wider text-on-surface font-semibold" htmlFor="emailAddress">
                     Email Address <span className="text-secondary">*</span>
                   </label>
-                  <input className="w-full bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 rounded text-body-md font-body-md text-on-surface placeholder:text-outline-variant outline-none transition-all duration-150 focus:shadow-inner" id="emailAddress" name="emailAddress" placeholder="name@organization.com" required type="email"/>
+                  <input
+                    className="w-full bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 rounded text-body-md font-body-md text-on-surface placeholder:text-outline-variant outline-none transition-all duration-150 focus:shadow-inner"
+                    id="emailAddress"
+                    name="emailAddress"
+                    placeholder="name@organization.com"
+                    required
+                    type="email"
+                    value={emailAddress}
+                    onChange={(e) => setEmailAddress(e.target.value)}
+                  />
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-space-md">
@@ -179,7 +263,14 @@ export function ContactContent() {
                       Program of Interest <span className="text-secondary">*</span>
                     </label>
                     <div className="relative">
-                      <select className="w-full appearance-none bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 pr-10 rounded text-body-md font-body-md text-on-surface outline-none transition-all duration-150 cursor-pointer" id="program" name="program" required defaultValue="">
+                      <select
+                        className="w-full appearance-none bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 pr-10 rounded text-body-md font-body-md text-on-surface outline-none transition-all duration-150 cursor-pointer"
+                        id="program"
+                        name="program"
+                        required
+                        value={program}
+                        onChange={(e) => setProgram(e.target.value)}
+                      >
                         <option disabled value="">Select curriculum pathway</option>
                         <option value="spoken-english">Spoken English Mastery</option>
                         <option value="interview-skills">Executive Interview &amp; Pitching Skills</option>
@@ -197,13 +288,13 @@ export function ContactContent() {
                       Preferred Mode <span className="text-secondary">*</span>
                     </label>
                     <div className="grid grid-cols-2 gap-2 h-[48px]">
-                      <label className="flex items-center justify-center gap-2 bg-surface-container-low has-[:checked]:bg-primary has-[:checked]:text-on-primary rounded cursor-pointer transition-all duration-150 px-2">
-                        <input defaultChecked className="sr-only" name="mode" type="radio" value="campus"/>
+                      <label className={`flex items-center justify-center gap-2 rounded cursor-pointer transition-all duration-150 px-2 ${mode === 'campus' ? 'bg-primary text-on-primary' : 'bg-surface-container-low'}`}>
+                        <input className="sr-only" name="mode" type="radio" value="campus" checked={mode === 'campus'} onChange={() => setMode('campus')}/>
                         <span className="material-symbols-outlined text-[18px]">domain</span>
                         <span className="font-label-md text-label-md uppercase tracking-wider font-semibold">Campus</span>
                       </label>
-                      <label className="flex items-center justify-center gap-2 bg-surface-container-low has-[:checked]:bg-primary has-[:checked]:text-on-primary rounded cursor-pointer transition-all duration-150 px-2">
-                        <input className="sr-only" name="mode" type="radio" value="online"/>
+                      <label className={`flex items-center justify-center gap-2 rounded cursor-pointer transition-all duration-150 px-2 ${mode === 'online' ? 'bg-primary text-on-primary' : 'bg-surface-container-low'}`}>
+                        <input className="sr-only" name="mode" type="radio" value="online" checked={mode === 'online'} onChange={() => setMode('online')}/>
                         <span className="material-symbols-outlined text-[18px]">videocam</span>
                         <span className="font-label-md text-label-md uppercase tracking-wider font-semibold">Online Live</span>
                       </label>
@@ -215,12 +306,24 @@ export function ContactContent() {
                   <label className="font-label-md text-label-md uppercase tracking-wider text-on-surface font-semibold" htmlFor="briefNote">
                     Brief Note or Current Communication Challenge
                   </label>
-                  <textarea className="w-full bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 rounded text-body-md font-body-md text-on-surface placeholder:text-outline-variant outline-none transition-all duration-150 resize-none focus:shadow-inner" id="briefNote" name="briefNote" placeholder="Share your current focus areas (e.g. stage fright, accent modulation, executive presentations, C-suite interviewing)..." rows={4}></textarea>
+                  <textarea
+                    className="w-full bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 rounded text-body-md font-body-md text-on-surface placeholder:text-outline-variant outline-none transition-all duration-150 resize-none focus:shadow-inner"
+                    id="briefNote"
+                    name="briefNote"
+                    placeholder="Share your current focus areas..."
+                    rows={4}
+                    value={briefNote}
+                    onChange={(e) => setBriefNote(e.target.value)}
+                  ></textarea>
                 </div>
                 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-space-sm pt-space-xs">
-                  <button className="inline-flex items-center justify-center gap-2 bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-md text-label-md uppercase tracking-widest px-8 py-3.5 rounded-lg transition-colors duration-150 shadow-sm" type="submit">
-                    <span>Send Enquiry</span>
+                  <button
+                    disabled={isSubmitting}
+                    className="inline-flex items-center justify-center gap-2 bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-md text-label-md uppercase tracking-widest px-8 py-3.5 rounded-lg transition-colors duration-150 shadow-sm disabled:opacity-50"
+                    type="submit"
+                  >
+                    <span>{isSubmitting ? "Sending..." : "Send Enquiry"}</span>
                     <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                   </button>
                   <div className="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">

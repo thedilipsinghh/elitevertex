@@ -6,8 +6,8 @@ dotenv.config();
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   PORT: z.coerce.number().default(5000),
-  DATABASE_URL: z.string().url(),
-  JWT_ACCESS_SECRET: z.string().min(10),
+  DATABASE_URL: z.string().optional(),
+  JWT_ACCESS_SECRET: z.string().min(10).default("super_secret_jwt_access_key_default_32chars"),
   JWT_REFRESH_SECRET: z.string().min(10).optional(),
   JWT_ACCESS_EXPIRATION: z.string().default("15m"),
   JWT_REFRESH_EXPIRATION: z.string().default("7d"),
@@ -18,7 +18,7 @@ const envSchema = z.object({
   ADMIN_PASS: z.string().optional(),
   EMAIL_PASS: z.string().optional(),
   EMAIL_FROM: z.string().email().optional(),
-  FRONTEND_URL: z.string().url().default("http://localhost:3000"),
+  FRONTEND_URL: z.string().default("http://localhost:3000"),
 });
 
 const _env = envSchema.safeParse(process.env);

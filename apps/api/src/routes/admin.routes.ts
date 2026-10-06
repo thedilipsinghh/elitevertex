@@ -17,4 +17,16 @@ router.post("/gallery", adminCtrl.createGalleryItem);
 router.patch("/gallery/:id", adminCtrl.updateGalleryItem);
 router.delete("/gallery/:id", adminCtrl.deleteGalleryItem);
 
+// CMS: FAQs
+router.get("/faqs", adminCtrl.getAdminFaqs);
+router.post("/faqs", adminCtrl.createFaq);
+router.patch("/faqs/:id", adminCtrl.updateFaq);
+router.delete("/faqs/:id", adminCtrl.deleteFaq);
+
+// CMS: Testimonials (Reviews)
+router.get("/testimonials", adminCtrl.getAdminTestimonials);
+router.post("/testimonials", adminCtrl.createTestimonial);
+router.patch("/testimonials/:id", adminCtrl.updateTestimonial);
+router.delete("/testimonials/:id", adminCtrl.deleteTestimonial);
+
 export default router;

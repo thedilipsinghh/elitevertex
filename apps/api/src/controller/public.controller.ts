@@ -7,7 +7,7 @@ export const getCourses = async (req: Request, res: Response, next: NextFunction
   try {
     const activeCourses = await db.query.courses.findMany({
       where: sql`status = 'active'`,
-      orderBy: (courses, { asc }) => [asc(courses.sortOrder)],
+      orderBy: (courses: any, { asc }: any) => [asc(courses.sortOrder)],
       with: {
         modules: true
       }

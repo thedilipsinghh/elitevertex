@@ -2,11 +2,59 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useGetFaqsQuery, useGetTestimonialsQuery, useGetGalleryQuery } from "@/lib/features/api/apiSlice";
 
 export function HomeContent() {
-  const [openFaqId, setOpenFaqId] = useState<number | null>(null);
+  const [openFaqId, setOpenFaqId] = useState<string | number | null>(null);
 
-  const toggleFaq = (id: number) => {
+  const { data: faqResponse } = useGetFaqsQuery({});
+  const { data: testimonialsResponse } = useGetTestimonialsQuery({});
+  const { data: galleryResponse } = useGetGalleryQuery({});
+
+  const apiFaqs = faqResponse?.data || [];
+  const apiTestimonials = testimonialsResponse?.data || [];
+  const apiGallery = galleryResponse?.data || [];
+
+  // Fallback defaults if database tables are empty
+  const defaultFaqs = [
+    {
+      id: 1,
+      question: "I have extreme hesitation speaking in public. Can I join?",
+      answer: "Over 85% of our learners arrive with stage hesitation. Our introductory week uses gradual speech exposure within 12-person cohorts, removing pressure completely before public speech modules begin."
+    },
+    {
+      id: 2,
+      question: "What is the batch size and duration?",
+      answer: "Batches are hard-capped at 12 participants. Cohorts run 4 to 8 weeks with both weekday evening and weekend intensive options available across campuses."
+    },
+    {
+      id: 3,
+      question: "Is the certificate recognized across corporations?",
+      answer: "Yes. Certificates bear the Council for Executive Speech and Oratory accreditation and unique digital cryptographic verification hashes recognized by top MNC recruiters."
+    }
+  ];
+
+  const defaultTestimonials = [
+    {
+      id: "1",
+      name: "Rohan Varma",
+      role: "Corporate Executive",
+      message: "Elite Vertex completely transformed my presentation skills. I went from avoiding team meetings to delivering keynote speeches at our annual summit.",
+      rating: 5
+    },
+    {
+      id: "2",
+      name: "Priya Sundaram",
+      role: "MBA Candidate",
+      message: "The micro-cohort format gave me the personal attention I needed. The GD and interview preparation helped me crack my top dream job!",
+      rating: 5
+    }
+  ];
+
+  const faqsList = apiFaqs.length > 0 ? apiFaqs : defaultFaqs;
+  const testimonialsList = apiTestimonials.length > 0 ? apiTestimonials : defaultTestimonials;
+
+  const toggleFaq = (id: string | number) => {
     setOpenFaqId(openFaqId === id ? null : id);
   };
 
@@ -280,9 +328,35 @@ export function HomeContent() {
         </div>
       </section>
 
-      {/* SECTION 7: UNIFIED PREVIEW (Gallery, Certificate Verification, FAQ Highlight) */}
+      {/* SECTION 7: UNIFIED PREVIEW (Gallery, Reviews & Testimonials, Certificate Verification, FAQ Highlight) */}
       <section className="w-full bg-surface py-space-3xl">
         <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
+          {/* DYNAMIC TESTIMONIALS / REVIEWS CAROUSEL STRIP */}
+          <div className="mb-space-2xl">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-space-lg gap-space-sm">
+              <div>
+                <span className="font-label-md text-label-md uppercase tracking-widest text-secondary font-semibold mb-space-3xs block">Learner Transformations</span>
+                <h2 className="font-headline-lg text-headline-lg text-primary tracking-tight">
+                  What Our Alumni Say
+                </h2>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+              {testimonialsList.map((item: any) => (
+                <div key={item.id} className="bg-surface-container-lowest p-space-lg rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-space-xs">
+                      <h3 className="font-headline-sm text-headline-sm text-primary">{item.name}</h3>
+                      <span className="text-secondary text-body-md font-bold">{"★".repeat(item.rating || 5)}</span>
+                    </div>
+                    <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block mb-space-sm">{item.role}</span>
+                    <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">"{item.message}"</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
             {/* Gallery & Certificate Column */}
             <div className="lg:col-span-6 flex flex-col gap-space-lg">
@@ -298,15 +372,25 @@ export function HomeContent() {
                   </Link>
                 </div>
                 <div className="grid grid-cols-3 gap-space-xs">
-                  <div className="rounded overflow-hidden aspect-square bg-surface-container">
-                    <img alt="Close-up candid documentary photo of an adult learner giving a mock speech behind a sleek lectern in an executive communication center" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQa0GsC_Z4AgP4E_1nZyj-4yONayc1wren5BeGnQSL9pfSXmpR0v6biBPKubc9evuj0AUgFoVTLRvZxv-NFzsXaCnzBYQGaCOmIgx7sSlG24YfI5lz6gBaELaoEgj_Iv7U-GhY8ozQQ4vMROM_ppT862kcCh-MedyKG64BD6N4GswnXwuWPM70R3CHL8DhN5j6x_D_seA81raG2WzUISKsZZMdLeYWT4k7K6-xjB0a5iGcmPG1srLAxQ"/>
-                  </div>
-                  <div className="rounded overflow-hidden aspect-square bg-surface-container">
-                    <img alt="Small group of diverse corporate trainees engaged in earnest discussion around an oak table in a modern learning library" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpLPHxd52Ac_nm48VO_HNke-GjvWNmhF-3vger-g_toKK2DxOWbacOhNQIPkkLhX6AGWbaGx158-I5fzwlU0Uc3q-HS8ztBFFVqIrSswq55iufTWB85v8IGTqwT1Jh9mLQ0p5MveOXmQPob8Ah9eNQw1vaZ-fhpNnNJx7MKwdFI8Sm9-oIKqzXZvLmpYh4PhSkr0TO5c6zNi_UUL2GkDJqftg-6wXgK-7nwNzTSPHVjcDa2J0p2yQ0PQ"/>
-                  </div>
-                  <div className="rounded overflow-hidden aspect-square bg-surface-container">
-                    <img alt="Speech faculty mentor reviewing an analytical articulation progress chart with an enrolled professional on a laptop screen" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAH_Yl3vspv6gyyZ4oijSuVywpUbBo2oAKlNRgBpm9nWe4Q9EHFasAmAVNT4uZpa9P2jYfxFwOIjLZMZVHyGuZMhjK7obOlkfQrzJqW1AhdaE01fi-A-2TiVqZh78vDHpNU6DduHBvgPg61pcHVuNER0rdERr0fhTa1Sw9SCHVBlNyMWm7zsMJcHxmNFhBTiTwKBvucN5W6labwB8GXTZbTorqAOwPaNZ6Pd9ygQSUAXMc4YECWNzKt1w"/>
-                  </div>
+                  {apiGallery.length >= 3 ? (
+                    apiGallery.slice(0, 3).map((item: any) => (
+                      <div key={item.id} className="rounded overflow-hidden aspect-square bg-surface-container">
+                        <img alt={item.title || "Gallery photo"} className="w-full h-full object-cover" src={item.image} />
+                      </div>
+                    ))
+                  ) : (
+                    <>
+                      <div className="rounded overflow-hidden aspect-square bg-surface-container">
+                        <img alt="Documentary photo of learner behind podium" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQa0GsC_Z4AgP4E_1nZyj-4yONayc1wren5BeGnQSL9pfSXmpR0v6biBPKubc9evuj0AUgFoVTLRvZxv-NFzsXaCnzBYQGaCOmIgx7sSlG24YfI5lz6gBaELaoEgj_Iv7U-GhY8ozQQ4vMROM_ppT862kcCh-MedyKG64BD6N4GswnXwuWPM70R3CHL8DhN5j6x_D_seA81raG2WzUISKsZZMdLeYWT4k7K6-xjB0a5iGcmPG1srLAxQ"/>
+                      </div>
+                      <div className="rounded overflow-hidden aspect-square bg-surface-container">
+                        <img alt="Corporate trainees in discussion" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpLPHxd52Ac_nm48VO_HNke-GjvWNmhF-3vger-g_toKK2DxOWbacOhNQIPkkLhX6AGWbaGx158-I5fzwlU0Uc3q-HS8ztBFFVqIrSswq55iufTWB85v8IGTqwT1Jh9mLQ0p5MveOXmQPob8Ah9eNQw1vaZ-fhpNnNJx7MKwdFI8Sm9-oIKqzXZvLmpYh4PhSkr0TO5c6zNi_UUL2GkDJqftg-6wXgK-7nwNzTSPHVjcDa2J0p2yQ0PQ"/>
+                      </div>
+                      <div className="rounded overflow-hidden aspect-square bg-surface-container">
+                        <img alt="Speech faculty mentor reviewing progress" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAH_Yl3vspv6gyyZ4oijSuVywpUbBo2oAKlNRgBpm9nWe4Q9EHFasAmAVNT4uZpa9P2jYfxFwOIjLZMZVHyGuZMhjK7obOlkfQrzJqW1AhdaE01fi-A-2TiVqZh78vDHpNU6DduHBvgPg61pcHVuNER0rdERr0fhTa1Sw9SCHVBlNyMWm7zsMJcHxmNFhBTiTwKBvucN5W6labwB8GXTZbTorqAOwPaNZ6Pd9ygQSUAXMc4YECWNzKt1w"/>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
               {/* Certificate Verification Card */}
@@ -339,36 +423,17 @@ export function HomeContent() {
                 </div>
                 {/* Accordion items with inline interactive disclosure */}
                 <div className="flex flex-col gap-space-xs">
-                  {/* FAQ 1 */}
-                  <div className="bg-surface-container-low rounded-lg p-space-md transition-all cursor-pointer" onClick={() => toggleFaq(1)}>
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-label-md text-label-md uppercase tracking-wider text-primary font-semibold">I have extreme hesitation speaking in public. Can I join?</h4>
-                      <span className={`material-symbols-outlined text-[18px] text-on-surface-variant transition-transform duration-200 ${openFaqId === 1 ? 'rotate-180' : ''}`}>expand_more</span>
+                  {faqsList.map((item: any) => (
+                    <div key={item.id} className="bg-surface-container-low rounded-lg p-space-md transition-all cursor-pointer" onClick={() => toggleFaq(item.id)}>
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-label-md text-label-md uppercase tracking-wider text-primary font-semibold">{item.question}</h4>
+                        <span className={`material-symbols-outlined text-[18px] text-on-surface-variant transition-transform duration-200 ${openFaqId === item.id ? 'rotate-180' : ''}`}>expand_more</span>
+                      </div>
+                      <div className={`mt-space-2xs font-body-sm text-body-sm text-on-surface-variant leading-relaxed ${openFaqId === item.id ? 'block' : 'hidden'}`}>
+                        {item.answer}
+                      </div>
                     </div>
-                    <div className={`mt-space-2xs font-body-sm text-body-sm text-on-surface-variant leading-relaxed ${openFaqId === 1 ? 'block' : 'hidden'}`}>
-                      Over 85% of our learners arrive with stage hesitation. Our introductory week uses gradual speech exposure within 12-person cohorts, removing pressure completely before public speech modules begin.
-                    </div>
-                  </div>
-                  {/* FAQ 2 */}
-                  <div className="bg-surface-container-low rounded-lg p-space-md transition-all cursor-pointer" onClick={() => toggleFaq(2)}>
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-label-md text-label-md uppercase tracking-wider text-primary font-semibold">What is the batch size and duration?</h4>
-                      <span className={`material-symbols-outlined text-[18px] text-on-surface-variant transition-transform duration-200 ${openFaqId === 2 ? 'rotate-180' : ''}`}>expand_more</span>
-                    </div>
-                    <div className={`mt-space-2xs font-body-sm text-body-sm text-on-surface-variant leading-relaxed ${openFaqId === 2 ? 'block' : 'hidden'}`}>
-                      Batches are hard-capped at 12 participants. Cohorts run 4 to 8 weeks with both weekday evening and weekend intensive options available across campuses.
-                    </div>
-                  </div>
-                  {/* FAQ 3 */}
-                  <div className="bg-surface-container-low rounded-lg p-space-md transition-all cursor-pointer" onClick={() => toggleFaq(3)}>
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-label-md text-label-md uppercase tracking-wider text-primary font-semibold">Is the certificate recognized across corporations?</h4>
-                      <span className={`material-symbols-outlined text-[18px] text-on-surface-variant transition-transform duration-200 ${openFaqId === 3 ? 'rotate-180' : ''}`}>expand_more</span>
-                    </div>
-                    <div className={`mt-space-2xs font-body-sm text-body-sm text-on-surface-variant leading-relaxed ${openFaqId === 3 ? 'block' : 'hidden'}`}>
-                      Yes. Certificates bear the Council for Executive Speech and Oratory accreditation and unique digital cryptographic verification hashes recognized by top MNC recruiters.
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>

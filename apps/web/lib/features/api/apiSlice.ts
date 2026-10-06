@@ -6,12 +6,24 @@ export const apiSlice = createApi({
     baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1',
     credentials: 'include',
   }),
-  tagTypes: ['Courses', 'Course'],
+  tagTypes: ['Courses', 'Course', 'Gallery', 'Testimonials', 'Faqs'],
   endpoints: (builder) => ({
     // Public Endpoints
     getCourses: builder.query({
       query: () => '/courses',
       providesTags: ['Courses'],
+    }),
+    getGallery: builder.query({
+      query: () => '/gallery',
+      providesTags: ['Gallery'],
+    }),
+    getTestimonials: builder.query({
+      query: () => '/testimonials',
+      providesTags: ['Testimonials'],
+    }),
+    getFaqs: builder.query({
+      query: () => '/faqs',
+      providesTags: ['Faqs'],
     }),
 
     // Admin Endpoints
@@ -43,6 +55,48 @@ export const apiSlice = createApi({
       invalidatesTags: ['Courses'],
     }),
 
+    // Admin FAQ Endpoints
+    getAdminFaqs: builder.query({
+      query: () => '/admin/faqs',
+      providesTags: ['Faqs'],
+    }),
+    createFaq: builder.mutation({
+      query: (body) => ({
+        url: '/admin/faqs',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Faqs'],
+    }),
+    deleteFaq: builder.mutation({
+      query: (id) => ({
+        url: `/admin/faqs/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Faqs'],
+    }),
+
+    // Admin Testimonial Endpoints
+    getAdminTestimonials: builder.query({
+      query: () => '/admin/testimonials',
+      providesTags: ['Testimonials'],
+    }),
+    createTestimonial: builder.mutation({
+      query: (body) => ({
+        url: '/admin/testimonials',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Testimonials'],
+    }),
+    deleteTestimonial: builder.mutation({
+      query: (id) => ({
+        url: `/admin/testimonials/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Testimonials'],
+    }),
+
     // Auth Endpoints
     login: builder.mutation({
       query: (credentials) => ({
@@ -56,9 +110,18 @@ export const apiSlice = createApi({
 
 export const {
   useGetCoursesQuery,
+  useGetGalleryQuery,
+  useGetTestimonialsQuery,
+  useGetFaqsQuery,
   useGetAdminCoursesQuery,
   useCreateCourseMutation,
   useUpdateCourseMutation,
   useDeleteCourseMutation,
+  useGetAdminFaqsQuery,
+  useCreateFaqMutation,
+  useDeleteFaqMutation,
+  useGetAdminTestimonialsQuery,
+  useCreateTestimonialMutation,
+  useDeleteTestimonialMutation,
   useLoginMutation,
 } = apiSlice;

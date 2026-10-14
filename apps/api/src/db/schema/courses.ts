@@ -1,4 +1,5 @@
 import { pgTable, uuid, varchar, text, timestamp, integer, pgEnum, boolean } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 
 export const courseStatusEnum = pgEnum("course_status", ["active", "draft"]);
 
@@ -32,3 +33,16 @@ export const courseModules = pgTable("course_modules", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+// Relations — required for db.query relational API (with: { modules: true })
+export const coursesRelations = relations(courses, ({ many }) => ({
+  modules: many(courseModules),
+}));
+
+export const courseModulesRelations = relations(courseModules, ({ one }) => ({
+  course: one(courses, {
+    fields: [courseModules.courseId],
+    references: [courses.id],
+  }),
+}));
+

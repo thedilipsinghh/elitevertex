@@ -58,11 +58,11 @@ export default function CourseForm({ initialData, isEdit }: CourseFormProps) {
     fd.append("image", file);
 
     try {
-      // Direct fetch to upload endpoint, ensure cookies are sent if needed
-      const res = await fetch("http://localhost:5000/api/v1/admin/upload", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+      const res = await fetch(`${apiUrl}/admin/upload`, {
         method: "POST",
         body: fd,
-        // credentials: "include" // Adjust based on cors config
+        credentials: "include",
       });
       const json = await res.json();
       if (json.success) {

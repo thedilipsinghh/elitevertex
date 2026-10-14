@@ -8,20 +8,25 @@ import { errorHandler } from "./middleware/error.middleware";
 
 const app = express();
 
+// Allowed origins — local dev + production frontend
+const ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  env.FRONTEND_URL, // https://elitevertex-web.vercel.app
+].filter(Boolean) as string[];
+
 // Middleware
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (
-      origin === env.FRONTEND_URL ||
-      origin.endsWith(".vercel.app") ||
-      process.env.NODE_ENV !== "production"
-    ) {
+    // Allow server-to-server (no origin) and all allowed origins
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
       return callback(null, true);
     }
-    return callback(null, true);
+    return callback(new Error(`CORS: origin '${origin}' not allowed`));
   },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
 }));
 app.use(express.json());
 app.use(cookieParser());

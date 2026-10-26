@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import React from "react";
+import { useGetFaqsQuery } from "@/lib/features/api/apiSlice";
+
 
 const faqData = [
   {
@@ -113,21 +115,24 @@ export function FaqContent() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
+const { data: faqResponse, isLoading, error } = useGetFaqsQuery({});
+  const faqData = faqResponse?.data || [];
 
   const toggleFaq = (id: string) => {
     setOpenId(openId === id ? null : id);
   };
 
-  const filteredFaqs = faqData.filter(faq => {
-    const matchesCategory = activeCategory === "all" || faq.categories.includes(activeCategory);
+  const filteredFaqs = faqData.filter((faq: any) => {
+    const matchesCategory = activeCategory === "all" || (faq.categories ?? []).includes(activeCategory);
     
     const query = searchQuery.toLowerCase();
     const matchesSearch = !query || 
       faq.question.toLowerCase().includes(query) || 
-      faq.rawText.toLowerCase().includes(query);
-      
+      faq.answer?.props?.children?.toString().toLowerCase().includes(query);
     return matchesCategory && matchesSearch;
   });
+      
+
 
   return (
     <div className="flex flex-col w-full">
@@ -224,35 +229,41 @@ export function FaqContent() {
           
           {/* Right Column: Accordion Items */}
           <div className="lg:col-span-8 flex flex-col">
-            {filteredFaqs.map((faq) => {
-              const isOpen = openId === faq.id;
-              
-              return (
-                <article key={faq.id} className="group bg-surface-container-lowest rounded shadow-sm mb-space-xs transition-colors">
-                  <button 
-                    aria-expanded={isOpen} 
-                    className="w-full px-space-md py-space-md text-left flex items-start justify-between gap-space-sm" 
-                    type="button"
-                    onClick={() => toggleFaq(faq.id)}
-                  >
-                    <div className="flex items-start gap-space-sm">
-                      <span className="font-label-md text-label-md text-on-surface-variant/50 pt-0.5 select-none shrink-0">{faq.id}</span>
-                      <h2 className={`font-headline-sm text-headline-sm transition-colors ${isOpen ? 'text-primary' : 'text-on-surface group-hover:text-primary'}`}>
-                        {faq.question}
-                      </h2>
-                    </div>
-                    <span className={`material-symbols-outlined text-on-surface-variant text-[22px] transition-transform duration-200 shrink-0 mt-0.5 ${isOpen ? 'rotate-180' : ''}`}>
-                      expand_more
-                    </span>
-                  </button>
-                  <div className={`px-space-md pb-space-md pl-[calc(1.5rem+1.5rem)] ${isOpen ? 'block' : 'hidden'}`}>
-                    <div className="pt-space-2xs text-on-surface-variant font-body-md text-body-md leading-relaxed">
-                      {faq.answer}
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+            {isLoading ? (
+  <div className="grid gap-4">
+    {Array.from({ length: 3 }).map((_, i) => (
+      <div key={i} className="border-b pb-4 animate-pulse">
+        <div className="h-5 bg-surface-container-low rounded w-3/4 mb-2"></div>
+        <div className="h-4 bg-surface-container-low rounded w-full"></div>
+      </div>
+    ))}
+  </div>
+) : (
+  filteredFaqs.map((faq: any) => {
+    const isOpen = openId === faq.id;
+    return (
+      <article key={faq.id} className="group bg-surface-container-lowest rounded shadow-sm mb-space-xs transition-colors">
+        <button
+          aria-expanded={isOpen}
+          className="w-full px-space-md py-space-md text-left flex items-start justify-between gap-space-sm"
+          type="button"
+          onClick={() => toggleFaq(faq.id)}
+        >
+          <div className="flex items-start gap-space-sm">
+            <span className="font-label-md text-label-md text-on-surface-variant/50 pt-0.5 select-none shrink-0">{faq.id}</span>
+            <h2 className={`font-headline-sm text-headline-sm transition-colors ${isOpen ? 'text-primary' : 'text-on-surface group-hover:text-primary'}`}>
+              {faq.question}
+            </h2>
+          </div>
+          <span className={`material-symbols-outlined text-on-surface-variant text-[22px] transition-transform duration-200 shrink-0 mt-0.5 ${isOpen ? 'rotate-180' : ''}`}>expand_more</span>
+        </button>
+        <div className={`px-space-md pb-space-md pl-[calc(1.5rem+1.5rem)] ${isOpen ? 'block' : 'hidden'}`}>
+          <div className="pt-space-2xs text-on-surface-variant font-body-md text-body-md leading-relaxed">{faq.answer}</div>
+        </div>
+      </article>
+    );
+  })
+)}
 
             {/* No Results Fallback State */}
             {filteredFaqs.length === 0 && (

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useGetAboutPageQuery, useGetMentorsQuery } from "@/lib/features/api/apiSlice";
 
 export function AboutContent() {
@@ -10,6 +9,41 @@ export function AboutContent() {
 
   const aboutData = aboutResponse?.data || {};
   const mentorsList = mentorsResponse?.data || [];
+
+  // Parse extra structured data from paradigmParagraph3 if present
+  let extra: any = {};
+  if (aboutData?.paradigmParagraph3) {
+    try {
+      if (typeof aboutData.paradigmParagraph3 === "string" && aboutData.paradigmParagraph3.trim().startsWith("{")) {
+        extra = JSON.parse(aboutData.paradigmParagraph3);
+      }
+    } catch {
+      // not JSON; ignored
+    }
+  }
+
+  const defaultWhyUsItems = [
+    { icon: "school", title: "Practical Learning", description: "Learn by doing with hands-on speech drills & live practice." },
+    { icon: "record_voice_over", title: "Roleplay Training", description: "Real-world workplace simulations & public stage practice." },
+    { icon: "group", title: "Expert Mentors", description: "Learn from experienced speech coaches & linguists." },
+    { icon: "groups", title: "Small Batches", description: "Personalized attention and individual vocal diagnostic feedback." },
+    { icon: "verified", title: "Verifiable Certificate", description: "Get an ISO 9001:2015 accredited certificate for career growth." },
+    { icon: "work", title: "Career Support", description: "Interview preparation, presentation skills, & placement guidance." },
+  ];
+
+  const whyUsItems = extra?.whyUsItems && Array.isArray(extra.whyUsItems) && extra.whyUsItems.length > 0
+    ? extra.whyUsItems
+    : defaultWhyUsItems;
+
+  const defaultFacilities = [
+    { icon: "graphic_eq", title: "Acoustic Pods", description: "Soundproof chambers for speech recording and feedback." },
+    { icon: "videocam", title: "HD Playback Labs", description: "Dual-camera video review for posture and body language." },
+    { icon: "meeting_room", title: "Executive Studios", description: "Roundtable chambers configured for authentic boardroom practice." },
+  ];
+
+  const facilities = extra?.facilities && Array.isArray(extra.facilities) && extra.facilities.length > 0
+    ? extra.facilities
+    : defaultFacilities;
 
   const leadMentor = mentorsList[0] || {
     name: "Dr. Meenakshi Sundaram",
@@ -21,265 +55,264 @@ export function AboutContent() {
   };
 
   return (
-    <div className="flex flex-col w-full">
-      {/* 1. Compact Editorial Header */}
-      <section className="w-full bg-surface-container-lowest">
-        <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop py-space-xl lg:py-space-2xl">
-          <div className="max-w-3xl flex flex-col gap-space-2xs">
-            <div className="flex items-center gap-space-xs">
-              <span className="w-2 h-2 rounded-full bg-secondary"></span>
-              <span className="font-label-md text-label-md uppercase tracking-widest text-secondary">About Elite Vertex</span>
+    <div className="flex flex-col w-full font-sans bg-background text-foreground">
+      
+      {/* 1. HERO BANNER SECTION */}
+      <section className="w-full bg-background py-12 lg:py-16 border-b border-outline-variant/20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="max-w-3xl flex flex-col gap-3">
+            <div className="inline-block text-secondary font-bold tracking-widest text-xs uppercase mb-1">
+              {extra.headerBadge || "ABOUT ELITE VERTEX"}
             </div>
-            <h1 className="font-display text-headline-lg-mobile md:text-headline-lg lg:text-display text-on-surface tracking-tight leading-[1.08] mt-space-3xs">
-              {aboutData.headerTitle || "More Than English. We Build Confidence."}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
+              {aboutData.headerTitle || "Empowering Communicators & Future Leaders"}
             </h1>
-            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mt-space-xs">
-              {aboutData.headerSubtitle || "Founded on the conviction that spoken language is mastered through psychological safety, active voice mechanics, and deliberate physical practice."}
+            <p className="text-muted-foreground text-base sm:text-lg leading-relaxed mt-2 font-normal">
+              {aboutData.headerSubtitle || "Learn more about Elite Vertex Institute, our mission, vision, and the expert mentors guiding our students towards executive confidence and oral fluency."}
             </p>
           </div>
         </div>
       </section>
 
-      {/* 2. Our Story */}
-      <section className="w-full bg-surface py-space-2xl lg:py-space-3xl">
-        <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
-            {/* Left Column Narrative */}
-            <div className="lg:col-span-6 flex flex-col gap-space-md pr-0 lg:pr-space-md">
-              <div className="flex items-center gap-space-xs">
-                <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">01 / Origin &amp; Paradigm</span>
+      {/* 2. VISION & MISSION SECTION */}
+      <section className="py-16 lg:py-24 bg-surface-container-low/60 border-b border-outline-variant/20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
+            
+            {/* Left Header */}
+            <div className="lg:col-span-1">
+              <span className="text-secondary font-bold text-xs uppercase tracking-widest block mb-2">
+                {extra.purposeLabel || "INSTITUTIONAL PURPOSE"}
+              </span>
+              <h2 className="text-3xl lg:text-4xl font-extrabold text-foreground leading-tight">
+                {extra.purposeTitle || "Our Vision & Mission"}
+              </h2>
+            </div>
+
+            {/* Right 2-Card Grid */}
+            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+              
+              {/* Our Vision Card */}
+              <div className="bg-secondary/5 border border-secondary/20 rounded-3xl p-8 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-14 h-14 bg-surface-container-lowest rounded-full flex items-center justify-center border border-outline-variant/40 shadow-sm shrink-0">
+                  <span className="material-symbols-outlined text-secondary text-[26px]">
+                    visibility
+                  </span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground mb-2">
+                    {aboutData.visionTitle || "Our Vision"}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed font-normal">
+                    {aboutData.visionBody || "To be a premier communication institute that empowers individuals with practical fluency, vocal confidence, and executive presence for global career success."}
+                  </p>
+                </div>
               </div>
-              <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight">
+
+              {/* Our Mission Card */}
+              <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-3xl p-8 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-14 h-14 bg-surface-container-lowest rounded-full flex items-center justify-center border border-outline-variant/40 shadow-sm shrink-0">
+                  <span className="material-symbols-outlined text-secondary text-[26px]">
+                    ads_click
+                  </span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground mb-2">
+                    {aboutData.missionTitle || "Our Mission"}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed font-normal">
+                    {aboutData.missionBody || "To deliver high-impact, practical training through expert mentors, real-world simulations, and personalized feedback to transform speakers into confident leaders."}
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. WHY CHOOSE ELITE VERTEX 6-CARD GRID */}
+      <section className="py-16 lg:py-24 bg-background">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="text-secondary font-bold text-xs uppercase tracking-widest block mb-2">
+              {extra.whyUsLabel || "WHY US"}
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground">
+              {extra.whyUsTitle || "Why Choose Elite Vertex?"}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:grid-cols-6 gap-6">
+            {whyUsItems.map((item: any, idx: number) => (
+              <div key={idx} className="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl text-center flex flex-col items-center p-6 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all">
+                <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-5 border border-secondary/20">
+                  <span className="material-symbols-outlined text-secondary text-[24px]">
+                    {item.icon || "school"}
+                  </span>
+                </div>
+                <h3 className="font-bold text-sm text-foreground mb-2">{item.title}</h3>
+                <p className="text-muted-foreground text-xs leading-relaxed font-medium">
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. INSTITUTIONAL STORY & AIRTIME STATS SECTION */}
+      <section className="py-16 lg:py-24 bg-surface-container-low/60 border-t border-outline-variant/20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            <div className="lg:col-span-6 flex flex-col gap-6">
+              <span className="text-xs font-bold uppercase tracking-widest text-secondary">
+                {extra.storyLabel || "01 / ORIGIN & PARADIGM"}
+              </span>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-foreground tracking-tight">
                 {aboutData.paradigmTitle || "Fluency is a physical and psychological habit."}
               </h2>
-              <div className="flex flex-col gap-space-sm text-on-surface-variant font-body-md text-body-md">
+              
+              <div className="flex flex-col gap-4 text-muted-foreground text-sm sm:text-base leading-relaxed font-normal">
                 <p>
-                  {aboutData.paradigmParagraph1 || "Traditional language pedagogy treats communication as a silent written exercise. For decades, classrooms across India drilled parsing syntax, memorizing verb tenses, and filling blanks—leaving adult professionals articulate on paper, yet gripped with crippling hesitation the moment they speak."}
+                  {aboutData.paradigmParagraph1 || "Traditional language learning treats spoken communication as a silent written test. Classrooms drilled parsing syntax and memorizing grammar rules—leaving professionals articulate on paper, yet hesitant when speaking."}
                 </p>
                 <p>
-                  {aboutData.paradigmParagraph2 || "Elite Vertex was founded to reverse this obsolete hierarchy. Language fluency is not theoretical knowledge; it is muscular conditioning and nervous system calibration. Under sustained acoustic guidance, vocal cord hesitation dissolves only when students are liberated from fear of judgment."}
+                  {aboutData.paradigmParagraph2 || "Elite Vertex was created to change this paradigm. Fluency is not theoretical knowledge; it is vocal muscle conditioning and confidence. Under acoustic guidance, speech hesitation dissolves when students are liberated from fear of judgment."}
                 </p>
               </div>
-              <div className="pt-space-xs flex items-center gap-space-lg">
+
+              <div className="pt-2 flex items-center gap-8">
                 <div className="flex flex-col">
-                  <span className="font-headline-md text-headline-md text-primary font-bold">{aboutData.airtimeStat || "70%"}</span>
-                  <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Acoustic Airtime Per Learner</span>
+                  <span className="text-3xl font-extrabold text-primary">{aboutData.airtimeStat || "70%"}</span>
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-1">
+                    {extra.airtimeLabel || "Acoustic Airtime Per Learner"}
+                  </span>
                 </div>
-                <div className="w-px h-10 bg-surface-container-highest"></div>
+                <div className="w-px h-10 bg-outline-variant/40"></div>
                 <div className="flex flex-col">
-                  <span className="font-headline-md text-headline-md text-secondary font-bold">{aboutData.ratioStat || "1:12"}</span>
-                  <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Strict Cohort Ratio</span>
+                  <span className="text-3xl font-extrabold text-secondary">{aboutData.ratioStat || "1:12"}</span>
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-1">
+                    {extra.ratioLabel || "Strict Cohort Ratio"}
+                  </span>
                 </div>
               </div>
             </div>
-            {/* Right Column Authentic Photo */}
+
             <div className="lg:col-span-6">
-              <div className="relative bg-surface-container-low p-space-xs rounded-xl shadow-sm">
+              <div className="bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 shadow-md">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  alt="Elite Vertex interactive workshop"
-                  className="w-full aspect-[4/3] object-cover rounded-lg"
-                  src={aboutData.paradigmImage || "https://lh3.googleusercontent.com/aida/AEtjO1XUmQebC7cWdgP8rjmnfdqiY3TWTBNoYsfMaSYI7n3xfYNILdru7siueSJaT3rMs4i4yPJNbvZvfikMQY3F9R2qu9KcA-IJpgJKfBgkmFG_E5MXmadYRgWJ_6PhUHhZrCm8UV-zLzfi7YQS7zuXK6r0MjulQm5z6SjXV14VWLoizz-xs76JsWDExBfm2OMZySxsZVg3HIpEMQlOhdIgz88ZuQ4xbfsXjeGRuCDxyYgFYtotlQBLMiC4mi6i"}
+                  alt="Elite Vertex interactive speech workshop"
+                  className="w-full aspect-[4/3] object-cover rounded-xl"
+                  src={aboutData.paradigmImage || "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=80"}
                 />
               </div>
             </div>
+
           </div>
         </div>
       </section>
 
-      {/* 3. Vision & Mission */}
-      <section className="w-full bg-surface-container-lowest py-space-2xl lg:py-space-3xl shadow-[0_1px_0_rgba(0,0,0,0.02)]">
-        <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
-          <div className="max-w-xl mb-space-xl">
-            <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">02 / Purpose &amp; Horizon</span>
-            <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight mt-space-3xs">
-              Institutional Directives
+      {/* 5. FACULTY & LEADERSHIP SECTION */}
+      <section className="py-16 lg:py-24 bg-background">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="max-w-2xl mb-12">
+            <span className="text-xs font-bold uppercase tracking-widest text-secondary block mb-2">
+              {extra.facultyLabel || "02 / LEADERSHIP & FACULTY"}
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground">
+              {extra.facultyTitle || "Guided by Experienced Speech Coaches"}
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-space-xl">
-            {/* Vision */}
-            <div className="bg-surface-container-low p-space-xl rounded-xl flex flex-col justify-between">
-              <div className="flex flex-col gap-space-sm">
-                <span className="font-label-md text-label-md uppercase tracking-wider text-secondary">The Institutional Vision</span>
-                <h3 className="font-headline-md text-headline-md text-primary tracking-tight">
-                  {aboutData.visionTitle || "Eradicating speech anxiety and language hesitation across India’s rising talent."}
-                </h3>
-                <p className="font-body-md text-body-md text-on-surface-variant mt-space-2xs">
-                  {aboutData.visionBody || "To build a culture where no engineer, founder, educator, or graduate is held back by vocal diffidence. We envision Indian professional voices commanding global auditoriums, boardrooms, and academic symposia with unmatched clarity, gravitas, and poise."}
-                </p>
-              </div>
-              <div className="pt-space-lg mt-space-lg flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm">
-                <span className="material-symbols-outlined text-[18px] text-secondary">trip_origin</span>
-                <span>National Oral Fluency Standard 2030</span>
-              </div>
-            </div>
-            {/* Mission */}
-            <div className="bg-primary-container text-on-primary-container p-space-xl rounded-xl flex flex-col justify-between">
-              <div className="flex flex-col gap-space-sm">
-                <span className="font-label-md text-label-md uppercase tracking-wider text-secondary-fixed">The Core Mission</span>
-                <h3 className="font-headline-md text-headline-md text-surface-container-lowest tracking-tight">
-                  {aboutData.missionTitle || "Acoustic immersion, personalized vocal diagnostics, and CEFR-verified advancement."}
-                </h3>
-                <p className="font-body-md text-body-md text-primary-fixed-dim mt-space-2xs">
-                  {aboutData.missionBody || "Deploying small-group seminar pedagogy strictly capped at 12 participants per studio. Every student receives phoneme-level acoustic feedback, daily impromptu podium time, and psychologically fortified speaking drills mapped directly to Cambridge CEFR standards."}
-                </p>
-              </div>
-              <div className="pt-space-lg mt-space-lg flex items-center gap-space-xs text-primary-fixed-dim font-label-sm text-label-sm">
-                <span className="material-symbols-outlined text-[18px] text-secondary-fixed">verified</span>
-                <span>Accredited Academic Methodology</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* 4. Teaching Philosophy */}
-      <section className="w-full bg-surface py-space-2xl lg:py-space-3xl">
-        <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-xl">
-            <div>
-              <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">03 / Pedagogical Architecture</span>
-              <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight mt-space-3xs">
-                Learn → Practice → Speak → Improve
-              </h2>
-            </div>
-            <p className="font-body-md text-body-md text-on-surface-variant max-w-md">
-              A four-stage closed feedback cycle engineered to systematically dismantle vocal inhibition through micro-coaching and live airtime.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
-            {/* Stage 1 */}
-            <div className="bg-surface-container-lowest p-space-lg rounded-xl flex flex-col gap-space-sm shadow-sm hover:translate-y-[-2px] transition-transform duration-200">
-              <div className="flex items-center justify-between">
-                <span className="font-headline-md text-headline-md font-bold text-on-surface">01</span>
-                <span className="font-label-md text-label-md uppercase tracking-wider text-secondary">Step One</span>
-              </div>
-              <h3 className="font-headline-sm text-headline-sm text-on-surface mt-space-2xs">Learn</h3>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Targeted 15-minute conceptual briefs on vocal inflection, thought-framing frameworks (PREP, STAR), and tone modulation. Zero lecture overload.
-              </p>
-            </div>
-            {/* Stage 2 */}
-            <div className="bg-surface-container-lowest p-space-lg rounded-xl flex flex-col gap-space-sm shadow-sm hover:translate-y-[-2px] transition-transform duration-200">
-              <div className="flex items-center justify-between">
-                <span className="font-headline-md text-headline-md font-bold text-on-surface">02</span>
-                <span className="font-label-md text-label-md uppercase tracking-wider text-secondary">Step Two</span>
-              </div>
-              <h3 className="font-headline-sm text-headline-sm text-on-surface mt-space-2xs">Practice</h3>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Drills in private, sound-isolated acoustic pods. Rapid repetition of rhythm, jaw relaxation mechanics, and uninhibited phrasing drills.
-              </p>
-            </div>
-            {/* Stage 3 */}
-            <div className="bg-surface-container-lowest p-space-lg rounded-xl flex flex-col gap-space-sm shadow-sm hover:translate-y-[-2px] transition-transform duration-200">
-              <div className="flex items-center justify-between">
-                <span className="font-headline-md text-headline-md font-bold text-on-surface">03</span>
-                <span className="font-label-md text-label-md uppercase tracking-wider text-secondary">Step Three</span>
-              </div>
-              <h3 className="font-headline-sm text-headline-sm text-on-surface mt-space-2xs">Speak</h3>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Live podium speaking infront of an intimate group of 12. Impromptu debates, board presentations, and simulated high-stakes cross-examinations.
-              </p>
-            </div>
-            {/* Stage 4 */}
-            <div className="bg-surface-container-lowest p-space-lg rounded-xl flex flex-col gap-space-sm shadow-sm hover:translate-y-[-2px] transition-transform duration-200">
-              <div className="flex items-center justify-between">
-                <span className="font-headline-md text-headline-md font-bold text-on-surface">04</span>
-                <span className="font-label-md text-label-md uppercase tracking-wider text-secondary">Step Four</span>
-              </div>
-              <h3 className="font-headline-sm text-headline-sm text-on-surface mt-space-2xs">Improve</h3>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">
-                High-definition video playback analysis with faculty. Constructive diagnostic critique on eye-line, filler cadence, and assertive articulation.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Learning Environment & Leadership */}
-      <section className="w-full bg-surface-container-low py-space-2xl lg:py-space-3xl">
-        <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
-          <div className="max-w-2xl mb-space-xl">
-            <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">04 / Leadership &amp; Space</span>
-            <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight mt-space-3xs">
-              Scholarly Rigor in Modern Architectural Spaces
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
-            {/* Faculty Portrait */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-5">
-              <div className="bg-surface-container-lowest p-space-xs rounded-xl shadow-sm">
+              <div className="bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 shadow-md">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   alt={leadMentor.name}
-                  className="w-full aspect-[4/5] object-cover rounded-lg"
-                  src={leadMentor.profileImage || "https://lh3.googleusercontent.com/aida/AEtjO1VxRPTogt0A57N14457KucT3rxqNKRPPEb1qPm-CIFuw1wiSHSbHElScSJfENkOfdFaJADBnZTmQJ3ZWim1ZL82hh6-iAqn9ATFm4QPXJ2B63y699ZfTPjJvUQ3SMK6sN-F0AtI0zgS4-YFYqaJVyc4Wu7ACiSpt9EmlbyhLppBRFv6aan4TTgQU3aICLKS1C9VGvExCM7cClYc1bNGkvgwYHQWjGDxmJXda8d5ntxI3AORC2RZtuTfV1AQ"}
+                  className="w-full aspect-[4/5] object-cover rounded-xl"
+                  src={leadMentor.profileImage || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"}
                 />
-                <div className="p-space-sm flex flex-col gap-space-3xs">
-                  <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">{leadMentor.name}</span>
-                  <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">{leadMentor.designation}</span>
+                <div className="p-4 flex flex-col gap-1">
+                  <span className="font-bold text-foreground text-lg">{leadMentor.name}</span>
+                  <span className="text-xs font-semibold text-secondary uppercase tracking-wider">{leadMentor.designation}</span>
                 </div>
               </div>
             </div>
-            {/* Bio & Infrastructure Highlights */}
-            <div className="lg:col-span-7 flex flex-col gap-space-lg">
-              <div className="flex flex-col gap-space-sm">
-                <div className="inline-flex items-center gap-space-xs px-space-xs py-space-3xs bg-secondary-fixed text-on-secondary-fixed rounded text-label-sm font-label-sm uppercase tracking-wider w-fit">
-                  {leadMentor.accreditation || "British Council Accredited Fellow"}
-                </div>
-                <h3 className="font-headline-md text-headline-md text-on-surface tracking-tight">
-                  &quot;{leadMentor.quote || "We do not teach you to impersonate a native speaker. We coach you to speak with total clarity, natural gravitas, and unflinching presence."}&quot;
-                </h3>
-                <p className="font-body-md text-body-md text-on-surface-variant">
-                  {leadMentor.bio}
-                </p>
+
+            <div className="lg:col-span-7 flex flex-col gap-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-secondary/10 text-secondary rounded-full text-xs font-bold uppercase tracking-wider w-fit">
+                <span className="material-symbols-outlined text-[16px]">verified</span>
+                <span>{leadMentor.accreditation || "British Council Accredited Fellow"}</span>
               </div>
-              {/* Physical Features Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-space-sm pt-space-xs">
-                <div className="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex flex-col gap-space-3xs">
-                  <span className="material-symbols-outlined text-secondary text-[28px]">graphic_eq</span>
-                  <h4 className="font-headline-sm text-headline-sm text-on-surface mt-space-2xs text-[1rem]">Acoustic Pods</h4>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">Individual soundproof chambers for private speech recording and playback calibration.</p>
-                </div>
-                <div className="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex flex-col gap-space-3xs">
-                  <span className="material-symbols-outlined text-secondary text-[28px]">videocam</span>
-                  <h4 className="font-headline-sm text-headline-sm text-on-surface mt-space-2xs text-[1rem]">HD Playback Labs</h4>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">Dual-camera review setups to analyze body posture, micro-pauses, and eye contact vectors.</p>
-                </div>
-                <div className="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex flex-col gap-space-3xs">
-                  <span className="material-symbols-outlined text-secondary text-[28px]">meeting_room</span>
-                  <h4 className="font-headline-sm text-headline-sm text-on-surface mt-space-2xs text-[1rem]">Executive Studios</h4>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">Roundtable chambers in Bengaluru and New Delhi configured for authentic boardroom simulations.</p>
-                </div>
+              
+              <h3 className="text-xl sm:text-2xl font-bold text-foreground leading-relaxed">
+                &quot;{leadMentor.quote || "We do not teach you to impersonate a native speaker. We coach you to speak with total clarity, natural gravitas, and unflinching presence."}&quot;
+              </h3>
+              
+              <p className="text-muted-foreground text-sm sm:text-base leading-relaxed font-normal">
+                {leadMentor.bio}
+              </p>
+
+              {/* Dynamic Facilities / Studios */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                {facilities.map((fac: any, fIdx: number) => (
+                  <div key={fIdx} className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/30 flex flex-col gap-1">
+                    <span className="material-symbols-outlined text-secondary text-[24px]">
+                      {fac.icon || "meeting_room"}
+                    </span>
+                    <h4 className="font-bold text-foreground text-sm mt-1">{fac.title}</h4>
+                    <p className="text-xs text-muted-foreground leading-normal">{fac.description}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 6. High-Trust Final CTA */}
-      <section className="w-full bg-surface py-space-2xl lg:py-space-3xl">
-        <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
-          <div className="bg-primary p-space-xl md:p-space-2xl rounded-xl text-on-primary flex flex-col md:flex-row md:items-center justify-between gap-space-xl shadow-md">
-            <div className="flex flex-col gap-space-xs max-w-xl">
-              <span className="font-label-md text-label-md uppercase tracking-widest text-secondary-fixed">Direct Admission Portal</span>
-              <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-surface-bright tracking-tight">
-                Start Your Journey With Elite Vertex.
+      {/* 6. FINAL CALL TO ACTION BANNER */}
+      <section className="py-16 lg:py-24 bg-surface-container-low/60 border-t border-outline-variant/20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="bg-primary p-8 sm:p-12 lg:p-16 rounded-[2rem] text-on-primary flex flex-col md:flex-row md:items-center justify-between gap-8 shadow-xl">
+            
+            <div className="flex flex-col gap-3 max-w-xl">
+              <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">
+                {extra.ctaBadge || "DIRECT ADMISSIONS PORTAL"}
+              </span>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
+                {extra.ctaTitle || "Start Your Journey With Elite Vertex."}
               </h2>
-              <p className="font-body-md text-body-md text-surface-variant max-w-lg">
-                Experience an active classroom session and receive a complimentary 20-minute diagnostic speech assessment with our senior academic linguists.
+              <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-normal">
+                {extra.ctaSubtitle || "Experience an active classroom session and receive a complimentary 20-minute speech assessment with our senior academic linguists."}
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-space-md shrink-0">
-              <Link className="inline-flex items-center justify-center bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-md text-label-md uppercase tracking-wider px-space-xl py-space-sm rounded-lg transition-colors duration-150" href="/book-counselling">
-                Book Free Counselling
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 shrink-0">
+              <Link
+                href={extra.ctaPrimaryUrl || "/book-counselling"}
+                className="inline-flex items-center justify-center bg-secondary hover:bg-on-secondary-container text-white font-bold text-sm uppercase tracking-wider px-8 py-4 rounded-xl transition-all shadow-md"
+              >
+                {extra.ctaPrimaryLabel || "Book Free Counselling"}
               </Link>
-              <Link className="inline-flex items-center gap-space-3xs text-on-primary font-label-md text-label-md uppercase tracking-wider hover:text-secondary-fixed transition-colors py-space-sm" href="/courses">
-                <span>Explore Curriculum</span>
-                <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              <Link
+                href={extra.ctaSecondaryUrl || "/courses"}
+                className="inline-flex items-center justify-center gap-2 text-white font-bold text-sm uppercase tracking-wider hover:text-amber-400 transition-colors py-4 px-4"
+              >
+                <span>{extra.ctaSecondaryLabel || "Explore Curriculum"}</span>
+                <span className="material-symbols-outlined text-[18px]">
+                  arrow_forward
+                </span>
               </Link>
             </div>
+
           </div>
         </div>
       </section>
+
     </div>
   );
 }

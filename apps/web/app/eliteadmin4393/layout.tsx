@@ -2,32 +2,47 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useLogoutMutation, useGetMeQuery } from "@/lib/features/api/apiSlice";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { data: me } = useGetMeQuery(undefined, { skip: pathname === "/eliteadmin4393/login" });
+  const [logout] = useLogoutMutation();
 
   if (pathname === "/eliteadmin4393/login") {
     return <>{children}</>;
   }
 
-  const handleLogout = () => {
-    // Basic logout logic: delete cookie/token
-    document.cookie = "admin_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  const currentUser = me?.data as { name?: string; email?: string; role?: string } | undefined;
+
+  const handleLogout = async () => {
+    try {
+      await logout(undefined).unwrap();
+    } catch {
+      // ignore network errors; still clear local state
+    }
     router.push("/eliteadmin4393/login");
   };
 
   const menuItems = [
     { name: "Dashboard", path: "/eliteadmin4393/dashboard", icon: "dashboard" },
-    { name: "Courses", path: "/eliteadmin4393/courses", icon: "school" },
+    { name: "Home Page CMS", path: "/eliteadmin4393/home", icon: "home" },
+    { name: "Courses (CMS)", path: "/eliteadmin4393/courses", icon: "school" },
+    { name: "Pages", path: "/eliteadmin4393/pages", icon: "description" },
+    { name: "Navigation", path: "/eliteadmin4393/navigation", icon: "menu" },
+    { name: "Media Library", path: "/eliteadmin4393/media", icon: "perm_media" },
     { name: "Mentors & Faculty", path: "/eliteadmin4393/mentors", icon: "person" },
-    { name: "About Page", path: "/eliteadmin4393/about", icon: "info" },
+    { name: "About Page (CMS)", path: "/eliteadmin4393/about", icon: "info" },
+    { name: "Contact Page (CMS)", path: "/eliteadmin4393/contact", icon: "contact_support" },
+    { name: "Certificates (CMS)", path: "/eliteadmin4393/certificates", icon: "workspace_premium" },
     { name: "Testimonials", path: "/eliteadmin4393/testimonials", icon: "reviews" },
     { name: "Gallery", path: "/eliteadmin4393/gallery", icon: "collections" },
     { name: "FAQ", path: "/eliteadmin4393/faq", icon: "help" },
     { name: "Campus Network", path: "/eliteadmin4393/campuses", icon: "location_city" },
     { name: "Student Leads", path: "/eliteadmin4393/messages", icon: "contact_mail" },
-    { name: "Home & Settings", path: "/eliteadmin4393/settings", icon: "settings" },
+    { name: "Settings", path: "/eliteadmin4393/settings", icon: "settings" },
+    { name: "Users", path: "/eliteadmin4393/users", icon: "group" },
   ];
 
   return (
@@ -54,6 +69,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           ))}
         </nav>
         <div className="p-space-md border-t border-outline-variant">
+          {currentUser && (
+            <div className="mb-space-sm px-space-md">
+              <p className="font-label-lg text-on-surface truncate">{currentUser.name || "Admin"}</p>
+              <p className="text-label-sm text-on-surface-variant truncate capitalize">
+                {currentUser.role || "admin"}
+              </p>
+            </div>
+          )}
           <button
             onClick={handleLogout}
             className="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-label-lg text-error hover:bg-error-container w-full transition-colors"
@@ -73,7 +96,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span className="material-symbols-outlined text-[24px]">logout</span>
           </button>
         </header>
-        
+
         {/* Page Content */}
         <div className="flex-1 overflow-y-auto p-space-lg md:p-space-2xl">
           {children}

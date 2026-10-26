@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Metadata } from "next";
 import { VerifyCertificateContent } from "@/components/verify-certificate/VerifyCertificateContent";
 
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function VerifyCertificatePage() {
-  return <VerifyCertificateContent />;
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>}>
+      <VerifyCertificateContent />
+    </Suspense>
+  );
 }

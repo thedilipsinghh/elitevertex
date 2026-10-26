@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { galleryItems } from "@/data/gallery";
+import { useGetGalleryQuery } from "@/lib/features/api/apiSlice";
 
 type FilterType = "all" | "classroom" | "events" | "workshops" | "milestones";
 
@@ -11,7 +11,24 @@ export function GalleryContent() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [lightboxItem, setLightboxItem] = useState<typeof galleryItems[0] | null>(null);
 
-  const filteredItems = galleryItems.filter((item) => filter === "all" || item.category === filter);
+  const { data: galleryResponse, isLoading } = useGetGalleryQuery({});
+  const galleryItems = galleryResponse?.data || [];
+  const filteredItems = galleryItems.filter((item: any) => filter === "all" || item.category === filter);
+
+  // Loading skeleton placeholder for gallery when data is being fetched
+  const renderLoadingSkeleton = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <div key={i} className="bg-surface-container-low rounded-xl animate-pulse shadow-sm">
+          <div className="aspect-[4/3] bg-gray-200" />
+          <div className="p-4 flex flex-col gap-2">
+            <div className="h-5 bg-gray-200 rounded w-3/4" />
+            <div className="h-4 bg-gray-200 rounded w-1/2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   // Close lightbox when clicking escape
   if (typeof window !== "undefined") {
@@ -95,13 +112,14 @@ export function GalleryContent() {
           </div>
         </div>
       </section>
+{isLoading && galleryItems.length === 0 ? renderLoadingSkeleton() : null}
 
       {/* Editorial Asymmetric Layout */}
       <section className="w-full py-space-2xl md:py-space-3xl bg-surface">
         <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start mb-space-xl">
-            {filteredItems.slice(0, 2).map((item) => (
+            {filteredItems.slice(0, 2).map((item: any) => (
               <article 
                 key={item.id} 
                 onClick={() => setLightboxItem(item)}
@@ -135,7 +153,7 @@ export function GalleryContent() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
-            {filteredItems.slice(2, 4).map((item) => (
+            {filteredItems.slice(2, 4).map((item: any) => (
               <article 
                 key={item.id} 
                 onClick={() => setLightboxItem(item)}

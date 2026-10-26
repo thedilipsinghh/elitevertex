@@ -3,11 +3,39 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useGetPublicNavigationQuery, useGetWebsiteSettingsQuery } from "@/lib/features/api/apiSlice";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+
+interface NavNode {
+  id: string;
+  label: string;
+  url: string;
+  openInNewTab?: boolean;
+  children?: NavNode[];
+}
+
+const FALLBACK_NAV: { name: string; href: string }[] = [
+  { name: "Home", href: "/" },
+  { name: "Courses", href: "/courses" },
+  { name: "About", href: "/about" },
+  { name: "Verify Certificate", href: "/verify-certificate" },
+  { name: "Contact", href: "/contact" },
+];
 
 export function Navbar() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const { data: navResponse } = useGetPublicNavigationQuery("header");
+  const { data: settingsResponse } = useGetWebsiteSettingsQuery({});
+  const settings = settingsResponse?.data || {};
+
+  const cmsNodes: NavNode[] = navResponse?.data || [];
+  const navItems =
+    cmsNodes.length > 0
+      ? cmsNodes.map((n) => ({ name: n.label, href: n.url, children: n.children || [] }))
+      : FALLBACK_NAV;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,9 +46,7 @@ export function Navbar() {
       }
     };
 
-    // Check initial scroll position
     handleScroll();
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -30,14 +56,6 @@ export function Navbar() {
     setMobileMenuOpen(false);
   }, [pathname]);
 
-  const navItems = [
-    { name: "Home", href: "/" },
-    { name: "Courses", href: "/courses" },
-    { name: "About", href: "/about" },
-    { name: "Verify Certificate", href: "/verify-certificate" },
-    { name: "Contact", href: "/contact" },
-  ];
-
   const isLinkActive = (path: string) => {
     if (path === "/") {
       return pathname === "/";
@@ -45,39 +63,74 @@ export function Navbar() {
     return pathname === path || (pathname?.startsWith(path) ?? false);
   };
 
+  const logoSrc = settings.logoUrl || "/logo.png";
+
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-surface-container-lowest/98 backdrop-blur-md shadow-md border-b border-outline-variant/10 py-1"
-          : "bg-surface-container-lowest/90 backdrop-blur-sm shadow-[0_1px_8px_rgba(0,0,0,0.04)] py-0"
-      }`}
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-200 ${isScrolled
+        ? "bg-surface-container-lowest/95 backdrop-blur-md shadow-sm border-b border-outline-variant py-1"
+        : "bg-surface-container-lowest/90 backdrop-blur-sm border-b border-outline-variant/40 py-0"
+        }`}
     >
-      <div className="h-16 md:h-20 max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop flex items-center justify-between gap-space-md transition-all duration-300">
+      <div className="h-16 md:h-20 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 transition-all duration-200">
+
         {/* Brand / Logo */}
-        <div className="flex items-center gap-space-xs shrink-0">
-          <Link href="/" className="flex items-center gap-space-xs">
-            <img
-              alt="Elite Vertex Brand Logo"
-              className="h-10 md:h-12 w-auto object-contain transition-all duration-300"
-              src="/logo.png"
-            />
+        <div className="flex items-center gap-3 shrink-0">
+          <Link href="/" className="flex items-center" aria-label="Elite Vertex Home">
+            <div className="bg-white rounded-lg p-1.5 shadow-xs border border-slate-200/80 dark:border-slate-700">
+              <img
+                alt="Elite Vertex Brand Logo"
+                className="h-8 md:h-10 w-auto object-contain transition-all"
+                src={logoSrc}
+              />
+            </div>
           </Link>
         </div>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-space-lg">
+        <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
           {navItems.map((item) => {
             const active = isLinkActive(item.href);
+            const children = (item as { children?: NavNode[] }).children || [];
+            if (children.length > 0) {
+              return (
+                <div key={item.href} className="relative group">
+                  <Link
+                    href={item.href}
+                    className={`font-semibold text-xs uppercase tracking-wider transition-colors py-2 flex items-center gap-1 ${active
+                      ? "text-primary font-bold"
+                      : "text-on-surface-variant hover:text-primary"
+                      }`}
+                  >
+                    {item.name}
+                    <span className="material-symbols-outlined text-[16px]">expand_more</span>
+                  </Link>
+                  <div className="absolute left-0 top-full pt-2 hidden group-hover:block">
+                    <div className="bg-surface-container-lowest rounded-lg shadow-lg border border-outline-variant min-w-[200px] py-2">
+                      {children.map((child) => (
+                        <Link
+                          key={child.id}
+                          href={child.url}
+                          target={child.openInNewTab ? "_blank" : undefined}
+                          rel={child.openInNewTab ? "noreferrer" : undefined}
+                          className="block px-4 py-2 text-sm text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors"
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`font-label-md text-label-md uppercase tracking-wider transition-all duration-200 py-space-2xs relative ${
-                  active
-                    ? "text-primary font-bold after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:rounded-full"
-                    : "text-on-surface-variant hover:text-primary font-medium"
-                }`}
+                className={`font-semibold text-xs uppercase tracking-wider transition-colors py-2 relative ${active
+                  ? "text-primary font-bold after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:rounded-full"
+                  : "text-on-surface-variant hover:text-primary"
+                  }`}
               >
                 {item.name}
               </Link>
@@ -85,21 +138,26 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* Action Buttons & Mobile Toggle */}
-        <div className="flex items-center gap-space-sm shrink-0">
+        {/* Action Buttons, Theme Toggle & Mobile Menu Trigger */}
+        <div className="flex items-center gap-3 shrink-0">
           <Link
             href="/book-counselling"
-            className="hidden sm:inline-flex items-center justify-center bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-md text-label-md uppercase tracking-wider px-space-md py-space-xs rounded-lg transition-colors duration-150 shadow-sm"
+            className="hidden sm:inline-flex items-center justify-center bg-secondary hover:bg-on-secondary-container text-on-secondary font-semibold text-xs uppercase tracking-wider px-4 py-2.5 rounded-lg transition-colors shadow-xs"
           >
             Book Free Counselling
           </Link>
 
+          {/* Theme Toggle (Desktop) */}
+          <ThemeToggle className="w-10 h-10" />
+
+          {/* Login Action */}
           <Link
             href="/login"
-            className="w-9 h-9 rounded-full bg-primary flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity"
+            className="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity"
             title="Account Login"
+            aria-label="Account Login"
           >
-            <span className="material-symbols-outlined text-on-primary text-[20px]">
+            <span className="material-symbols-outlined text-[20px]">
               person
             </span>
           </Link>
@@ -108,7 +166,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"
+            className="lg:hidden w-10 h-10 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
             aria-label="Toggle Navigation Menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -121,35 +179,52 @@ export function Navbar() {
 
       {/* Mobile Navigation Menu Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-surface-container-lowest border-b border-outline-variant/20 px-gutter-mobile py-space-md shadow-lg animate-in slide-in-from-top-2 duration-200">
-          <nav className="flex flex-col gap-space-xs">
+        <div className="lg:hidden bg-surface-container-lowest border-b border-outline-variant px-4 py-4 shadow-lg animate-in slide-in-from-top-2 duration-200">
+          <nav className="flex flex-col gap-1">
             {navItems.map((item) => {
               const active = isLinkActive(item.href);
+              const children = (item as { children?: NavNode[] }).children || [];
               return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`px-space-sm py-space-xs rounded-md text-body-md font-label-md uppercase tracking-wider transition-colors ${
-                    active
-                      ? "bg-primary/10 text-primary font-bold"
-                      : "text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium"
-                  }`}
-                >
-                  {item.name}
-                </Link>
+                <div key={item.href} className="flex flex-col">
+                  <Link
+                    href={item.href}
+                    className={`px-3 py-2.5 rounded-md text-sm font-semibold uppercase tracking-wider transition-colors ${active
+                      ? "bg-surface-container text-primary font-bold"
+                      : "text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
+                      }`}
+                  >
+                    {item.name}
+                  </Link>
+                  {children.length > 0 && (
+                    <div className="flex flex-col pl-4 mt-1 border-l border-outline-variant">
+                      {children.map((child) => (
+                        <Link
+                          key={child.id}
+                          href={child.url}
+                          className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary transition-colors"
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               );
             })}
-            <div className="pt-space-xs mt-space-xs border-t border-outline-variant/20 sm:hidden">
+
+            <div className="pt-3 mt-2 border-t border-outline-variant flex flex-col gap-2">
+              <ThemeToggle showLabel className="w-full justify-start py-2.5 px-3" />
               <Link
                 href="/book-counselling"
-                className="w-full flex items-center justify-center bg-secondary text-on-secondary font-label-md text-label-md uppercase tracking-wider px-space-md py-space-xs rounded-lg transition-colors"
+                className="w-full flex items-center justify-center bg-secondary text-on-secondary font-semibold text-xs uppercase tracking-wider px-4 py-3 rounded-lg transition-colors sm:hidden"
               >
                 Book Free Counselling
               </Link>
             </div>
           </nav>
-        </div>
-      )}
-    </header>
+        </div >
+      )
+      }
+    </header >
   );
 }

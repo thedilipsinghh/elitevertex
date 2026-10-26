@@ -9,4 +9,8 @@ export * from "./certificates";
 export * from "./mentors";
 export * from "./about_page";
 export * from "./campuses";
+export * from "./pages";
+export * from "./navigation";
+export * from "./media";
+export * from "./audit_logs";
 

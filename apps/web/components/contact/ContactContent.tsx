@@ -2,490 +2,543 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useGetCampusesQuery, useSubmitContactMutation, useGetWebsiteSettingsQuery } from "@/lib/features/api/apiSlice";
+import { useGetWebsiteSettingsQuery, useSubmitContactMutation } from "@/lib/features/api/apiSlice";
 
 export function ContactContent() {
-  const { data: campusesResponse } = useGetCampusesQuery({});
   const { data: settingsResponse } = useGetWebsiteSettingsQuery({});
   const [submitContact, { isLoading: isSubmitting }] = useSubmitContactMutation();
 
-  const apiCampuses = campusesResponse?.data || [];
   const siteSettings = settingsResponse?.data || {};
 
-  const [fullName, setFullName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [emailAddress, setEmailAddress] = useState("");
-  const [program, setProgram] = useState("");
-  const [mode, setMode] = useState("campus");
-  const [briefNote, setBriefNote] = useState("");
+  const phone = siteSettings.phone || "+91 (80) 4920-8800";
+  const whatsapp = siteSettings.whatsapp || "+91 98450 12345";
+  const email = siteSettings.email || "admissions@elitevertex.edu.in";
+  const address = siteSettings.address || "42, Apex Tower, M.G. Road, Bengaluru, Karnataka 560001";
+  const workingHours = siteSettings.workingHours || "Mon - Sat: 8:30 AM - 8:00 PM\nSunday: Appointments Only";
+  const googleMapsUrl = siteSettings.googleMapsUrl || "https://maps.google.com/?q=Elite+Vertex+Bengaluru";
+
+  const contactTagline = siteSettings.contactTagline || "CONTACT US";
+  const contactTitle = siteSettings.contactTitle || "We're Here to Help You Start Your Learning Journey";
+  const contactSubtitle = siteSettings.contactSubtitle || "Have questions about our courses or admissions? Get in touch with us. Our academic team will respond to you shortly.";
+
+  const callToActionTitle = siteSettings.callToActionTitle || "Ready to Start Your Future?";
+  const callToActionSubtitle = siteSettings.callToActionSubtitle || "Join hundreds of students who are building successful careers with Elite Vertex Institute.";
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    program: "Fluent Spoken English",
+    mode: "Classroom / Campus",
+    subject: "Admissions Consultation",
+    message: "",
+  });
+
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !emailAddress) return;
+    if (!formData.name || !formData.email) return;
+    setErrorMessage("");
 
     try {
       await submitContact({
-        name: fullName,
-        email: emailAddress,
-        phone: phoneNumber,
-        subject: `Admissions Lead: ${program || 'General'} (${mode})`,
-        program,
-        mode,
-        message: briefNote || "Callback requested for course counselling.",
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim() || undefined,
+        program: formData.program,
+        mode: formData.mode,
+        subject: formData.subject || "Admissions Consultation",
+        message: formData.message.trim() || "Requesting course information and academic counselling callback.",
       }).unwrap();
 
+      setSubmittedEmail(formData.email.trim());
       setIsSubmitted(true);
-      setFullName("");
-      setPhoneNumber("");
-      setEmailAddress("");
-      setProgram("");
-      setBriefNote("");
-    } catch (err) {
-      console.error("Enquiry Submission Error:", err);
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        program: "Fluent Spoken English",
+        mode: "Classroom / Campus",
+        subject: "Admissions Consultation",
+        message: "",
+      });
+    } catch (err: any) {
+      console.error("Contact Form Submission Error:", err);
+      setErrorMessage(
+        err?.data?.message || "Unable to send your message at this moment. Please call us directly or try again."
+      );
     }
   };
 
+  const mapEmbedUrl =
+    googleMapsUrl && googleMapsUrl.includes("maps/embed")
+      ? googleMapsUrl
+      : `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+
   return (
-    <div className="flex flex-col w-full">
-      <section className="w-full max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop pt-space-xl pb-space-lg">
-        <div className="flex flex-col max-w-2xl">
-          <div className="flex items-center gap-space-2xs text-secondary mb-space-3xs">
-            <span className="font-label-sm text-label-sm uppercase tracking-widest font-semibold">Contact Elite Vertex</span>
-            <span className="w-8 h-px bg-secondary opacity-40"></span>
-          </div>
-          <h1 className="font-headline-lg text-headline-lg md:text-display text-primary tracking-tight font-extrabold mb-space-xs">
-            Let’s Start Your Journey.
-          </h1>
-          <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
-            Visit our flagship campuses in Bengaluru and Delhi, or connect directly with our academic admissions desk for structured guidance.
-          </p>
-        </div>
-      </section>
-      
-      <section className="w-full max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop pb-space-3xl">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
-          <div className="lg:col-span-5 flex flex-col gap-space-lg">
-            <div className="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
-              <div className="flex items-center justify-between pb-space-2xs">
-                <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant font-bold">Academic Direct Lines</span>
-                <span className="inline-flex items-center gap-1 font-label-sm text-label-sm text-secondary bg-surface-container-low px-space-2xs py-1 rounded">
-                  <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span> Desk Active
+    <div className="w-full flex flex-col font-sans bg-background text-foreground">
+      {/* SECTION 1: HERO & CONTACT FORM */}
+      <section className="bg-background py-12 lg:py-20 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+          
+          {/* Left Column: Info & Details */}
+          <div className="z-10 flex flex-col">
+            <div className="inline-block text-secondary font-bold tracking-widest text-xs uppercase mb-3">
+              {contactTagline}
+            </div>
+            
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground mb-6 leading-tight">
+              {contactTitle.includes("Start Your") ? (
+                <>
+                  {contactTitle.split("Start Your")[0]}
+                  <br />
+                  <span className="text-secondary">Start Your {contactTitle.split("Start Your")[1]}</span>
+                </>
+              ) : (
+                contactTitle
+              )}
+            </h1>
+            
+            <p className="text-muted-foreground text-base sm:text-lg mb-8 max-w-lg leading-relaxed font-normal">
+              {contactSubtitle}
+            </p>
+
+            {/* Quick Contact Info Badges */}
+            <div className="flex flex-wrap items-center gap-6 mb-10">
+              <a
+                href={`tel:${phone.replace(/[^0-9+]/g, "")}`}
+                className="flex items-center gap-3 hover:opacity-85 transition-all group"
+              >
+                <div className="w-10 h-10 rounded-full bg-secondary/10 border border-secondary/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <span className="material-symbols-outlined text-secondary text-[20px]">
+                    call
+                  </span>
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-foreground">Call Us</div>
+                  <div className="text-xs text-muted-foreground font-medium">{phone}</div>
+                </div>
+              </a>
+
+              <a
+                href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 hover:opacity-85 transition-all group"
+              >
+                <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <span className="material-symbols-outlined text-emerald-600 text-[20px]">
+                    chat
+                  </span>
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-foreground">WhatsApp</div>
+                  <div className="text-xs text-muted-foreground font-medium">{whatsapp}</div>
+                </div>
+              </a>
+
+              <a
+                href={`mailto:${email}`}
+                className="flex items-center gap-3 hover:opacity-85 transition-all group"
+              >
+                <div className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <span className="material-symbols-outlined text-blue-600 text-[20px]">
+                    mail
+                  </span>
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-foreground">Email Us</div>
+                  <div className="text-xs text-muted-foreground font-medium">{email}</div>
+                </div>
+              </a>
+            </div>
+
+            {/* Feature Highlights Card */}
+            <div className="bg-surface-container-low/70 rounded-3xl p-6 sm:p-8 border border-outline-variant/30 flex flex-col sm:flex-row items-center gap-6">
+              <div className="w-20 h-20 rounded-2xl bg-secondary/10 flex items-center justify-center shrink-0 border border-secondary/20">
+                <span className="material-symbols-outlined text-secondary text-[36px]">
+                  school
                 </span>
               </div>
-              <div className="space-y-space-sm">
-                <div className="flex items-start gap-space-xs">
-                  <div className="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center shrink-0 mt-0.5 text-primary">
-                    <span className="material-symbols-outlined text-[20px]">call</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Direct Admissions Line</span>
-                    <a className="font-headline-sm text-headline-sm text-primary font-bold hover:text-secondary transition-colors" href="tel:+918049208800">
-                      +91 (80) 4920-8800
-                    </a>
-                    <span className="font-body-sm text-body-sm text-on-surface-variant">Toll-free priority switchboard</span>
-                  </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-4 w-full">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary text-[18px] shrink-0">
+                    check_circle
+                  </span>
+                  <span className="text-xs font-semibold text-foreground">24-Hour Lead Response</span>
                 </div>
-                <div className="flex items-start gap-space-xs">
-                  <div className="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center shrink-0 mt-0.5 text-primary">
-                    <span className="material-symbols-outlined text-[20px]">chat</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">WhatsApp Admissions Direct</span>
-                    <a className="font-body-lg text-body-lg font-bold text-on-surface hover:text-secondary transition-colors" href="https://wa.me/919845012345" rel="noopener noreferrer" target="_blank">
-                      +91 98450 12345
-                    </a>
-                    <span className="font-body-sm text-body-sm text-on-surface-variant">Instant syllabus &amp; batch schedules</span>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary text-[18px] shrink-0">
+                    check_circle
+                  </span>
+                  <span className="text-xs font-semibold text-foreground">1-on-1 Speech Diagnostic</span>
                 </div>
-                <div className="flex items-start gap-space-xs">
-                  <div className="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center shrink-0 mt-0.5 text-primary">
-                    <span className="material-symbols-outlined text-[20px]">mail</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Admissions Office</span>
-                    <a className="font-body-md text-body-md font-semibold text-primary hover:text-secondary transition-colors" href="mailto:admissions@elitevertex.edu.in">
-                      admissions@elitevertex.edu.in
-                    </a>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary text-[18px] shrink-0">
+                    check_circle
+                  </span>
+                  <span className="text-xs font-semibold text-foreground">Admissions Counseling</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary text-[18px] shrink-0">
+                    check_circle
+                  </span>
+                  <span className="text-xs font-semibold text-foreground">Tailored Cohort Matching</span>
                 </div>
               </div>
-              <div className="bg-surface-container-low p-space-sm rounded-lg flex items-start gap-space-xs">
-                <span className="material-symbols-outlined text-secondary text-[22px] shrink-0">schedule</span>
-                <div className="flex flex-col">
-                  <span className="font-label-md text-label-md uppercase tracking-wider text-primary font-semibold">Desk &amp; Campus Hours</span>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
-                    Mon – Sat • 8:30 AM – 8:00 PM<br/>
-                    Sunday • Academic consultations by prior appointment only
+            </div>
+          </div>
+
+          {/* Right Column: Contact Message Form */}
+          <div className="w-full id-contact-form" id="contactForm">
+            <div className="bg-surface-container-lowest rounded-[2rem] p-6 sm:p-8 lg:p-10 shadow-xl border border-outline-variant/30">
+              <h3 className="text-xl font-bold text-foreground mb-6">Send Us a Message</h3>
+
+              {errorMessage && (
+                <div className="mb-4 bg-error-container text-on-error-container p-4 rounded-xl text-xs font-semibold">
+                  {errorMessage}
+                </div>
+              )}
+
+              {isSubmitted ? (
+                <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100 rounded-2xl p-6 sm:p-8 flex flex-col gap-3">
+                  <div className="flex items-center gap-3 font-extrabold text-emerald-800 dark:text-emerald-300 text-lg">
+                    <span className="material-symbols-outlined text-[28px] text-emerald-600 dark:text-emerald-400">task_alt</span>
+                    <span>Inquiry Received Successfully!</span>
+                  </div>
+                  <p className="text-sm text-emerald-800 dark:text-emerald-200 leading-relaxed">
+                    Thank you for reaching out to <strong>Elite Vertex English Institute</strong>. A confirmation email has been dispatched to <strong>{submittedEmail}</strong>.
                   </p>
+                  <div className="p-4 bg-white/70 dark:bg-emerald-900/30 rounded-xl border border-emerald-200 dark:border-emerald-800/50 text-xs text-emerald-900 dark:text-emerald-200 leading-relaxed">
+                    <strong className="block mb-1 text-emerald-950 dark:text-white uppercase tracking-wider text-[11px]">What Happens Next:</strong>
+                    A senior language advisor will review your query and contact you within 24 hours to schedule your complimentary diagnostic speech evaluation.
+                  </div>
+                  <button
+                    onClick={() => setIsSubmitted(false)}
+                    className="mt-2 text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 underline hover:text-emerald-950 dark:hover:text-white self-start"
+                  >
+                    Send Another Message
+                  </button>
                 </div>
-              </div>
-            </div>
-            
-            <div className="bg-primary-container text-on-primary rounded-xl p-space-lg shadow-md flex flex-col gap-space-sm">
-              <div className="flex items-center gap-space-2xs text-secondary-fixed">
-                <span className="material-symbols-outlined text-[22px]">record_voice_over</span>
-                <span className="font-label-sm text-label-sm uppercase tracking-widest font-bold">Direct Campus Diagnostic</span>
-              </div>
-              <h3 className="font-headline-sm text-headline-sm font-semibold tracking-tight text-surface">
-                Walk-in Speaking Appraisal
-              </h3>
-              <p className="font-body-sm text-body-sm text-on-primary-container leading-relaxed">
-                Take a complimentary 20-minute verbal baseline test with a faculty speech coach. Receive instant phonetic feedback and a structured band roadmap.
-              </p>
-              <div className="flex items-center gap-2 pt-space-3xs text-secondary-fixed font-label-md text-label-md uppercase tracking-wider">
-                <span className="material-symbols-outlined text-[18px]">verified</span>
-                <span>No reservation required during open hours</span>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-space-sm">
-              {apiCampuses.length > 0 ? (
-                apiCampuses.map((item: any, idx: number) => (
-                  <div key={item.id} className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
-                    <div className="flex flex-col">
-                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-bold mb-1">Centre 0{idx + 1}</span>
-                      <h4 className="font-headline-sm text-headline-sm font-bold text-primary mb-space-3xs">{item.name}</h4>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        {item.address}
-                      </p>
-                    </div>
-                    {item.metroAccess && (
-                      <div className="mt-space-md pt-space-xs flex items-center gap-1.5 text-on-surface-variant font-label-sm text-label-sm">
-                        <span className="material-symbols-outlined text-[16px] text-primary">directions_subway</span>
-                        <span>{item.metroAccess}</span>
-                      </div>
-                    )}
-                  </div>
-                ))
               ) : (
-                <>
-                  <div className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
-                    <div className="flex flex-col">
-                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-bold mb-1">Centre 01</span>
-                      <h4 className="font-headline-sm text-headline-sm font-bold text-primary mb-space-3xs">Bengaluru</h4>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Ground &amp; 2nd Floor, Apex Tower, M.G. Road, Bengaluru 560001
-                      </p>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                  {/* Name and Email */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-foreground mb-1.5">
+                        Your Full Name <span className="text-secondary">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        placeholder="e.g. Rahul Sharma"
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition-all placeholder:text-muted-foreground font-medium"
+                      />
                     </div>
-                    <div className="mt-space-md pt-space-xs flex items-center gap-1.5 text-on-surface-variant font-label-sm text-label-sm">
-                      <span className="material-symbols-outlined text-[16px] text-primary">directions_subway</span>
-                      <span>120m from M.G. Road Metro</span>
+
+                    <div>
+                      <label className="block text-xs font-bold text-foreground mb-1.5">
+                        Email Address <span className="text-secondary">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        placeholder="e.g. rahul@example.com"
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition-all placeholder:text-muted-foreground font-medium"
+                      />
                     </div>
                   </div>
-                  
-                  <div className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
-                    <div className="flex flex-col">
-                      <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-bold mb-1">Centre 02</span>
-                      <h4 className="font-headline-sm text-headline-sm font-bold text-primary mb-space-3xs">New Delhi</h4>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Statesman House, Barakhamba Road, Connaught Place, New Delhi 110001
-                      </p>
+
+                  {/* Phone & Program of Interest */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-foreground mb-1.5">
+                        Phone / WhatsApp (Optional)
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        placeholder="e.g. +91 98765 43210"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition-all placeholder:text-muted-foreground font-medium"
+                      />
                     </div>
-                    <div className="mt-space-md pt-space-xs flex items-center gap-1.5 text-on-surface-variant font-label-sm text-label-sm">
-                      <span className="material-symbols-outlined text-[16px] text-primary">directions_subway</span>
-                      <span>Direct Barakhamba Gate 4 Access</span>
+
+                    <div>
+                      <label className="block text-xs font-bold text-foreground mb-1.5">
+                        Program of Interest
+                      </label>
+                      <select
+                        name="program"
+                        value={formData.program}
+                        onChange={(e) => setFormData({ ...formData, program: e.target.value })}
+                        className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition-all font-medium text-foreground cursor-pointer"
+                      >
+                        <option value="Fluent Spoken English">Fluent Spoken English</option>
+                        <option value="Executive Business Communication">Executive Business Communication</option>
+                        <option value="Public Speaking & Rhetoric">Public Speaking & Rhetoric</option>
+                        <option value="Accent Conditioning & Vocal Dynamics">Accent Conditioning & Vocal Dynamics</option>
+                        <option value="IELTS / Academic English Mastery">IELTS / Academic English Mastery</option>
+                        <option value="Custom 1-on-1 Executive Coaching">Custom 1-on-1 Executive Coaching</option>
+                      </select>
                     </div>
                   </div>
-                </>
+
+                  {/* Preferred Learning Mode */}
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1.5">
+                      Preferred Mode of Training
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {["Classroom / Campus", "Live Online", "Hybrid Cohort"].map((m) => (
+                        <button
+                          key={m}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, mode: m })}
+                          className={`py-2 px-3 rounded-lg text-xs font-bold border transition-colors ${
+                            formData.mode === m
+                              ? "bg-secondary text-white border-secondary"
+                              : "bg-surface-container-low border-outline-variant/40 text-foreground hover:bg-surface-container"
+                          }`}
+                        >
+                          {m}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Subject */}
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1.5">
+                      Subject / Inquiry Reason
+                    </label>
+                    <input
+                      type="text"
+                      name="subject"
+                      placeholder="e.g. Seeking batch timings and fee schedule"
+                      value={formData.subject}
+                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                      className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition-all placeholder:text-muted-foreground font-medium"
+                    />
+                  </div>
+
+                  {/* Message */}
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1.5">
+                      Your Message or Questions <span className="text-secondary">*</span>
+                    </label>
+                    <textarea
+                      name="message"
+                      rows={4}
+                      placeholder="Share your learning goals, current challenges with spoken English, or convenient callback timing..."
+                      required
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition-all placeholder:text-muted-foreground font-medium resize-none"
+                    ></textarea>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full py-4 bg-secondary hover:bg-on-secondary-container text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-1 disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <svg className="animate-spin h-5 w-5 text-white mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                      </svg>
+                    ) : (
+                      <span className="material-symbols-outlined text-[18px]">send</span>
+                    )}
+                    <span>{isSubmitting ? "Sending Inquiry..." : "Submit Inquiry"}</span>
+                  </button>
+
+                  <div className="flex items-center justify-center gap-2 mt-2 text-muted-foreground">
+                    <span className="material-symbols-outlined text-[16px]">
+                      lock
+                    </span>
+                    <span className="text-xs font-medium">Your data is confidential. We will never share or sell your details.</span>
+                  </div>
+                </form>
               )}
             </div>
           </div>
-          
-          <div className="lg:col-span-7">
-            <div className="bg-surface-container-lowest p-space-lg md:p-space-xl rounded-xl shadow-sm">
-              <div className="flex flex-col mb-space-md">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-secondary"></span>
-                  <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant font-bold">Academic Registry</span>
-                </div>
-                <h2 className="font-headline-lg text-headline-md md:text-headline-lg font-bold text-primary tracking-tight">
-                  Request an Admissions Callback
-                </h2>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
-                  Our academic advisors evaluate your current communication proficiency and suggest targeted course pathways.
+
+        </div>
+      </section>
+
+      {/* SECTION 2: 4 CONTACT DETAILS CARDS GRID */}
+      <section className="py-12 lg:py-16 bg-surface-container-low/60 border-y border-outline-variant/20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            {/* Card 1: Our Address */}
+            <div className="bg-surface-container-lowest p-7 rounded-2xl border border-outline-variant/30 shadow-sm flex items-start gap-4 hover:-translate-y-1 transition-transform duration-200">
+              <div className="w-11 h-11 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 border border-secondary/20">
+                <span className="material-symbols-outlined text-secondary text-[22px]">
+                  location_on
+                </span>
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground text-sm mb-1">Our Address</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed font-medium whitespace-pre-line">
+                  {address}
                 </p>
               </div>
-              
-              <form className="flex flex-col gap-space-md" onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-space-md">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-label-md text-label-md uppercase tracking-wider text-on-surface font-semibold" htmlFor="fullName">
-                      Full Name <span className="text-secondary">*</span>
-                    </label>
-                    <input
-                      className="w-full bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 rounded text-body-md font-body-md text-on-surface placeholder:text-outline-variant outline-none transition-all duration-150 focus:shadow-inner"
-                      id="fullName"
-                      name="fullName"
-                      placeholder="e.g. Dr. Alistair Menon"
-                      required
-                      type="text"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-label-md text-label-md uppercase tracking-wider text-on-surface font-semibold" htmlFor="phoneNumber">
-                      Phone Number <span className="text-secondary">*</span>
-                    </label>
-                    <input
-                      className="w-full bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 rounded text-body-md font-body-md text-on-surface placeholder:text-outline-variant outline-none transition-all duration-150 focus:shadow-inner"
-                      id="phoneNumber"
-                      name="phoneNumber"
-                      placeholder="+91 90000 00000"
-                      required
-                      type="tel"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                    />
-                  </div>
-                </div>
-                
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-md text-label-md uppercase tracking-wider text-on-surface font-semibold" htmlFor="emailAddress">
-                    Email Address <span className="text-secondary">*</span>
-                  </label>
-                  <input
-                    className="w-full bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 rounded text-body-md font-body-md text-on-surface placeholder:text-outline-variant outline-none transition-all duration-150 focus:shadow-inner"
-                    id="emailAddress"
-                    name="emailAddress"
-                    placeholder="name@organization.com"
-                    required
-                    type="email"
-                    value={emailAddress}
-                    onChange={(e) => setEmailAddress(e.target.value)}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-space-md">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-label-md text-label-md uppercase tracking-wider text-on-surface font-semibold" htmlFor="program">
-                      Program of Interest <span className="text-secondary">*</span>
-                    </label>
-                    <div className="relative">
-                      <select
-                        className="w-full appearance-none bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 pr-10 rounded text-body-md font-body-md text-on-surface outline-none transition-all duration-150 cursor-pointer"
-                        id="program"
-                        name="program"
-                        required
-                        value={program}
-                        onChange={(e) => setProgram(e.target.value)}
-                      >
-                        <option disabled value="">Select curriculum pathway</option>
-                        <option value="spoken-english">Spoken English Mastery</option>
-                        <option value="interview-skills">Executive Interview &amp; Pitching Skills</option>
-                        <option value="personality-dev">Personality &amp; Public Presence</option>
-                        <option value="business-english">Business English &amp; Corporate Oratory</option>
-                      </select>
-                      <span className="material-symbols-outlined pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">
-                        expand_more
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-label-md text-label-md uppercase tracking-wider text-on-surface font-semibold">
-                      Preferred Mode <span className="text-secondary">*</span>
-                    </label>
-                    <div className="grid grid-cols-2 gap-2 h-[48px]">
-                      <label className={`flex items-center justify-center gap-2 rounded cursor-pointer transition-all duration-150 px-2 ${mode === 'campus' ? 'bg-primary text-on-primary' : 'bg-surface-container-low'}`}>
-                        <input className="sr-only" name="mode" type="radio" value="campus" checked={mode === 'campus'} onChange={() => setMode('campus')}/>
-                        <span className="material-symbols-outlined text-[18px]">domain</span>
-                        <span className="font-label-md text-label-md uppercase tracking-wider font-semibold">Campus</span>
-                      </label>
-                      <label className={`flex items-center justify-center gap-2 rounded cursor-pointer transition-all duration-150 px-2 ${mode === 'online' ? 'bg-primary text-on-primary' : 'bg-surface-container-low'}`}>
-                        <input className="sr-only" name="mode" type="radio" value="online" checked={mode === 'online'} onChange={() => setMode('online')}/>
-                        <span className="material-symbols-outlined text-[18px]">videocam</span>
-                        <span className="font-label-md text-label-md uppercase tracking-wider font-semibold">Online Live</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-md text-label-md uppercase tracking-wider text-on-surface font-semibold" htmlFor="briefNote">
-                    Brief Note or Current Communication Challenge
-                  </label>
-                  <textarea
-                    className="w-full bg-surface-container-low focus:bg-surface-container-lowest px-4 py-3 rounded text-body-md font-body-md text-on-surface placeholder:text-outline-variant outline-none transition-all duration-150 resize-none focus:shadow-inner"
-                    id="briefNote"
-                    name="briefNote"
-                    placeholder="Share your current focus areas..."
-                    rows={4}
-                    value={briefNote}
-                    onChange={(e) => setBriefNote(e.target.value)}
-                  ></textarea>
-                </div>
-                
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-space-sm pt-space-xs">
-                  <button
-                    disabled={isSubmitting}
-                    className="inline-flex items-center justify-center gap-2 bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-md text-label-md uppercase tracking-widest px-8 py-3.5 rounded-lg transition-colors duration-150 shadow-sm disabled:opacity-50"
-                    type="submit"
-                  >
-                    <span>{isSubmitting ? "Sending..." : "Send Enquiry"}</span>
-                    <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-                  </button>
-                  <div className="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
-                    <span className="material-symbols-outlined text-[18px] text-primary">security</span>
-                    <span>No spam. Strictly academic alignment.</span>
-                  </div>
-                </div>
-                
-                {isSubmitted && (
-                  <div className="mt-space-xs p-space-sm bg-surface-container-high rounded-lg flex items-center gap-3 text-on-surface">
-                    <span className="material-symbols-outlined text-secondary text-[24px]">task_alt</span>
-                    <div className="flex flex-col">
-                      <span className="font-label-md text-label-md uppercase tracking-wider font-bold">Enquiry Registered</span>
-                      <span className="font-body-sm text-body-sm text-on-surface-variant">An academic counsellor will reach you via call or WhatsApp within 2 business hours.</span>
-                    </div>
-                  </div>
-                )}
-              </form>
             </div>
+
+            {/* Card 2: Working Hours */}
+            <div className="bg-surface-container-lowest p-7 rounded-2xl border border-outline-variant/30 shadow-sm flex items-start gap-4 hover:-translate-y-1 transition-transform duration-200">
+              <div className="w-11 h-11 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 border border-secondary/20">
+                <span className="material-symbols-outlined text-secondary text-[22px]">
+                  schedule
+                </span>
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground text-sm mb-1">Working Hours</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed font-medium whitespace-pre-line">
+                  {workingHours}
+                </p>
+              </div>
+            </div>
+
+            {/* Card 3: Email Us */}
+            <div className="bg-surface-container-lowest p-7 rounded-2xl border border-outline-variant/30 shadow-sm flex items-start gap-4 hover:-translate-y-1 transition-transform duration-200">
+              <div className="w-11 h-11 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 border border-secondary/20">
+                <span className="material-symbols-outlined text-secondary text-[22px]">
+                  mail
+                </span>
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground text-sm mb-1">Email Us</h3>
+                <a
+                  href={`mailto:${email}`}
+                  className="text-xs text-muted-foreground hover:text-secondary transition-colors font-medium break-all"
+                >
+                  {email}
+                </a>
+              </div>
+            </div>
+
+            {/* Card 4: Call Us */}
+            <div className="bg-surface-container-lowest p-7 rounded-2xl border border-outline-variant/30 shadow-sm flex items-start gap-4 hover:-translate-y-1 transition-transform duration-200">
+              <div className="w-11 h-11 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 border border-secondary/20">
+                <span className="material-symbols-outlined text-secondary text-[22px]">
+                  call
+                </span>
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground text-sm mb-1">Call Us</h3>
+                <a
+                  href={`tel:${phone.replace(/[^0-9+]/g, "")}`}
+                  className="text-xs text-muted-foreground hover:text-secondary transition-colors font-medium"
+                >
+                  {phone}
+                </a>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
-      
-      <section className="w-full max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop pb-space-3xl">
-        <div className="flex flex-col gap-space-md">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-xs pb-space-2xs">
-            <div className="flex flex-col">
-              <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-bold">Transit &amp; Parking</span>
-              <h3 className="font-headline-lg text-headline-md md:text-headline-lg font-bold text-primary tracking-tight">
-                Campus Access &amp; Locations
-              </h3>
-            </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant max-w-md">
-              Both facilities are situated directly adjacent to core transit arteries with dedicated multi-level subterranean visitor parking.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-lg">
-            <div className="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm flex flex-col">
-              <div className="w-full h-64 bg-cover bg-center relative bg-surface-container bg-[url('https://maps.googleapis.com/maps/api/staticmap?center=12.9715987,77.5945627&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C12.9715987,77.5945627&key=YOUR_API_KEY_HERE')]">
-                <div className="absolute inset-0 bg-primary/10"></div>
-                <div className="absolute top-4 left-4 bg-surface-container-lowest/95 backdrop-blur-none px-3 py-1.5 rounded shadow-sm flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-secondary"></span>
-                  <span className="font-label-sm text-label-sm uppercase tracking-wider font-bold text-primary">Bengaluru Flagship</span>
-                </div>
-                <div className="absolute bottom-4 right-4 bg-primary text-on-primary px-3 py-1 rounded text-label-sm font-label-sm tracking-wider uppercase">
-                  Apex Tower
-                </div>
-              </div>
-              <div className="p-space-md flex flex-col gap-space-sm flex-1 justify-between">
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-headline-sm text-headline-sm font-bold text-primary">M.G. Road Campus</h4>
-                    <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Karnataka</span>
-                  </div>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    Ground &amp; 2nd Floor, Apex Tower, M.G. Road, Bengaluru 560001
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-space-xs pt-space-2xs bg-surface-container-low p-space-sm rounded-lg text-on-surface">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-secondary text-[20px]">train</span>
-                    <div className="flex flex-col leading-tight">
-                      <span className="font-label-sm text-label-sm uppercase tracking-wider font-bold">M.G. Road Metro</span>
-                      <span className="font-body-sm text-[12px] text-on-surface-variant">Purple Line (Exit C)</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-secondary text-[20px]">local_parking</span>
-                    <div className="flex flex-col leading-tight">
-                      <span className="font-label-sm text-label-sm uppercase tracking-wider font-bold">Valet &amp; Basements</span>
-                      <span className="font-body-sm text-[12px] text-on-surface-variant">Levels B1 – B3 reserved</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between pt-space-3xs text-on-surface-variant font-body-sm text-body-sm">
-                  <span className="flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[18px] text-primary">navigation</span>
-                    Landmark: Opposite Cauvery Arts Emporium
-                  </span>
-                  <a className="font-label-md text-label-md uppercase tracking-wider text-secondary font-bold hover:underline" href="https://maps.google.com" rel="noopener noreferrer" target="_blank">
-                    Get Directions →
-                  </a>
-                </div>
-              </div>
-            </div>
+
+      {/* SECTION 3: MAP LOCATION & DIRECTIONS */}
+      <section className="py-12 lg:py-20 bg-background">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="w-full h-[420px] bg-surface-container-low rounded-[2rem] overflow-hidden relative border border-outline-variant/30 shadow-md">
             
-            <div className="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm flex flex-col">
-              <div className="w-full h-64 bg-cover bg-center relative bg-surface-container bg-[url('https://maps.googleapis.com/maps/api/staticmap?center=28.6293,77.2223&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C28.6293,77.2223&key=YOUR_API_KEY_HERE')]">
-                <div className="absolute inset-0 bg-primary/10"></div>
-                <div className="absolute top-4 left-4 bg-surface-container-lowest/95 backdrop-blur-none px-3 py-1.5 rounded shadow-sm flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-secondary"></span>
-                  <span className="font-label-sm text-label-sm uppercase tracking-wider font-bold text-primary">New Delhi Centre</span>
-                </div>
-                <div className="absolute bottom-4 right-4 bg-primary text-on-primary px-3 py-1 rounded text-label-sm font-label-sm tracking-wider uppercase">
-                  Statesman House
-                </div>
-              </div>
-              <div className="p-space-md flex flex-col gap-space-sm flex-1 justify-between">
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-headline-sm text-headline-sm font-bold text-primary">Connaught Place Campus</h4>
-                    <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">NCR</span>
-                  </div>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    Statesman House, Barakhamba Road, Connaught Place, New Delhi 110001
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-space-xs pt-space-2xs bg-surface-container-low p-space-sm rounded-lg text-on-surface">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-secondary text-[20px]">train</span>
-                    <div className="flex flex-col leading-tight">
-                      <span className="font-label-sm text-label-sm uppercase tracking-wider font-bold">Barakhamba Metro</span>
-                      <span className="font-body-sm text-[12px] text-on-surface-variant">Blue Line (Gate No. 4)</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-secondary text-[20px]">local_parking</span>
-                    <div className="flex flex-col leading-tight">
-                      <span className="font-label-sm text-label-sm uppercase tracking-wider font-bold">Multi-tier Parking</span>
-                      <span className="font-body-sm text-[12px] text-on-surface-variant">Automated campus bay</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between pt-space-3xs text-on-surface-variant font-body-sm text-body-sm">
-                  <span className="flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[18px] text-primary">navigation</span>
-                    Landmark: Radial Junction 2, Inner Circle
-                  </span>
-                  <a className="font-label-md text-label-md uppercase tracking-wider text-secondary font-bold hover:underline" href="https://maps.google.com" rel="noopener noreferrer" target="_blank">
-                    Get Directions →
-                  </a>
-                </div>
-              </div>
+            {/* Google Map Embed */}
+            <iframe
+              title="Elite Vertex Campus Location"
+              src={mapEmbedUrl}
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen={false}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="w-full h-full filter contrast-[1.02]"
+            ></iframe>
+
+            {/* Floating Location Card Overlay */}
+            <div className="absolute top-6 left-6 sm:top-10 sm:left-10 bg-surface-container-lowest/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-xl border border-outline-variant/40 max-w-[320px] z-10">
+              <h3 className="text-xl font-bold text-foreground mb-3">Find Us Here</h3>
+              <p className="text-xs text-muted-foreground mb-6 leading-relaxed font-medium whitespace-pre-line">
+                {address}
+              </p>
+              <a
+                href={googleMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider w-full bg-primary text-on-primary py-3.5 rounded-xl shadow-md hover:bg-on-surface transition-all"
+              >
+                <span>Get Directions</span>
+                <span className="material-symbols-outlined text-[16px]">
+                  arrow_forward
+                </span>
+              </a>
             </div>
+
           </div>
         </div>
       </section>
-      
-      <section className="w-full bg-surface-container-low py-space-2xl">
-        <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
-          <div className="bg-surface-container-lowest rounded-xl p-space-lg md:p-space-2xl shadow-sm flex flex-col md:flex-row items-center justify-between gap-space-lg text-center md:text-left">
-            <div className="flex flex-col max-w-xl">
-              <span className="font-label-md text-label-md uppercase tracking-widest text-secondary font-bold mb-space-3xs">
-                Institutional Commitment
-              </span>
-              <h2 className="font-headline-lg text-headline-lg font-bold text-primary tracking-tight mb-space-2xs">
-                We’re Ready to Help You Take the Next Step.
+
+      {/* SECTION 4: CALL TO ACTION BANNER */}
+      <section className="py-12 lg:py-20 pb-24 bg-surface-container-low/60">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="bg-secondary/5 rounded-[32px] border border-secondary/20 flex flex-col md:flex-row items-center overflow-hidden shadow-sm">
+            
+            {/* Visual Icon Column */}
+            <div className="w-full md:w-4/12 h-56 md:h-auto min-h-[260px] bg-secondary/10 flex items-center justify-center p-8">
+              <div className="w-24 h-24 rounded-full bg-secondary/20 border border-secondary/30 flex items-center justify-center shadow-inner">
+                <span className="material-symbols-outlined text-secondary text-[48px]">
+                  rocket_launch
+                </span>
+              </div>
+            </div>
+
+            {/* Content Column */}
+            <div className="w-full md:w-8/12 p-8 lg:p-14 text-center md:text-left">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground mb-4">
+                {callToActionTitle}
               </h2>
-              <p className="font-body-lg text-body-lg text-on-surface-variant">
-                Speak With Confidence. Rise With Communication.
+              <p className="text-muted-foreground text-sm sm:text-base mb-8 max-w-md mx-auto md:mx-0 leading-relaxed font-normal">
+                {callToActionSubtitle}
               </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <Link
+                  href="/courses"
+                  className="inline-flex items-center justify-center gap-2 bg-secondary text-white font-bold text-sm rounded-xl px-8 py-3.5 shadow-md hover:bg-on-secondary-container transition-all hover:-translate-y-0.5"
+                >
+                  <span>Explore Courses</span>
+                  <span className="material-symbols-outlined text-[18px]">
+                    arrow_forward
+                  </span>
+                </Link>
+                <a
+                  href="#contactForm"
+                  className="inline-flex items-center justify-center gap-2 border border-secondary/30 text-secondary hover:bg-secondary/10 bg-surface-container-lowest font-bold text-sm rounded-xl px-8 py-3.5 shadow-sm transition-all hover:-translate-y-0.5"
+                >
+                  <span>Talk to an Expert</span>
+                  <span className="material-symbols-outlined text-[18px]">
+                    arrow_forward
+                  </span>
+                </a>
+              </div>
             </div>
-            <div className="flex flex-col sm:flex-row items-center gap-space-sm shrink-0">
-              <a className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary hover:bg-on-surface text-on-primary font-label-md text-label-md uppercase tracking-wider px-space-lg py-space-xs rounded-lg transition-colors duration-150" href="tel:+918049208800">
-                <span className="material-symbols-outlined text-[18px]">call</span>
-                <span>Call Admissions</span>
-              </a>
-              <Link className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md uppercase tracking-wider px-space-lg py-space-xs rounded-lg transition-colors duration-150" href="#contactForm">
-                <span>Fill Callback Form</span>
-              </Link>
-            </div>
+
           </div>
         </div>
       </section>

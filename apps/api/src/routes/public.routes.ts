@@ -2,6 +2,8 @@ import { Router } from "express";
 import { getCourses, getGallery, getTestimonials, getFaqs, getWebsiteSettings, getMentors, getAboutPage, getCampuses } from "../controller/public.controller";
 import { submitContactForm } from "../controller/contact.controller";
 import { verifyCertificate } from "../controller/certificate.controller";
+import { getPublishedPage } from "../controller/pages.controller";
+import { getPublicNavigation } from "../controller/navigation.controller";
 
 const router = Router();
 
@@ -13,6 +15,8 @@ router.get("/website-settings", getWebsiteSettings);
 router.get("/mentors", getMentors);
 router.get("/about", getAboutPage);
 router.get("/campuses", getCampuses);
+router.get("/navigation/:location", getPublicNavigation);
+router.get("/pages/:slug", getPublishedPage);
 router.post("/contact", submitContactForm);
 router.get("/certificates/verify/:certificateNumber", verifyCertificate);
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useGetAdminMentorsQuery, useCreateMentorMutation, useDeleteMentorMutation } from "@/lib/features/api/apiSlice";
+import DualImageInput from "@/components/admin/DualImageInput";
 
 export default function AdminMentorsPage() {
   const { data: response, isLoading } = useGetAdminMentorsQuery({});
@@ -114,14 +115,13 @@ export default function AdminMentorsPage() {
               className="bg-surface-container p-3 rounded-lg outline-none focus:ring-2 focus:ring-primary text-on-surface"
             />
           </div>
-          <div className="flex flex-col gap-1 md:col-span-2">
-            <label className="font-label-md text-on-surface">Profile Image URL</label>
-            <input
-              type="text"
-              placeholder="https://..."
+          <div className="md:col-span-2">
+            <DualImageInput
+              label="Mentor Profile Photo"
               value={profileImage}
-              onChange={(e) => setProfileImage(e.target.value)}
-              className="bg-surface-container p-3 rounded-lg outline-none focus:ring-2 focus:ring-primary text-on-surface"
+              onChange={(url) => setProfileImage(url)}
+              helpText="Upload faculty portrait from device or paste an image link."
+              placeholder="https://images.unsplash.com/... or https://..."
             />
           </div>
           <div className="flex flex-col gap-1 md:col-span-2">

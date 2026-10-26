@@ -1,7 +1,7 @@
 import { db } from "../../config/db";
-import { admins, websiteSettings, faqs, courses, mentors, campuses, aboutPage, testimonials, galleryItems } from "../schema";
-import bcrypt from "bcryptjs";
+import { admins, websiteSettings, faqs, courses, mentors, campuses, aboutPage, testimonials, galleryItems, pages, pageSections, navigationMenus, navigationItems } from "../schema";
 import { eq } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 
 async function runSeed() {
   console.log("🌱 Seeding database...");
@@ -20,8 +20,15 @@ async function runSeed() {
       email: adminEmail,
       name: "Super Admin",
       passwordHash,
+      role: "admin",
     });
     console.log(`✅ Seeded admin user (${adminEmail} / ${adminPass})`);
+  }
+
+  // Ensure existing admin has role set
+  if (existingAdmin && existingAdmin.role !== "admin") {
+    await db.update(admins).set({ role: "admin" }).where(eq(admins.id, existingAdmin.id));
+    console.log("✅ Promoted existing admin to role=admin");
   }
 
   // Seed Website Settings
@@ -43,23 +50,20 @@ async function runSeed() {
       {
         question: "How long are the courses?",
         answer: "Most courses run for 4 to 12 weeks depending on whether it is an intensive workshop or a full flagship masterclass.",
-        category: "General",
         displayOrder: 1,
-        isPublished: true,
+        isActive: true,
       },
       {
         question: "Do you offer placement assistance & interview training?",
         answer: "Yes! Our specialized Interview Skills & GD module includes 1-on-1 mock panels and resume review with corporate hiring partners.",
-        category: "Placement",
         displayOrder: 2,
-        isPublished: true,
+        isActive: true,
       },
       {
         question: "Are classes available online or on-campus?",
         answer: "We offer both physical classroom batches across our campus centers and hybrid/online live interactive cohorts.",
-        category: "Batches",
         displayOrder: 3,
-        isPublished: true,
+        isActive: true,
       },
     ]);
     console.log("✅ Seeded FAQs");
@@ -239,20 +243,16 @@ async function runSeed() {
         city: "Bengaluru",
         name: "Indiranagar Flagship Campus",
         address: "2nd Floor, Elite Vertex Building, 100ft Road, Indiranagar, Bengaluru 560038",
-        phone: "+91 98765 43210",
-        email: "indiranagar@elitevertax.com",
-        landmarks: "Next to Metro Station Exit 2",
-        displayOrder: 1,
+        landmark: "Next to Metro Station Exit 2",
+        mapUrl: "https://maps.google.com/?q=Indiranagar+Bengaluru",
         isPublished: true,
       },
       {
         city: "Bengaluru",
         name: "Koramangala Learning Hub",
         address: "80ft Road, 4th Block, Koramangala, Bengaluru 560034",
-        phone: "+91 98765 43211",
-        email: "koramangala@elitevertax.com",
-        landmarks: "Opposite Sony World Junction",
-        displayOrder: 2,
+        landmark: "Opposite Sony World Junction",
+        mapUrl: "https://maps.google.com/?q=Koramangala+Bengaluru",
         isPublished: true,
       },
     ]);
@@ -263,14 +263,12 @@ async function runSeed() {
   const existingAbout = await db.query.aboutPage.findFirst();
   if (!existingAbout) {
     await db.insert(aboutPage).values({
-      heroTitle: "Empowering Professional Communication Excellence",
-      heroSubtitle: "Transforming spoken fluency, executive poise, and interview mastery across India.",
-      mission: "To eliminate language hesitation and equip ambitious individuals with persuasive spoken English skills for global career success.",
-      vision: "To become the premier acoustic speech lab and professional training academy in the nation.",
-      story: "Founded by language specialists and corporate trainers, Elite Vertex combines speech diagnostics with intensive acoustic practice.",
-      statsFellows: "5,000+",
-      statsBatches: "120+",
-      statsSuccessRate: "98%",
+      headerTitle: "Empowering Professional Communication Excellence",
+      headerSubtitle: "Transforming spoken fluency, executive poise, and interview mastery across India.",
+      visionTitle: "Our Vision",
+      visionBody: "To become the premier acoustic speech lab and professional training academy in the nation.",
+      missionTitle: "Our Mission",
+      missionBody: "To eliminate language hesitation and equip ambitious individuals with persuasive spoken English skills for global career success.",
     });
     console.log("✅ Seeded About Page");
   }
@@ -322,6 +320,213 @@ async function runSeed() {
     ]);
     console.log("✅ Seeded Gallery");
   }
+
+  // Seed CMS: Home page with sections matching the existing design
+  const existingHomePage = await db.query.pages.findFirst({
+    where: eq(pages.slug, "home"),
+  });
+
+  if (!existingHomePage) {
+    const [homePage] = await db
+      .insert(pages)
+      .values({
+        slug: "home",
+        title: "Home",
+        metaTitle: "Elite Vertex — Spoken English, Communication & Career Skills",
+        metaDescription:
+          "Build the English, communication skills, and executive confidence you need for classrooms, global careers, and everyday influence.",
+        status: "published",
+        publishedAt: new Date(),
+      })
+      .returning();
+
+    const homeSections = [
+      {
+        type: "hero",
+        title: "Hero",
+        sortOrder: 1,
+        content: {
+          tagline: "Spoken English • Communication • Career Skills",
+          heading: "Speak With Confidence. Go Further.",
+          subheading:
+            "Build the English, communication skills, and executive confidence you need for classrooms, global careers, and everyday influence.",
+          image:
+            "https://lh3.googleusercontent.com/aida/AEtjO1XUmQebC7cWdgP8rjmnfdqiY3TWTBNoYsfMaSYI7n3xfYNILdru7siueSJaT3rMs4i4yPJNbvZvfikMQY3F9R2qu9KcA-IJpgJKfBgkmFG_E5MXmadYRgWJ_6PhUHhZrCm8UV-zLzfi7YQS7zuXK6r0MjulQm5z6SjXV14VWLoizz-xs76JsWDExBfm2OMZySxsZVg3HIpEMQlOhdIgz88ZuQ4xbfsXjeGRuCDxyYgFYtotlQBLMiC4mi6i",
+          imageAlt: "Learners collaborating actively in executive seminar hall at Elite Vertex",
+          primaryCtaLabel: "Book Free Counselling",
+          primaryCtaUrl: "/contact",
+          secondaryCtaLabel: "Explore Courses",
+          secondaryCtaUrl: "/courses",
+        },
+      },
+      {
+        type: "pillars",
+        title: "Trust Strip",
+        sortOrder: 2,
+        content: {
+          items: [
+            { label: "Pillar 01", title: "Practical Learning", description: "70% active speaking, zero passive lecturing." },
+            { label: "Pillar 02", title: "Expert Trainers", description: "Cambridge-certified linguists & speech mentors." },
+            { label: "Pillar 03", title: "Personal Attention", description: "Strictly capped micro-cohorts of 12 peers." },
+            { label: "Pillar 04", title: "Career-Focused", description: "Interview panels, GD mastery, and boardroom articulation." },
+          ],
+        },
+      },
+      {
+        type: "about_preview",
+        title: "About Preview",
+        sortOrder: 3,
+        content: {
+          label: "Pedagogical Framework",
+          heading: "More Than English. We Build Confidence.",
+          paragraph1:
+            "Traditional language teaching isolates students inside grammar rules and rote drills. True oratory fluency requires psychological comfort, systematic desensitization to scrutiny, and immediate real-time feedback loops.",
+          paragraph2:
+            "At Elite Vertex, every participant receives continuous spoken runtime. We deconstruct anxiety, rebuild phonetics, and condition the posture of authority so your internal intellect translates effortlessly outward.",
+          linkLabel: "Discover Elite Vertex",
+          linkUrl: "/about",
+          image:
+            "https://lh3.googleusercontent.com/aida/AEtjO1UbCF47-wiszdwusF3kMtv218IqjqvwCWDJvXsccjhFWJowp5BXlhN1kafTOugiyzVfXIo1qi-UcFsCrXM57_lf-qI570CX2oKhiyKwApnDYDnGhjl05XnUcddmLAQBAC6iFtCkxGqpYRZMU9Qz-9h2x7T4YArXXt7nfL08xtPsa92omp0t5PyG8ovtazAtrAb_SaxJcN0q6Zs2xHS7t9SSVcj163VqpH4g0UmK98w5ZaPNxHYi4F5GhoI",
+          imageAlt: "Academic mentor guiding student presentation in modern learning acoustic pod",
+        },
+      },
+      {
+        type: "courses_preview",
+        title: "Courses Preview",
+        sortOrder: 4,
+        content: {
+          label: "Curriculum Tracks",
+          heading: "Learn Skills That Move You Forward.",
+          linkLabel: "View All Courses",
+          linkUrl: "/courses",
+          items: [
+            { title: "Spoken English Mastery", description: "Foundation to executive fluency, structural grammar, accent conditioning, and daily verbal sparring.", meta: "8 Weeks • In-Campus", url: "/courses" },
+            { title: "Interview Skills & Group Discussion", description: "Behavioral frameworks (STAR method), high-pressure panel simulations, case extempore, and rapid rebuttals.", meta: "4 Weeks • Cohort-Based", url: "/courses" },
+            { title: "Personality Development & Public Speaking", description: "Stage presence, vocal diaphragmatic modulation, kinesics, physical anchoring, and emotional resonance.", meta: "6 Weeks • Studio Lab", url: "/courses" },
+            { title: "Professional & Executive Communication", description: "Boardroom presentations, executive brevity, persuasive corporate correspondence, and diplomatic dissent.", meta: "6 Weeks • Executive Weekend", url: "/courses" },
+          ],
+        },
+      },
+      {
+        type: "testimonials",
+        title: "Testimonials",
+        sortOrder: 5,
+        content: {
+          badge: "STUDENT LOVE",
+          heading: "Loved By Many Students",
+          subheading:
+            "We're proud to have a community of learners who trust us to help them grow their skills and achieve their goals.",
+        },
+      },
+      {
+        type: "gallery",
+        title: "Gallery",
+        sortOrder: 6,
+        content: {
+          heading: "Be A Part Of Our Thriving Community",
+          subheading:
+            "Connect, share, and grow together with thousands of passionate learners across the globe.",
+        },
+      },
+      {
+        type: "certificate_faq",
+        title: "Certificate & FAQ",
+        sortOrder: 7,
+        content: {
+          certificateCardTitle: "Official Attestation",
+          certificateCardText: "Verify any alumni completion credential or serial number online.",
+          certificateCardCta: "Verify",
+          certificateCardCtaUrl: "/verify-certificate",
+          diagnosticLabel: "Speech Diagnostic",
+          diagnosticTitle: "Complimentary Speech Baseline Assessment",
+          diagnosticText:
+            "Evaluate your spoken clarity, pause cadence, and acoustic confidence with our senior academic linguists.",
+          diagnosticNote: "No obligation required",
+          faqLabel: "Clarifications",
+          faqTitle: "Common Inquiries",
+          faqLinkLabel: "View All FAQ",
+          faqLinkUrl: "/faq",
+        },
+      },
+      {
+        type: "cta",
+        title: "Final CTA",
+        sortOrder: 8,
+        content: {
+          label: "Admissions Open For Next Cohort",
+          heading: "Your Next Opportunity Starts With Better Communication.",
+          subheading:
+            "Schedule an in-person or virtual speech evaluation with our academic directors. Discover your baseline fluency score and receive a personalized curriculum path.",
+          primaryCtaLabel: "Book Free Counselling",
+          primaryCtaUrl: "/contact",
+          secondaryCtaLabel: "Visit Campus",
+          secondaryCtaUrl: "/contact",
+        },
+      },
+    ];
+
+    await db.insert(pageSections).values(
+      homeSections.map((s) => ({
+        pageId: homePage.id,
+        type: s.type,
+        title: s.title,
+        sortOrder: s.sortOrder,
+        draftContent: s.content,
+        publishedContent: s.content,
+        isVisible: true,
+      }))
+    );
+    console.log("✅ Seeded Home page with 8 sections");
+  }
+
+  // Seed CMS: Navigation menus
+  const seedMenu = async (location: string, name: string, items: Array<{ label: string; url: string }>) => {
+    let menu = await db.query.navigationMenus.findFirst({
+      where: eq(navigationMenus.location, location),
+    });
+    if (!menu) {
+      const [created] = await db
+        .insert(navigationMenus)
+        .values({ name, location })
+        .returning();
+      menu = created;
+    }
+    const existingItems = await db.query.navigationItems.findMany({
+      where: eq(navigationItems.menuId, menu.id),
+    });
+    if (existingItems.length === 0) {
+      await db.insert(navigationItems).values(
+        items.map((item, index) => ({
+          menuId: menu.id,
+          label: item.label,
+          url: item.url,
+          position: index + 1,
+          isVisible: true,
+        }))
+      );
+    }
+    return menu;
+  };
+
+  await seedMenu("header", "Header Menu", [
+    { label: "Home", url: "/" },
+    { label: "Courses", url: "/courses" },
+    { label: "About", url: "/about" },
+    { label: "Verify Certificate", url: "/verify-certificate" },
+    { label: "Contact", url: "/contact" },
+  ]);
+
+  await seedMenu("footer", "Footer Menu", [
+    { label: "Home", url: "/" },
+    { label: "Courses & Curriculum", url: "/courses" },
+    { label: "About the Institute", url: "/about" },
+    { label: "Campus Gallery", url: "/gallery" },
+    { label: "Verify Credential", url: "/verify-certificate" },
+    { label: "FAQ & Help", url: "/faq" },
+    { label: "Contact & Visit", url: "/contact" },
+  ]);
+
+  console.log("✅ Seeded navigation menus");
 
   console.log("🎉 Seeding complete!");
   process.exit(0);

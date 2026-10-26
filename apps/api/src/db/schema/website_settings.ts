@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, timestamp, text } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, timestamp, text, boolean } from "drizzle-orm/pg-core";
 
 export const websiteSettings = pgTable("website_settings", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -10,11 +10,32 @@ export const websiteSettings = pgTable("website_settings", {
   callToActionTitle: text("cta_title"),
   callToActionSubtitle: text("cta_subtitle"),
   phone: varchar("phone", { length: 100 }),
+  whatsapp: varchar("whatsapp", { length: 100 }),
   email: varchar("email", { length: 255 }),
   address: text("address"),
+  workingHours: text("working_hours"),
   googleMapsUrl: text("google_maps_url"),
   facebookUrl: text("facebook_url"),
   instagramUrl: text("instagram_url"),
   footerText: text("footer_text"),
+  contactTitle: text("contact_title"),
+  contactSubtitle: text("contact_subtitle"),
+  contactTagline: text("contact_tagline"),
+  logoUrl: text("logo_url"),
+  faviconUrl: text("favicon_url"),
+  linkedinUrl: text("linkedin_url"),
+  youtubeUrl: text("youtube_url"),
+  announcementEnabled: boolean("announcement_enabled").default(false).notNull(),
+  announcementText: text("announcement_text"),
+  announcementLink: text("announcement_link"),
+  seoMetaTitle: varchar("seo_meta_title", { length: 255 }),
+  seoMetaDescription: text("seo_meta_description"),
+  certSig1Name: varchar("cert_sig1_name", { length: 255 }),
+  certSig1Title: varchar("cert_sig1_title", { length: 255 }),
+  certSig1Sign: text("cert_sig1_sign"),
+  certSig2Name: varchar("cert_sig2_name", { length: 255 }),
+  certSig2Title: varchar("cert_sig2_title", { length: 255 }),
+  certSig2Sign: text("cert_sig2_sign"),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+

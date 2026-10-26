@@ -2,14 +2,30 @@ import { Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { eq } from "drizzle-orm";
 import { db } from "../config/db";
 import { env } from "../config/env";
-import { sql } from "drizzle-orm";
+import { admins } from "../db/schema";
+import { AuthenticatedRequest } from "../middleware/auth.middleware";
 
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
 });
+
+const signToken = (payload: { adminId: string; email: string; role: string }) =>
+  jwt.sign(payload, env.JWT_ACCESS_SECRET, {
+    expiresIn: env.JWT_ACCESS_EXPIRATION as any,
+  });
+
+const setAuthCookie = (res: Response, token: string) => {
+  res.cookie("admin_token", token, {
+    httpOnly: true,
+    secure: env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+};
 
 export const adminLogin = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -23,38 +39,54 @@ export const adminLogin = async (req: Request, res: Response, next: NextFunction
     }
 
     const { email, password } = parsed.data;
+    const normalizedEmail = email.trim().toLowerCase();
 
-    // Check credentials directly against environment variables
-    const adminUser = env.ADMIN_USER || "admin@elitevertax.com";
-    const adminPass = env.ADMIN_PASS || "password123";
+    let user = await db.query.admins.findFirst({
+      where: eq(admins.email, normalizedEmail),
+    });
 
-    if (email !== adminUser || password !== adminPass) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
+    // Bootstrap: if no DB user matches but env credentials do, create the admin account.
+    if (!user) {
+      const envUser = (env.ADMIN_USER || "").trim().toLowerCase();
+      const envPass = env.ADMIN_PASS || "";
+      if (normalizedEmail === envUser && password === envPass) {
+        const [created] = await db
+          .insert(admins)
+          .values({
+            email: normalizedEmail,
+            passwordHash: await bcrypt.hash(envPass, 10),
+            name: "Super Admin",
+            role: "admin",
+          })
+          .returning();
+        user = created;
+      }
     }
 
-    const token = jwt.sign(
-      { adminId: "env-admin", email: adminUser },
-      env.JWT_ACCESS_SECRET,
-      { expiresIn: env.JWT_ACCESS_EXPIRATION as any }
-    );
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
 
-    res.cookie("admin_token", token, {
-      httpOnly: true,
-      secure: env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000,
+    const passwordOk = await bcrypt.compare(password, user.passwordHash);
+    if (!passwordOk) {
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
+
+    const token = signToken({
+      adminId: user.id,
+      email: user.email,
+      role: user.role,
     });
+    setAuthCookie(res, token);
 
     return res.status(200).json({
       success: true,
       message: "Login successful",
       data: {
-        id: "env-admin",
-        name: "Super Admin",
-        email: adminUser,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -63,9 +95,37 @@ export const adminLogin = async (req: Request, res: Response, next: NextFunction
 };
 
 export const adminLogout = (req: Request, res: Response) => {
-  res.clearCookie("admin_token");
+  res.clearCookie("admin_token", {
+    httpOnly: true,
+    secure: env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
   return res.status(200).json({
     success: true,
     message: "Logged out successfully",
   });
+};
+
+export const getMe = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    if (!req.admin) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    if (req.admin.id === "env-admin") {
+      return res.status(200).json({
+        success: true,
+        data: { id: "env-admin", name: "Super Admin", email: req.admin.email, role: "admin" },
+      });
+    }
+    const user = await db.query.admins.findFirst({ where: eq(admins.id, req.admin.id) });
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    return res.status(200).json({
+      success: true,
+      data: { id: user.id, name: user.name, email: user.email, role: user.role },
+    });
+  } catch (error) {
+    next(error);
+  }
 };

@@ -6,7 +6,7 @@ export const apiSlice = createApi({
     baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1',
     credentials: 'include',
   }),
-  tagTypes: ['Courses', 'Course', 'Gallery', 'Testimonials', 'Faqs', 'Settings', 'Mentors', 'About', 'Campuses', 'Messages'],
+  tagTypes: ['Courses', 'Course', 'Gallery', 'Testimonials', 'Faqs', 'Settings', 'Mentors', 'About', 'Campuses', 'Messages', 'Pages', 'Page', 'Navigation', 'Media', 'Users', 'Dashboard', 'Certificates'],
   endpoints: (builder) => ({
     // Public Endpoints
     getCourses: builder.query({
@@ -49,11 +49,77 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Messages'],
     }),
+    verifyCertificate: builder.query({
+      query: (certificateNumber: string) => `/certificates/verify/${encodeURIComponent(certificateNumber)}`,
+      providesTags: ['Certificates'],
+    }),
+
+    // Admin Certificate Endpoints
+    getAdminCertificates: builder.query({
+      query: (params?: { q?: string }) => {
+        const q = params?.q ? `?q=${encodeURIComponent(params.q)}` : '';
+        return `/admin/certificates${q}`;
+      },
+      providesTags: ['Certificates'],
+    }),
+    getAdminCertificateById: builder.query({
+      query: (id: string) => `/admin/certificates/${id}`,
+      providesTags: ['Certificates'],
+    }),
+    createCertificate: builder.mutation({
+      query: (body) => ({
+        url: '/admin/certificates',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Certificates'],
+    }),
+    updateCertificate: builder.mutation({
+      query: ({ id, ...body }: { id: string; [key: string]: any }) => ({
+        url: `/admin/certificates/${id}`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['Certificates'],
+    }),
+    deleteCertificate: builder.mutation({
+      query: (id: string) => ({
+        url: `/admin/certificates/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Certificates'],
+    }),
+    updateAuthoritySignatures: builder.mutation({
+      query: (body) => ({
+        url: '/admin/certificates/signatures',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Certificates', 'Settings'],
+    }),
+    seedCertificates: builder.mutation({
+      query: () => ({
+        url: '/admin/certificates/seed',
+        method: 'POST',
+      }),
+      invalidatesTags: ['Certificates'],
+    }),
 
     // Admin Endpoints
     getAdminCourses: builder.query({
       query: () => '/admin/courses',
       providesTags: ['Courses'],
+    }),
+    getAdminCourseById: builder.query({
+      query: (id) => `/admin/courses/${id}`,
+      providesTags: ['Course'],
+    }),
+    seedCourses: builder.mutation({
+      query: () => ({
+        url: '/admin/courses/seed',
+        method: 'POST',
+      }),
+      invalidatesTags: ['Courses'],
     }),
     createCourse: builder.mutation({
       query: (body) => ({
@@ -212,6 +278,27 @@ export const apiSlice = createApi({
       invalidatesTags: ['Messages'],
     }),
 
+    // Admin Gallery Endpoints
+    getAdminGallery: builder.query({
+      query: () => '/gallery',
+      providesTags: ['Gallery'],
+    }),
+    createGalleryItem: builder.mutation({
+      query: (body) => ({
+        url: '/admin/gallery',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Gallery'],
+    }),
+    deleteGalleryItem: builder.mutation({
+      query: (id) => ({
+        url: `/admin/gallery/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Gallery'],
+    }),
+
     // Auth Endpoints
     login: builder.mutation({
       query: (credentials) => ({
@@ -219,6 +306,154 @@ export const apiSlice = createApi({
         method: 'POST',
         body: credentials,
       }),
+    }),
+    logout: builder.mutation({
+      query: () => ({
+        url: '/auth/logout',
+        method: 'POST',
+      }),
+    }),
+    getMe: builder.query({
+      query: () => '/auth/me',
+      providesTags: ['Dashboard'],
+      keepUnusedDataFor: 5,
+    }),
+
+    // Dashboard
+    getDashboardStats: builder.query({
+      query: () => '/admin/dashboard/stats',
+      providesTags: ['Dashboard'],
+    }),
+
+    // Pages CMS
+    getAdminPages: builder.query({
+      query: () => '/admin/pages',
+      providesTags: ['Pages'],
+    }),
+    getAdminPage: builder.query({
+      query: (id) => `/admin/pages/${id}`,
+      providesTags: ['Page'],
+    }),
+    createPage: builder.mutation({
+      query: (body) => ({ url: '/admin/pages', method: 'POST', body }),
+      invalidatesTags: ['Pages', 'Dashboard'],
+    }),
+    updatePageMeta: builder.mutation({
+      query: ({ id, ...body }) => ({ url: `/admin/pages/${id}`, method: 'PATCH', body }),
+      invalidatesTags: ['Pages', 'Page'],
+    }),
+    deletePage: builder.mutation({
+      query: (id) => ({ url: `/admin/pages/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Pages', 'Dashboard'],
+    }),
+    duplicatePage: builder.mutation({
+      query: (id) => ({ url: `/admin/pages/${id}/duplicate`, method: 'POST' }),
+      invalidatesTags: ['Pages'],
+    }),
+    publishPage: builder.mutation({
+      query: (id) => ({ url: `/admin/pages/${id}/publish`, method: 'POST' }),
+      invalidatesTags: ['Pages', 'Page', 'Dashboard'],
+    }),
+    unpublishPage: builder.mutation({
+      query: (id) => ({ url: `/admin/pages/${id}/unpublish`, method: 'POST' }),
+      invalidatesTags: ['Pages', 'Page', 'Dashboard'],
+    }),
+    getPagePreview: builder.query({
+      query: (id) => `/admin/pages/${id}/preview`,
+    }),
+    addSection: builder.mutation({
+      query: ({ pageId, ...body }) => ({ url: `/admin/pages/${pageId}/sections`, method: 'POST', body }),
+      invalidatesTags: ['Page', 'Pages'],
+    }),
+    updateSection: builder.mutation({
+      query: ({ sectionId, ...body }) => ({ url: `/admin/sections/${sectionId}`, method: 'PATCH', body }),
+      invalidatesTags: ['Page'],
+    }),
+    deleteSection: builder.mutation({
+      query: (sectionId) => ({ url: `/admin/sections/${sectionId}`, method: 'DELETE' }),
+      invalidatesTags: ['Page', 'Pages'],
+    }),
+    reorderSections: builder.mutation({
+      query: (sectionIds) => ({ url: '/admin/sections/reorder', method: 'POST', body: { sectionIds } }),
+      invalidatesTags: ['Page'],
+    }),
+
+    // Navigation CMS
+    getAdminNavigation: builder.query({
+      query: () => '/admin/navigation',
+      providesTags: ['Navigation'],
+    }),
+    createMenuItem: builder.mutation({
+      query: ({ location, ...body }) => ({ url: `/admin/navigation/${location}/items`, method: 'POST', body }),
+      invalidatesTags: ['Navigation'],
+    }),
+    updateMenuItem: builder.mutation({
+      query: ({ itemId, ...body }) => ({ url: `/admin/navigation/items/${itemId}`, method: 'PATCH', body }),
+      invalidatesTags: ['Navigation'],
+    }),
+    deleteMenuItem: builder.mutation({
+      query: (itemId) => ({ url: `/admin/navigation/items/${itemId}`, method: 'DELETE' }),
+      invalidatesTags: ['Navigation'],
+    }),
+    reorderMenuItems: builder.mutation({
+      query: (itemIds) => ({ url: '/admin/navigation/items/reorder', method: 'POST', body: { itemIds } }),
+      invalidatesTags: ['Navigation'],
+    }),
+
+    // Media Library
+    getMedia: builder.query({
+      query: (params) => {
+        const q = new URLSearchParams();
+        if (params?.page) q.set('page', String(params.page));
+        if (params?.limit) q.set('limit', String(params.limit));
+        if (params?.search) q.set('search', params.search);
+        if (params?.folder) q.set('folder', params.folder);
+        const qs = q.toString();
+        return `/admin/media${qs ? `?${qs}` : ''}`;
+      },
+      providesTags: ['Media'],
+    }),
+    updateMedia: builder.mutation({
+      query: ({ id, ...body }) => ({ url: `/admin/media/${id}`, method: 'PATCH', body }),
+      invalidatesTags: ['Media'],
+    }),
+    deleteMedia: builder.mutation({
+      query: (id) => ({ url: `/admin/media/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Media', 'Dashboard'],
+    }),
+
+    // Users
+    getAdminUsers: builder.query({
+      query: () => '/admin/users',
+      providesTags: ['Users'],
+    }),
+    createAdminUser: builder.mutation({
+      query: (body) => ({ url: '/admin/users', method: 'POST', body }),
+      invalidatesTags: ['Users'],
+    }),
+    updateAdminUser: builder.mutation({
+      query: ({ id, ...body }) => ({ url: `/admin/users/${id}`, method: 'PATCH', body }),
+      invalidatesTags: ['Users'],
+    }),
+    deleteAdminUser: builder.mutation({
+      query: (id) => ({ url: `/admin/users/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Users'],
+    }),
+
+    // Audit logs
+    getAuditLogs: builder.query({
+      query: (limit) => `/admin/audit-logs${limit ? `?limit=${limit}` : ''}`,
+      providesTags: ['Dashboard'],
+    }),
+
+    // Public CMS
+    getPublicPage: builder.query({
+      query: (slug) => `/pages/${slug}`,
+      providesTags: ['Pages'],
+    }),
+    getPublicNavigation: builder.query({
+      query: (location) => `/navigation/${location}`,
+      providesTags: ['Navigation'],
     }),
   }),
 });
@@ -234,6 +469,8 @@ export const {
   useGetCampusesQuery,
   useSubmitContactMutation,
   useGetAdminCoursesQuery,
+  useGetAdminCourseByIdQuery,
+  useSeedCoursesMutation,
   useCreateCourseMutation,
   useUpdateCourseMutation,
   useDeleteCourseMutation,
@@ -256,5 +493,49 @@ export const {
   useGetAdminMessagesQuery,
   useUpdateMessageStatusMutation,
   useDeleteMessageMutation,
+  useGetAdminGalleryQuery,
+  useCreateGalleryItemMutation,
+  useDeleteGalleryItemMutation,
   useLoginMutation,
+  useLogoutMutation,
+  useGetMeQuery,
+  useGetDashboardStatsQuery,
+  useGetAdminPagesQuery,
+  useGetAdminPageQuery,
+  useCreatePageMutation,
+  useUpdatePageMetaMutation,
+  useDeletePageMutation,
+  useDuplicatePageMutation,
+  usePublishPageMutation,
+  useUnpublishPageMutation,
+  useLazyGetPagePreviewQuery,
+  useAddSectionMutation,
+  useUpdateSectionMutation,
+  useDeleteSectionMutation,
+  useReorderSectionsMutation,
+  useGetAdminNavigationQuery,
+  useCreateMenuItemMutation,
+  useUpdateMenuItemMutation,
+  useDeleteMenuItemMutation,
+  useReorderMenuItemsMutation,
+  useGetMediaQuery,
+  useUpdateMediaMutation,
+  useDeleteMediaMutation,
+  useGetAdminUsersQuery,
+  useCreateAdminUserMutation,
+  useUpdateAdminUserMutation,
+  useDeleteAdminUserMutation,
+  useGetAuditLogsQuery,
+  useGetPublicPageQuery,
+  useGetPublicNavigationQuery,
+  useVerifyCertificateQuery,
+  useLazyVerifyCertificateQuery,
+  useGetAdminCertificatesQuery,
+  useGetAdminCertificateByIdQuery,
+  useCreateCertificateMutation,
+  useUpdateCertificateMutation,
+  useDeleteCertificateMutation,
+  useUpdateAuthoritySignaturesMutation,
+  useSeedCertificatesMutation,
 } = apiSlice;
+

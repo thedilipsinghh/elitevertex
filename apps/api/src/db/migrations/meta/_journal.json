@@ -15,6 +15,13 @@
       "when": 1788766534529,
       "tag": "0001_special_rocket_raccoon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792478014253,
+      "tag": "0002_panoramic_colonel_america",
+      "breakpoints": true
     }
   ]
 }

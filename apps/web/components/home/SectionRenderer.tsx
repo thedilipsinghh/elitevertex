@@ -1,0 +1,624 @@
+"use client";
+
+import Link from "next/link";
+import { useState, useRef } from "react";
+import type { SectionContent } from "@/lib/cms/sections";
+import {
+  useGetFaqsQuery,
+  useGetTestimonialsQuery,
+  useGetGalleryQuery,
+} from "@/lib/features/api/apiSlice";
+
+const str = (v: unknown, fallback = ""): string =>
+  typeof v === "string" && v.length > 0 ? v : fallback;
+
+const arr = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
+
+const DEFAULT_HERO_IMAGE =
+  "https://lh3.googleusercontent.com/aida/AEtjO1XUmQebC7cWdgP8rjmnfdqiY3TWTBNoYsfMaSYI7n3xfYNILdru7siueSJaT3rMs4i4yPJNbvZvfikMQY3F9R2qu9KcA-IJpgJKfBgkmFG_E5MXmadYRgWJ_6PhUHhZrCm8UV-zLzfi7YQS7zuXK6r0MjulQm5z6SjXV14VWLoizz-xs76JsWDExBfm2OMZySxsZVg3HIpEMQlOhdIgz88ZuQ4xbfsXjeGRuCDxyYgFYtotlQBLMiC4mi6i";
+const DEFAULT_ABOUT_IMAGE =
+  "https://lh3.googleusercontent.com/aida/AEtjO1UbCF47-wiszdwusF3kMtv218IqjqvwCWDJvXsccjhFWJowp5BXlhN1kafTOugiyzVfXIo1qi-UcFsCrXM57_lf-qI570CX2oKhiyKwApnDYDnGhjl05XnUcddmLAQBAC6iFtCkxGqpYRZMU9Qz-9h2x7T4YArXXt7nfL08xtPsa92omp0t5PyG8ovtazAtrAb_SaxJcN0q6Zs2xHS7t9SSVcj163VqpH4g0UmK98w5ZaPNxHYi4F5GhoI";
+
+interface RenderProps {
+  content: SectionContent;
+}
+
+/* ------------------------------- HERO ------------------------------- */
+function HeroSection({ content }: RenderProps) {
+  return (
+    <section className="w-full bg-surface py-space-2xl md:py-space-3xl">
+      <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
+          <div className="lg:col-span-6 flex flex-col items-start">
+            <span className="font-label-md text-label-md uppercase tracking-widest text-secondary font-semibold mb-space-xs">
+              {str(content.tagline, "Spoken English • Communication • Career Skills")}
+            </span>
+            <h1 className="font-display text-display text-primary tracking-tight leading-none mb-space-md">
+              {str(content.heading, "Speak With Confidence. Go Further.")}
+            </h1>
+            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl mb-space-xl leading-relaxed">
+              {str(
+                content.subheading,
+                "Build the English, communication skills, and executive confidence you need for classrooms, global careers, and everyday influence."
+              )}
+            </p>
+            <div className="flex flex-wrap items-center gap-space-sm w-full sm:w-auto">
+              <Link
+                className="inline-flex items-center justify-center bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-md text-label-md uppercase tracking-wider px-space-lg py-space-xs rounded-lg transition-colors duration-150"
+                href={str(content.primaryCtaUrl, "/book-counselling")}
+              >
+                {str(content.primaryCtaLabel, "Book Free Counselling")}
+              </Link>
+              <Link
+                className="inline-flex items-center justify-center bg-transparent hover:bg-surface-container-high text-on-surface font-label-md text-label-md uppercase tracking-wider px-space-lg py-space-xs rounded-lg transition-colors duration-150"
+                href={str(content.secondaryCtaUrl, "/courses")}
+              >
+                {str(content.secondaryCtaLabel, "Explore Courses")}
+              </Link>
+            </div>
+          </div>
+          <div className="lg:col-span-6 w-full">
+            <div className="relative overflow-hidden rounded-xl bg-surface-container shadow-sm aspect-[16/11]">
+              <img
+                alt={str(content.imageAlt, "Learners collaborating actively in executive seminar hall at Elite Vertex")}
+                className="w-full h-full object-cover"
+                src={str(content.image, DEFAULT_HERO_IMAGE)}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------ PILLARS ----------------------------- */
+const DEFAULT_PILLARS = [
+  { label: "Pillar 01", title: "Practical Learning", description: "70% active speaking, zero passive lecturing." },
+  { label: "Pillar 02", title: "Expert Trainers", description: "Cambridge-certified linguists & speech mentors." },
+  { label: "Pillar 03", title: "Personal Attention", description: "Strictly capped micro-cohorts of 12 peers." },
+  { label: "Pillar 04", title: "Career-Focused", description: "Interview panels, GD mastery, and boardroom articulation." },
+];
+
+function PillarsSection({ content }: RenderProps) {
+  const items = arr<{ label?: string; title?: string; description?: string }>(content.items);
+  const pillars = items.length ? items : DEFAULT_PILLARS;
+  return (
+    <section className="w-full bg-surface-container-lowest py-space-xl shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+      <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-space-lg">
+          {pillars.map((p, i) => (
+            <div className="flex flex-col" key={i}>
+              <span className="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-space-3xs">
+                {str(p.label, `Pillar ${String(i + 1).padStart(2, "0")}`)}
+              </span>
+              <h3 className="font-headline-sm text-headline-sm text-primary">{str(p.title)}</h3>
+              <p className="font-body-sm text-body-sm text-on-surface-variant mt-space-3xs">{str(p.description)}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------- ABOUT PREVIEW -------------------------- */
+function AboutPreviewSection({ content }: RenderProps) {
+  return (
+    <section className="w-full bg-surface py-space-3xl">
+      <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-2xl items-center">
+          <div className="lg:col-span-5 order-2 lg:order-1">
+            <div className="rounded-xl overflow-hidden bg-surface-container aspect-[4/5]">
+              <img
+                alt={str(content.imageAlt, "Academic mentor guiding student presentation in modern learning acoustic pod")}
+                className="w-full h-full object-cover"
+                src={str(content.image, DEFAULT_ABOUT_IMAGE)}
+              />
+            </div>
+          </div>
+          <div className="lg:col-span-7 order-1 lg:order-2 flex flex-col">
+            <span className="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant mb-space-2xs">
+              {str(content.label, "Pedagogical Framework")}
+            </span>
+            <h2 className="font-headline-lg text-headline-lg text-primary tracking-tight mb-space-md">
+              {str(content.heading, "More Than English. We Build Confidence.")}
+            </h2>
+            <div className="flex flex-col gap-space-sm font-body-md text-body-md text-on-surface-variant max-w-2xl leading-relaxed mb-space-lg">
+              <p>
+                {str(
+                  content.paragraph1,
+                  "Traditional language teaching isolates students inside grammar rules and rote drills. True oratory fluency requires psychological comfort, systematic desensitization to scrutiny, and immediate real-time feedback loops."
+                )}
+              </p>
+              <p>
+                {str(
+                  content.paragraph2,
+                  "At Elite Vertex, every participant receives continuous spoken runtime. We deconstruct anxiety, rebuild phonetics, and condition the posture of authority so your internal intellect translates effortlessly outward."
+                )}
+              </p>
+            </div>
+            <div>
+              <Link
+                className="inline-flex items-center gap-space-2xs font-label-md text-label-md uppercase tracking-wider text-secondary hover:text-on-secondary-container transition-colors"
+                href={str(content.linkUrl, "/about")}
+              >
+                {str(content.linkLabel, "Discover Elite Vertex")}
+                <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------- COURSES PREVIEW ------------------------- */
+const DEFAULT_COURSES: { title: string; description: string; meta: string; image: string; url?: string; badge?: string }[] = [
+  {
+    title: "Pre-Foundation & Foundation English",
+    description: "Phonetics, word formation, active verbal sparring, sentence syntax, and dissolution of mother tongue inhibition.",
+    meta: "6 Weeks • Micro-Cohort",
+    badge: "Foundational Track",
+    image: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80",
+    url: "/courses",
+  },
+  {
+    title: "Elementary English & Daily Fluency",
+    description: "Complex sentence construction, spontaneous extempore speech, idioms, and natural rhythm for social and academic dialogue.",
+    meta: "8 Weeks • Classroom & Hybrid",
+    badge: "Intermediate Track",
+    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80",
+    url: "/courses",
+  },
+  {
+    title: "Intermediate English & Career Booster",
+    description: "STAR interview technique, boardroom objection handling, corporate presentations, and accent neutralization.",
+    meta: "8 Weeks • Career Track",
+    badge: "Professional Track",
+    image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80",
+    url: "/courses",
+  },
+  {
+    title: "Advanced English & Executive Presence",
+    description: "Persuasive keynote rhetoric, unscripted media Q&A, diplomatic boardroom influence, and executive storytelling.",
+    meta: "10 Weeks • Executive Track",
+    badge: "Leadership Track",
+    image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
+    url: "/courses",
+  },
+];
+
+function CoursesPreviewSection({ content }: RenderProps) {
+  const items = arr<{ title?: string; description?: string; meta?: string; image?: string; url?: string; badge?: string }>(content.items);
+  const courses = items.length ? items : DEFAULT_COURSES;
+  return (
+    <section className="w-full bg-surface-container-low py-16 lg:py-20 border-t border-outline-variant transition-colors">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-400/10 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-400/30 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-400"></span>
+              <span>{str(content.label, "Curriculum Tracks")}</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-on-surface tracking-tight">
+              {str(content.heading, "Learn Skills That Move You Forward.")}
+            </h2>
+          </div>
+          <Link
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-secondary hover:text-on-secondary-container transition-colors shrink-0"
+            href={str(content.linkUrl, "/courses")}
+          >
+            <span>{str(content.linkLabel, "View All Courses")}</span>
+            <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </Link>
+        </div>
+
+        {/* Card-based grid with img, title, description */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {courses.map((c, i) => {
+            const cardImg =
+              c.image ||
+              DEFAULT_COURSES[i % DEFAULT_COURSES.length]?.image ||
+              "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80";
+
+            return (
+              <Link
+                key={i}
+                href={str(c.url, "/courses")}
+                className="group flex flex-col bg-surface-container-lowest rounded-2xl border border-outline-variant overflow-hidden shadow-xs hover:shadow-md hover:border-secondary transition-all hover:-translate-y-1"
+              >
+                {/* Course Card Image */}
+                <div className="w-full aspect-[16/10] relative bg-surface-container overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={cardImg}
+                    alt={str(c.title)}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute top-3 left-3">
+                    <span className="px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-surface-container-lowest text-on-surface border border-outline-variant shadow-2xs">
+                      {str(c.badge, `Track 0${i + 1}`)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Course Card Body: Title, Description, Meta */}
+                <div className="p-5 flex-1 flex flex-col justify-between gap-4">
+                  <div className="flex flex-col gap-2">
+                    <h3 className="text-base sm:text-lg font-bold text-on-surface group-hover:text-secondary transition-colors line-clamp-2">
+                      {str(c.title)}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-on-surface-variant font-normal leading-relaxed line-clamp-3">
+                      {str(c.description)}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-outline-variant/60 flex items-center justify-between text-xs">
+                    <span className="font-semibold text-on-surface-variant uppercase tracking-wider text-[11px]">
+                      {str(c.meta, "Cohort Program")}
+                    </span>
+                    <span className="material-symbols-outlined text-secondary text-[18px] group-hover:translate-x-1 transition-transform">
+                      arrow_forward
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------- TESTIMONIALS --------------------------- */
+function TestimonialsSection({ content }: RenderProps) {
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const { data: response } = useGetTestimonialsQuery({});
+  const list = response?.data || [];
+
+  const scroll = (dir: "left" | "right") => {
+    sliderRef.current?.scrollBy({ left: dir === "left" ? -360 : 360, behavior: "smooth" });
+  };
+
+  return (
+    <section className="w-full bg-surface-container-low py-16 lg:py-24 border-t border-outline-variant overflow-hidden transition-colors">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+        <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-400/10 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-400/30 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-5 shadow-2xs">
+          <span className="material-symbols-outlined text-[16px]">favorite</span>
+          <span>{str(content.badge, "STUDENT LOVE")}</span>
+        </div>
+
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-on-surface tracking-tight text-center mb-4">
+          {str(content.heading, "Loved By Many Students")}
+        </h2>
+
+        <p className="text-on-surface-variant text-sm sm:text-base max-w-xl mx-auto text-center font-normal leading-relaxed mb-12">
+          {str(
+            content.subheading,
+            "We're proud to have a community of learners who trust us to help them grow their skills and achieve their goals."
+          )}
+        </p>
+
+        <div className="w-full relative group">
+          <div
+            ref={sliderRef}
+            className="flex gap-6 overflow-x-auto pb-6 pt-2 px-2 scroll-smooth snap-x snap-mandatory scrollbar-none"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {list.map((item: any) => (
+              <div
+                key={item.id}
+                className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between shrink-0 w-[290px] sm:w-[340px] lg:w-[360px] snap-center hover:-translate-y-0.5"
+              >
+                <div>
+                  <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[36px] font-bold block mb-2">format_quote</span>
+                  <p className="text-on-surface text-sm sm:text-base font-normal leading-relaxed text-left">&quot;{item.message}&quot;</p>
+                </div>
+                <div>
+                  <div className="w-full h-px bg-outline-variant my-5"></div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <img
+                        alt={item.name}
+                        className="w-10 h-10 rounded-full object-cover border border-outline-variant shadow-2xs"
+                        src={item.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=0b132b&color=fff`}
+                      />
+                      <div className="flex flex-col text-left">
+                        <span className="font-bold text-on-surface text-sm sm:text-base leading-tight">{item.name}</span>
+                        <span className="text-xs text-on-surface-variant font-normal mt-0.5">{item.role}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center text-amber-500 text-sm gap-0.5 shrink-0">{"★".repeat(item.rating || 5)}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-center gap-3 mt-8">
+            <button
+              type="button"
+              onClick={() => scroll("left")}
+              aria-label="Previous Testimonials"
+              className="w-10 h-10 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface flex items-center justify-center shadow-xs hover:bg-surface-container transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+            >
+              <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => scroll("right")}
+              aria-label="Next Testimonials"
+              className="w-10 h-10 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface flex items-center justify-center shadow-xs hover:bg-surface-container transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+            >
+              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------ GALLERY ----------------------------- */
+function GallerySection({ content }: RenderProps) {
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const { data: response, isLoading, error } = useGetGalleryQuery({});
+  const list = response?.data || [];
+
+  const scroll = (dir: "left" | "right") => {
+    sliderRef.current?.scrollBy({ left: dir === "left" ? -360 : 360, behavior: "smooth" });
+  };
+
+  return (
+    <section className="w-full bg-surface-container-low/60 py-16 lg:py-24 border-t border-outline-variant overflow-hidden transition-colors">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-on-surface tracking-tight text-center mb-4">
+          {str(content.heading, "Be A Part Of Our Thriving Community")}
+        </h2>
+        <p className="text-on-surface-variant text-sm sm:text-base max-w-xl mx-auto text-center font-normal leading-relaxed mb-12">
+          {str(content.subheading, "Connect, share, and grow together with thousands of passionate learners across the globe.")}
+        </p>
+
+        {isLoading && <p className="text-on-surface-variant mb-4">Loading gallery...</p>}
+        {error && <p className="text-red-500 mb-4">Failed to load gallery.</p>}
+
+        <div className="w-full relative group">
+          <div
+            ref={sliderRef}
+            className="flex gap-6 overflow-x-auto pb-6 pt-2 px-2 scroll-smooth snap-x snap-mandatory scrollbar-none"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {list.map((item: any) => (
+              <div
+                key={item.id}
+                className="relative group overflow-hidden rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 shrink-0 w-[280px] sm:w-[320px] lg:w-[360px] aspect-[16/10] snap-center cursor-pointer border border-outline-variant hover:-translate-y-0.5"
+              >
+                <img alt={item.title} src={item.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-black/60 flex items-end p-6">
+                  <span className="text-white font-bold text-base sm:text-lg leading-tight">{item.title}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-center gap-3 mt-8">
+            <button
+              type="button"
+              onClick={() => scroll("left")}
+              aria-label="Previous Gallery Image"
+              className="w-10 h-10 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface flex items-center justify-center shadow-xs hover:bg-surface-container transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+            >
+              <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => scroll("right")}
+              aria-label="Next Gallery Image"
+              className="w-10 h-10 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface flex items-center justify-center shadow-xs hover:bg-surface-container transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+            >
+              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------- CERTIFICATE / FAQ ----------------------- */
+function CertificateFaqSection({ content }: RenderProps) {
+  const [openFaqId, setOpenFaqId] = useState<string | number | null>(null);
+  const { data: response } = useGetFaqsQuery({});
+  const faqsList = response?.data || [];
+
+  return (
+    <section className="w-full bg-surface py-16 lg:py-24 transition-colors">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          <div className="lg:col-span-6 flex flex-col gap-6">
+            <div className="bg-surface-container-lowest p-6 sm:p-7 rounded-xl border border-outline-variant shadow-xs flex items-center justify-between gap-4">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+                  <span className="material-symbols-outlined text-[22px]">verified</span>
+                </div>
+                <div>
+                  <h4 className="font-bold text-base sm:text-lg text-on-surface">
+                    {str(content.certificateCardTitle, "Official Attestation")}
+                  </h4>
+                  <p className="text-xs sm:text-sm text-on-surface-variant mt-0.5">
+                    {str(content.certificateCardText, "Verify any alumni completion credential or serial number online.")}
+                  </p>
+                </div>
+              </div>
+              <Link
+                className="shrink-0 font-semibold text-xs uppercase tracking-wider bg-surface-container hover:bg-surface-container-high text-on-surface px-4 py-2 rounded-lg border border-outline-variant transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+                href={str(content.certificateCardCtaUrl, "/verify-certificate")}
+              >
+                {str(content.certificateCardCta, "Verify")}
+              </Link>
+            </div>
+
+            {/* Diagnostic Solid Card (Theme-safe with high contrast) */}
+            <div className="bg-[#0B132B] dark:bg-[#111C33] text-white p-6 sm:p-7 rounded-xl border border-slate-800 shadow-xs flex flex-col gap-3">
+              <div className="flex items-center gap-2 text-amber-400">
+                <span className="material-symbols-outlined text-[20px]">record_voice_over</span>
+                <span className="text-xs uppercase tracking-widest font-bold">
+                  {str(content.diagnosticLabel, "Speech Diagnostic")}
+                </span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold tracking-tight text-white">
+                {str(content.diagnosticTitle, "Complimentary Speech Baseline Assessment")}
+              </h3>
+              <p className="text-sm text-slate-300 leading-relaxed">
+                {str(content.diagnosticText, "Evaluate your spoken clarity, pause cadence, and acoustic confidence with our senior academic linguists.")}
+              </p>
+              <div className="flex items-center gap-2 pt-1 text-amber-400 text-xs font-semibold uppercase tracking-wider">
+                <span className="material-symbols-outlined text-[16px]">verified</span>
+                <span>{str(content.diagnosticNote, "No obligation required")}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-6 bg-surface-container-lowest p-6 sm:p-7 rounded-xl border border-outline-variant shadow-xs flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-widest text-on-surface-variant block mb-1">
+                    {str(content.faqLabel, "Clarifications")}
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-bold text-on-surface">
+                    {str(content.faqTitle, "Common Inquiries")}
+                  </h3>
+                </div>
+                <Link
+                  className="text-xs font-bold uppercase tracking-wider text-secondary hover:underline transition-colors flex items-center gap-1"
+                  href={str(content.faqLinkUrl, "/faq")}
+                >
+                  {str(content.faqLinkLabel, "View All FAQ")} <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                </Link>
+              </div>
+              <div className="flex flex-col gap-3">
+                {faqsList.map((item: any) => (
+                  <div key={item.id} className="bg-surface-container-low rounded-lg p-4 border border-outline-variant/60 transition-colors cursor-pointer" onClick={() => setOpenFaqId(openFaqId === item.id ? null : item.id)}>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-semibold uppercase tracking-wider text-on-surface">{item.question}</h4>
+                      <span className={`material-symbols-outlined text-[18px] text-on-surface-variant transition-transform duration-200 ${openFaqId === item.id ? "rotate-180" : ""}`}>expand_more</span>
+                    </div>
+                    <div className={`mt-2 text-sm text-on-surface-variant leading-relaxed ${openFaqId === item.id ? "block" : "hidden"}`}>
+                      {item.answer}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------- CTA -------------------------------- */
+function CtaSection({ content }: RenderProps) {
+  const headingText = str(content.heading, "Your Next Opportunity Starts With Better Communication.");
+
+  return (
+    <section className="relative w-full bg-surface-container-low text-on-surface py-16 sm:py-24 border-t border-outline-variant transition-colors duration-200">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
+          
+          {/* Cohort Status Badge - Solid clean badge, no gradient */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 text-xs font-bold tracking-widest uppercase mb-5 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-400"></span>
+            <span>{str(content.label, "Admissions Open For Next Cohort")}</span>
+          </div>
+
+          {/* Heading - Typography matching logo (Montserrat, clean bold) */}
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface mb-5 leading-tight uppercase">
+            {headingText}
+          </h2>
+
+          {/* Subheading */}
+          <p className="text-base sm:text-lg text-on-surface-variant max-w-2xl mb-8 leading-relaxed font-normal">
+            {str(
+              content.subheading,
+              "Schedule an in-person or virtual speech evaluation with our academic directors. Discover your baseline fluency score and receive a personalized curriculum path."
+            )}
+          </p>
+
+          {/* Action Buttons - Solid colors, no gradients */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+            <Link
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary hover:opacity-90 text-on-primary font-bold text-sm sm:text-base uppercase tracking-wider px-8 py-4 rounded-xl shadow-xs transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+              href={str(content.primaryCtaUrl, "/book-counselling")}
+            >
+              <span className="material-symbols-outlined text-[20px]">
+                calendar_month
+              </span>
+              <span>{str(content.primaryCtaLabel, "Book Free Counselling")}</span>
+            </Link>
+
+            <Link
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-surface-container-lowest hover:bg-surface-container text-on-surface font-bold text-sm sm:text-base uppercase tracking-wider px-8 py-4 rounded-xl border border-outline-variant transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+              href={str(content.secondaryCtaUrl, "/contact")}
+            >
+              <span className="material-symbols-outlined text-[20px] text-on-surface-variant">
+                location_on
+              </span>
+              <span>{str(content.secondaryCtaLabel, "Visit Campus")}</span>
+            </Link>
+          </div>
+
+          {/* Trust Highlights - Solid, no gradient */}
+          <div className="mt-12 pt-8 border-t border-outline-variant w-full max-w-2xl flex flex-wrap items-center justify-center gap-y-3 gap-x-6 sm:gap-x-8 text-xs sm:text-sm text-on-surface-variant font-medium">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[18px]">verified</span>
+              <span>Free 30-Min Diagnostic</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[18px]">group</span>
+              <span>Micro-Cohorts (12 Peers)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[18px]">school</span>
+              <span>Cambridge-Certified Mentors</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------------------- FALLBACK ------------------------------ */
+function UnknownSection({ content }: RenderProps) {
+  return (
+    <section className="w-full bg-surface py-space-2xl">
+      <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
+        <pre className="bg-surface-container p-space-md rounded-lg text-body-sm text-on-surface-variant overflow-x-auto">
+          {JSON.stringify(content, null, 2)}
+        </pre>
+      </div>
+    </section>
+  );
+}
+
+export const SECTION_RENDERERS: Record<string, (props: RenderProps) => React.ReactElement> = {
+  hero: HeroSection,
+  pillars: PillarsSection,
+  about_preview: AboutPreviewSection,
+  courses_preview: CoursesPreviewSection,
+  testimonials: TestimonialsSection,
+  gallery: GallerySection,
+  certificate_faq: CertificateFaqSection,
+  cta: CtaSection,
+};
+
+export function SectionRenderer({ type, content }: { type: string; content: SectionContent }) {
+  const Component = SECTION_RENDERERS[type] || UnknownSection;
+  return <Component content={content} />;
+}

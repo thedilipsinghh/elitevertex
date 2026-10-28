@@ -39,7 +39,7 @@ export default function DualImageInput({
       fd.append("image", file);
       fd.append("alt", file.name);
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+      const apiUrl = "/api/proxy";
       const res = await fetch(`${apiUrl}/admin/upload`, {
         method: "POST",
         body: fd,

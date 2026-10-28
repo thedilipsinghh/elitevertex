@@ -12,8 +12,10 @@ const app = express();
 const ALLOWED_ORIGINS = [
   "http://localhost:3000",
   "http://localhost:3001",
-  env.FRONTEND_URL, // https://elitevertex-web.vercel.app
-].filter(Boolean) as string[];
+  env.FRONTEND_URL,
+  "https://elitevertex-web.vercel.app",
+  "https://elitevertex.vercel.app",
+].filter((v): v is string => Boolean(v));
 
 // Middleware
 app.use(cors({

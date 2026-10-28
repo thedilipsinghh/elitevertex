@@ -19,11 +19,13 @@ const signToken = (payload: { adminId: string; email: string; role: string }) =>
   });
 
 const setAuthCookie = (res: Response, token: string) => {
+  const isProd = env.NODE_ENV === "production";
   res.cookie("admin_token", token, {
     httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
     maxAge: 24 * 60 * 60 * 1000,
+    path: "/",
   });
 };
 
@@ -95,10 +97,12 @@ export const adminLogin = async (req: Request, res: Response, next: NextFunction
 };
 
 export const adminLogout = (req: Request, res: Response) => {
+  const isProd = env.NODE_ENV === "production";
   res.clearCookie("admin_token", {
     httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
+    path: "/",
   });
   return res.status(200).json({
     success: true,

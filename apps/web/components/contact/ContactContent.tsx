@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useGetWebsiteSettingsQuery, useSubmitContactMutation } from "@/lib/features/api/apiSlice";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 export function ContactContent() {
   const { data: settingsResponse } = useGetWebsiteSettingsQuery({});
@@ -85,9 +86,10 @@ export function ContactContent() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
           
           {/* Left Column: Info & Details */}
-          <div className="z-10 flex flex-col">
-            <div className="inline-block text-secondary font-bold tracking-widest text-xs uppercase mb-3">
-              {contactTagline}
+          <ScrollReveal direction="up" delay={0} className="z-10 flex flex-col">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/30 text-secondary font-bold tracking-widest text-xs uppercase mb-3 w-fit badge-shimmer">
+              <span className="w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-400 animate-pulse"></span>
+              <span>{contactTagline}</span>
             </div>
             
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground mb-6 leading-tight">
@@ -191,11 +193,11 @@ export function ContactContent() {
                 </div>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* Right Column: Contact Message Form */}
-          <div className="w-full id-contact-form" id="contactForm">
-            <div className="bg-surface-container-lowest rounded-[2rem] p-6 sm:p-8 lg:p-10 shadow-xl border border-outline-variant/30">
+          <ScrollReveal direction="scale" delay={120} className="w-full id-contact-form" id="contactForm">
+            <div className="bg-surface-container-lowest rounded-[2rem] p-6 sm:p-8 lg:p-10 shadow-xl border border-outline-variant/30 hover-lift">
               <h3 className="text-xl font-bold text-foreground mb-6">Send Us a Message</h3>
 
               {errorMessage && (
@@ -374,81 +376,89 @@ export function ContactContent() {
                 </form>
               )}
             </div>
-          </div>
+          </ScrollReveal>
 
         </div>
       </section>
 
       {/* SECTION 2: 4 CONTACT DETAILS CARDS GRID */}
-      <section className="py-12 lg:py-16 bg-surface-container-low/60 border-y border-outline-variant/20">
+      <section className="py-12 lg:py-16 bg-surface-container-low/60 border-y border-outline-variant/20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* Card 1: Our Address */}
-            <div className="bg-surface-container-lowest p-7 rounded-2xl border border-outline-variant/30 shadow-sm flex items-start gap-4 hover:-translate-y-1 transition-transform duration-200">
-              <div className="w-11 h-11 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 border border-secondary/20">
-                <span className="material-symbols-outlined text-secondary text-[22px]">
-                  location_on
-                </span>
+            <ScrollReveal direction="up" delay={0}>
+              <div className="bg-surface-container-lowest p-7 rounded-2xl border border-outline-variant/30 shadow-xs flex items-start gap-4 hover-lift h-full">
+                <div className="w-11 h-11 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 border border-secondary/20">
+                  <span className="material-symbols-outlined text-secondary text-[22px]">
+                    location_on
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-foreground text-sm mb-1">Our Address</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed font-medium whitespace-pre-line">
+                    {address}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-foreground text-sm mb-1">Our Address</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed font-medium whitespace-pre-line">
-                  {address}
-                </p>
-              </div>
-            </div>
+            </ScrollReveal>
 
             {/* Card 2: Working Hours */}
-            <div className="bg-surface-container-lowest p-7 rounded-2xl border border-outline-variant/30 shadow-sm flex items-start gap-4 hover:-translate-y-1 transition-transform duration-200">
-              <div className="w-11 h-11 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 border border-secondary/20">
-                <span className="material-symbols-outlined text-secondary text-[22px]">
-                  schedule
-                </span>
+            <ScrollReveal direction="up" delay={80}>
+              <div className="bg-surface-container-lowest p-7 rounded-2xl border border-outline-variant/30 shadow-xs flex items-start gap-4 hover-lift h-full">
+                <div className="w-11 h-11 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 border border-secondary/20">
+                  <span className="material-symbols-outlined text-secondary text-[22px]">
+                    schedule
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-foreground text-sm mb-1">Working Hours</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed font-medium whitespace-pre-line">
+                    {workingHours}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-foreground text-sm mb-1">Working Hours</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed font-medium whitespace-pre-line">
-                  {workingHours}
-                </p>
-              </div>
-            </div>
+            </ScrollReveal>
 
             {/* Card 3: Email Us */}
-            <div className="bg-surface-container-lowest p-7 rounded-2xl border border-outline-variant/30 shadow-sm flex items-start gap-4 hover:-translate-y-1 transition-transform duration-200">
-              <div className="w-11 h-11 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 border border-secondary/20">
-                <span className="material-symbols-outlined text-secondary text-[22px]">
-                  mail
-                </span>
+            <ScrollReveal direction="up" delay={160}>
+              <div className="bg-surface-container-lowest p-7 rounded-2xl border border-outline-variant/30 shadow-xs flex items-start gap-4 hover-lift h-full">
+                <div className="w-11 h-11 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 border border-secondary/20">
+                  <span className="material-symbols-outlined text-secondary text-[22px]">
+                    mail
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-foreground text-sm mb-1">Email Us</h3>
+                  <a
+                    href={`mailto:${email}`}
+                    className="text-xs text-muted-foreground hover:text-secondary transition-colors font-medium break-all"
+                  >
+                    {email}
+                  </a>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-foreground text-sm mb-1">Email Us</h3>
-                <a
-                  href={`mailto:${email}`}
-                  className="text-xs text-muted-foreground hover:text-secondary transition-colors font-medium break-all"
-                >
-                  {email}
-                </a>
-              </div>
-            </div>
+            </ScrollReveal>
 
             {/* Card 4: Call Us */}
-            <div className="bg-surface-container-lowest p-7 rounded-2xl border border-outline-variant/30 shadow-sm flex items-start gap-4 hover:-translate-y-1 transition-transform duration-200">
-              <div className="w-11 h-11 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 border border-secondary/20">
-                <span className="material-symbols-outlined text-secondary text-[22px]">
-                  call
-                </span>
+            <ScrollReveal direction="up" delay={240}>
+              <div className="bg-surface-container-lowest p-7 rounded-2xl border border-outline-variant/30 shadow-xs flex items-start gap-4 hover-lift h-full">
+                <div className="w-11 h-11 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 border border-secondary/20">
+                  <span className="material-symbols-outlined text-secondary text-[22px]">
+                    call
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-foreground text-sm mb-1">Call Us</h3>
+                  <a
+                    href={`tel:${phone.replace(/[^0-9+]/g, "")}`}
+                    className="text-xs text-muted-foreground hover:text-secondary transition-colors font-medium"
+                  >
+                    {phone}
+                  </a>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-foreground text-sm mb-1">Call Us</h3>
-                <a
-                  href={`tel:${phone.replace(/[^0-9+]/g, "")}`}
-                  className="text-xs text-muted-foreground hover:text-secondary transition-colors font-medium"
-                >
-                  {phone}
-                </a>
-              </div>
-            </div>
+            </ScrollReveal>
 
           </div>
         </div>

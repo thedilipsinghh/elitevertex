@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname === '/admin' || request.nextUrl.pathname === '/eliteadmin4393') {
+  // Only route /eliteadmin4393 root
+  if (request.nextUrl.pathname === '/eliteadmin4393') {
     const hasToken = request.cookies.has('admin_token');
     return NextResponse.redirect(new URL(hasToken ? '/eliteadmin4393/dashboard' : '/eliteadmin4393/login', request.url));
   }
@@ -29,5 +30,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin', '/eliteadmin4393', '/eliteadmin4393/:path*'],
+  matcher: ['/eliteadmin4393', '/eliteadmin4393/:path*'],
 };

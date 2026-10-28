@@ -82,7 +82,7 @@ async function runSeed() {
       title: "Comprehensive Spoken English & Fluency Masterclass",
       shortDescription: "From hesitation to fluent articulation through daily acoustic speaking practice, paired rhetoric drills, and personalized vocal diagnostic coaching.",
       fullDescription: "A comprehensive masterclass designed to elevate your speaking skills to professional levels...",
-      image: "https://lh3.googleusercontent.com/aida/AEtjO1XUmQebC7cWdgP8rjmnfdqiY3TWTBNoYsfMaSYI7n3xfYNILdru7siueSJaT3rMs4i4yPJNbvZvfikMQY3F9R2qu9KcA-IJpgJKfBgkmFG_E5MXmadYRgWJ_6PhUHhZrCm8UV-zLzfi7YQS7zuXK6r0MjulQm5z6SjXV14VWLoizz-xs76JsWDExBfm2OMZySxsZVg3HIpEMQlOhdIgz88ZuQ4xbfsXjeGRuCDxyYgFYtotlQBLMiC4mi6i",
+      image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80",
       duration: "12 Weeks",
       level: "Cohort XXV Admissions Open",
       format: "Campus & Hybrid",
@@ -351,7 +351,7 @@ async function runSeed() {
           subheading:
             "Build the English, communication skills, and executive confidence you need for classrooms, global careers, and everyday influence.",
           image:
-            "https://lh3.googleusercontent.com/aida/AEtjO1XUmQebC7cWdgP8rjmnfdqiY3TWTBNoYsfMaSYI7n3xfYNILdru7siueSJaT3rMs4i4yPJNbvZvfikMQY3F9R2qu9KcA-IJpgJKfBgkmFG_E5MXmadYRgWJ_6PhUHhZrCm8UV-zLzfi7YQS7zuXK6r0MjulQm5z6SjXV14VWLoizz-xs76JsWDExBfm2OMZySxsZVg3HIpEMQlOhdIgz88ZuQ4xbfsXjeGRuCDxyYgFYtotlQBLMiC4mi6i",
+            "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80",
           imageAlt: "Learners collaborating actively in executive seminar hall at Elite Vertex",
           primaryCtaLabel: "Book Free Counselling",
           primaryCtaUrl: "/contact",
@@ -386,7 +386,7 @@ async function runSeed() {
           linkLabel: "Discover Elite Vertex",
           linkUrl: "/about",
           image:
-            "https://lh3.googleusercontent.com/aida/AEtjO1UbCF47-wiszdwusF3kMtv218IqjqvwCWDJvXsccjhFWJowp5BXlhN1kafTOugiyzVfXIo1qi-UcFsCrXM57_lf-qI570CX2oKhiyKwApnDYDnGhjl05XnUcddmLAQBAC6iFtCkxGqpYRZMU9Qz-9h2x7T4YArXXt7nfL08xtPsa92omp0t5PyG8ovtazAtrAb_SaxJcN0q6Zs2xHS7t9SSVcj163VqpH4g0UmK98w5ZaPNxHYi4F5GhoI",
+            "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80",
           imageAlt: "Academic mentor guiding student presentation in modern learning acoustic pod",
         },
       },

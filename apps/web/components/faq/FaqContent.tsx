@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import React from "react";
 import { useGetFaqsQuery } from "@/lib/features/api/apiSlice";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 
 const faqData = [
@@ -239,28 +240,32 @@ const { data: faqResponse, isLoading, error } = useGetFaqsQuery({});
     ))}
   </div>
 ) : (
-  filteredFaqs.map((faq: any) => {
+  filteredFaqs.map((faq: any, fIdx: number) => {
     const isOpen = openId === faq.id;
     return (
-      <article key={faq.id} className="group bg-surface-container-lowest rounded shadow-sm mb-space-xs transition-colors">
-        <button
-          aria-expanded={isOpen}
-          className="w-full px-space-md py-space-md text-left flex items-start justify-between gap-space-sm"
-          type="button"
-          onClick={() => toggleFaq(faq.id)}
-        >
-          <div className="flex items-start gap-space-sm">
-            <span className="font-label-md text-label-md text-on-surface-variant/50 pt-0.5 select-none shrink-0">{faq.id}</span>
-            <h2 className={`font-headline-sm text-headline-sm transition-colors ${isOpen ? 'text-primary' : 'text-on-surface group-hover:text-primary'}`}>
-              {faq.question}
-            </h2>
+      <ScrollReveal key={faq.id} direction="up" delay={Math.min(fIdx * 50, 400)}>
+        <article className="group bg-surface-container-lowest rounded-2xl border border-outline-variant/40 shadow-xs mb-space-xs transition-all hover-lift">
+          <button
+            aria-expanded={isOpen}
+            className="w-full px-space-md py-space-md text-left flex items-start justify-between gap-space-sm cursor-pointer"
+            type="button"
+            onClick={() => toggleFaq(faq.id)}
+          >
+            <div className="flex items-start gap-space-sm">
+              <span className="font-label-md text-label-md text-secondary font-bold pt-0.5 select-none shrink-0">{faq.id}</span>
+              <h2 className={`font-headline-sm text-headline-sm transition-colors ${isOpen ? 'text-secondary' : 'text-on-surface group-hover:text-secondary'}`}>
+                {faq.question}
+              </h2>
+            </div>
+            <span className={`material-symbols-outlined text-on-surface-variant text-[22px] transition-transform duration-300 shrink-0 mt-0.5 ${isOpen ? 'rotate-180 text-secondary' : ''}`}>expand_more</span>
+          </button>
+          <div className={`grid transition-all duration-300 ease-out px-space-md pl-[calc(1.5rem+1.5rem)] ${isOpen ? 'grid-rows-[1fr] opacity-100 pb-space-md' : 'grid-rows-[0fr] opacity-0'}`}>
+            <div className="overflow-hidden">
+              <div className="pt-space-2xs text-on-surface-variant font-body-md text-body-md leading-relaxed">{faq.answer}</div>
+            </div>
           </div>
-          <span className={`material-symbols-outlined text-on-surface-variant text-[22px] transition-transform duration-200 shrink-0 mt-0.5 ${isOpen ? 'rotate-180' : ''}`}>expand_more</span>
-        </button>
-        <div className={`px-space-md pb-space-md pl-[calc(1.5rem+1.5rem)] ${isOpen ? 'block' : 'hidden'}`}>
-          <div className="pt-space-2xs text-on-surface-variant font-body-md text-body-md leading-relaxed">{faq.answer}</div>
-        </div>
-      </article>
+        </article>
+      </ScrollReveal>
     );
   })
 )}

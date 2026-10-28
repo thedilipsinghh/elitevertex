@@ -127,6 +127,12 @@ export const settingsSchema = z.object({
   certSig2Name: z.string().max(255).nullable().optional(),
   certSig2Title: z.string().max(255).nullable().optional(),
   certSig2Sign: z.string().nullable().optional(),
+  socialStickyEnabled: z.boolean().optional(),
+  socialStickyPosition: z.string().max(20).nullable().optional(),
+  socialStickyOffset: z.string().max(20).nullable().optional(),
+  socialShowInstagram: z.boolean().optional(),
+  socialShowFacebook: z.boolean().optional(),
+  socialShowWhatsapp: z.boolean().optional(),
 });
 
 export const aboutSchema = z.object({

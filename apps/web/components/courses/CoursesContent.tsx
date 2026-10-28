@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useGetCoursesQuery } from "@/lib/features/api/apiSlice";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 type CourseCategory = "all" | "spoken" | "career" | "advanced";
 
@@ -24,11 +25,44 @@ interface CourseModule {
   modules?: any[];
 }
 
+const COURSE_IMAGES: Record<string, string> = {
+  "flagship-comprehensive-masterclass": "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80",
+  "basic-spoken-english": "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=80",
+  "intermediate-spoken-english": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
+  "advanced-spoken-english": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80",
+  "interview-skills": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80",
+  "personality-development": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80",
+  "public-speaking": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
+  "business-communication": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80",
+  "voice-accent": "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1200&q=80",
+  "pfe-1": "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=80",
+  "fe-2": "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80",
+  "be-3": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
+  "ie-4": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80",
+  "ae-5": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80",
+};
+
 const DEFAULT_TRACK_IMAGES: Record<string, string> = {
+  flagship: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80",
   spoken: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=80",
   career: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80",
   advanced: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80",
   professional: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
+};
+
+const getCourseImage = (course: CourseModule): string => {
+  const fallbackFlagship = "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80";
+  if (course.image && !course.image.includes("googleusercontent.com") && course.image.startsWith("http")) {
+    return course.image;
+  }
+  if (course.slug && COURSE_IMAGES[course.slug]) {
+    return COURSE_IMAGES[course.slug] ?? fallbackFlagship;
+  }
+  if (course.id && COURSE_IMAGES[course.id]) {
+    return COURSE_IMAGES[course.id] ?? fallbackFlagship;
+  }
+  const cat = (course.category || "").toLowerCase();
+  return DEFAULT_TRACK_IMAGES[cat] ?? fallbackFlagship;
 };
 
 const INSTITUTIONAL_COURSES: CourseModule[] = [
@@ -203,7 +237,7 @@ export function CoursesContent() {
   const courses: CourseModule[] = apiCourses.length > 0 ? apiCourses : INSTITUTIONAL_COURSES;
 
   // Auto-expand first item if none is selected
-  const currentExpandedId = expandedCourseId ?? courses[0]?.id ?? null;
+  const currentExpandedId = expandedCourseId === "none" ? null : (expandedCourseId ?? courses[0]?.id ?? null);
 
   const handleDownload = () => {
     setShowToast(true);
@@ -235,40 +269,42 @@ export function CoursesContent() {
     <div className="flex flex-col w-full bg-surface text-on-surface min-h-screen transition-colors">
       
       {/* ── 1. Hero Banner ── */}
-      <section className="w-full bg-surface-container-lowest border-b border-outline-variant py-12 md:py-20 transition-colors">
+      <section className="w-full bg-surface-container-lowest border-b border-outline-variant py-12 md:py-20 transition-colors overflow-hidden">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col max-w-3xl gap-4">
-            
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 text-xs font-bold tracking-widest uppercase w-fit shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-400"></span>
-              <span>Comprehensive Spoken English Curriculum</span>
+          <ScrollReveal direction="up" delay={0}>
+            <div className="flex flex-col max-w-3xl gap-4">
+              
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 text-xs font-bold tracking-widest uppercase w-fit shadow-2xs badge-shimmer">
+                <span className="w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-400 animate-pulse"></span>
+                <span>Comprehensive Spoken English Curriculum</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-on-surface tracking-tight leading-tight">
+                Structured English Programs For Every Skill Level.
+              </h1>
+
+              <p className="text-base sm:text-lg text-on-surface-variant max-w-2xl leading-relaxed font-normal">
+                From absolute foundational grammar (PFE) to executive boardroom presence (AE) — explore our accredited, step-by-step spoken English modules with 70% active speaking time.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <Link
+                  href="/book-counselling"
+                  className="inline-flex items-center justify-center gap-2 bg-secondary hover:bg-on-secondary-container text-on-secondary text-xs sm:text-sm font-bold uppercase tracking-wider px-6 sm:px-7 py-3.5 rounded-xl transition-all shadow-sm btn-press hover-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+                >
+                  <span className="material-symbols-outlined text-[18px]">calendar_month</span>
+                  <span>Book Free Counselling</span>
+                </Link>
+                <a
+                  href="tel:+918049208800"
+                  className="inline-flex items-center justify-center gap-2 bg-surface-container hover:bg-surface-container-high text-on-surface text-xs sm:text-sm font-bold uppercase tracking-wider px-6 sm:px-7 py-3.5 rounded-xl transition-all border border-outline-variant shadow-xs btn-press hover-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+                >
+                  <span className="material-symbols-outlined text-[18px]">call</span>
+                  <span>Admissions: +91 (80) 4920-8800</span>
+                </a>
+              </div>
             </div>
-
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-on-surface tracking-tight leading-tight">
-              Structured English Programs For Every Skill Level.
-            </h1>
-
-            <p className="text-base sm:text-lg text-on-surface-variant max-w-2xl leading-relaxed font-normal">
-              From absolute foundational grammar (PFE) to executive boardroom presence (AE) — explore our accredited, step-by-step spoken English modules with 70% active speaking time.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <Link
-                href="/book-counselling"
-                className="inline-flex items-center justify-center gap-2 bg-secondary hover:bg-on-secondary-container text-on-secondary text-xs sm:text-sm font-bold uppercase tracking-wider px-6 sm:px-7 py-3.5 rounded-lg transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
-              >
-                <span className="material-symbols-outlined text-[18px]">calendar_month</span>
-                <span>Book Free Counselling</span>
-              </Link>
-              <a
-                href="tel:+918049208800"
-                className="inline-flex items-center justify-center gap-2 bg-surface-container hover:bg-surface-container-high text-on-surface text-xs sm:text-sm font-bold uppercase tracking-wider px-6 sm:px-7 py-3.5 rounded-lg transition-colors border border-outline-variant shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
-              >
-                <span className="material-symbols-outlined text-[18px]">call</span>
-                <span>Admissions: +91 (80) 4920-8800</span>
-              </a>
-            </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -325,21 +361,24 @@ export function CoursesContent() {
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="flex flex-col gap-8">
-            {filteredCourses.map((course) => {
+            {filteredCourses.map((course, cIdx) => {
               const isExpanded = currentExpandedId === course.id;
               const moduleItems = getCourseModules(course);
-              const courseImg =
-                course.image ||
-                DEFAULT_TRACK_IMAGES[course.category] ||
-                "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80";
+              const courseImg = getCourseImage(course);
+              const fallbackTrackImg: string =
+                (course.category ? DEFAULT_TRACK_IMAGES[course.category.toLowerCase()] : undefined) ??
+                DEFAULT_TRACK_IMAGES.flagship ??
+                "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80";
 
               return (
-                <div
-                  key={course.id}
-                  className={`bg-surface-container-lowest rounded-2xl border transition-all duration-200 overflow-hidden shadow-xs hover:shadow-md flex flex-col ${
-                    isExpanded ? "border-secondary ring-1 ring-secondary/30" : "border-outline-variant"
-                  }`}
-                >
+                <ScrollReveal key={course.id} direction="up" delay={cIdx * 70}>
+                  <div
+                    className={`bg-surface-container-lowest rounded-2xl border transition-all duration-300 overflow-hidden flex flex-col hover-lift ${
+                      isExpanded
+                        ? "border-secondary/70 ring-1 ring-secondary/20 shadow-md"
+                        : "border-outline-variant shadow-xs hover:shadow-xl"
+                    }`}
+                  >
                   {/* Top / Main Card Content: Image + Details */}
                   <div className="flex flex-col lg:flex-row">
                     
@@ -349,19 +388,25 @@ export function CoursesContent() {
                       <img
                         src={courseImg}
                         alt={course.title}
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          if (target.src !== fallbackTrackImg) {
+                            target.src = fallbackTrackImg;
+                          }
+                        }}
                         className="w-full h-56 lg:h-full object-cover transition-transform duration-500 hover:scale-105"
                       />
                       
                       {/* Category Badge Pill Overlay */}
-                      <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                        <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-surface-container-lowest text-on-surface border border-outline-variant shadow-2xs">
+                      <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10 pointer-events-none">
+                        <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-surface-container-lowest/95 backdrop-blur-sm text-on-surface border border-outline-variant shadow-2xs">
                           {course.badge || `${course.category.toUpperCase()} TRACK`}
                         </span>
                       </div>
 
                       {course.level && (
-                        <div className="absolute bottom-3 left-3">
-                          <span className="px-2.5 py-1 rounded text-[11px] font-bold bg-primary text-on-primary shadow-xs">
+                        <div className="absolute bottom-3 left-3 z-10 pointer-events-none">
+                          <span className="px-2.5 py-1 rounded text-[11px] font-bold bg-primary/95 backdrop-blur-sm text-on-primary shadow-xs">
                             {course.level}
                           </span>
                         </div>
@@ -431,7 +476,7 @@ export function CoursesContent() {
                           onClick={() => toggleAccordion(course.id)}
                           className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors border ${
                             isExpanded
-                              ? "bg-secondary text-on-secondary border-secondary"
+                              ? "bg-secondary/15 hover:bg-secondary/25 text-secondary border-secondary/40 font-bold"
                               : "bg-surface-container hover:bg-surface-container-high text-on-surface border-outline-variant"
                           }`}
                         >
@@ -526,7 +571,8 @@ export function CoursesContent() {
                     </div>
                   )}
                 </div>
-              );
+              </ScrollReveal>
+            );
             })}
           </div>
 

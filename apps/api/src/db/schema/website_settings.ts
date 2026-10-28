@@ -36,6 +36,12 @@ export const websiteSettings = pgTable("website_settings", {
   certSig2Name: varchar("cert_sig2_name", { length: 255 }),
   certSig2Title: varchar("cert_sig2_title", { length: 255 }),
   certSig2Sign: text("cert_sig2_sign"),
+  socialStickyEnabled: boolean("social_sticky_enabled").default(true),
+  socialStickyPosition: varchar("social_sticky_position", { length: 20 }).default("right"),
+  socialStickyOffset: varchar("social_sticky_offset", { length: 20 }).default("center"),
+  socialShowInstagram: boolean("social_show_instagram").default(true),
+  socialShowFacebook: boolean("social_show_facebook").default(true),
+  socialShowWhatsapp: boolean("social_show_whatsapp").default(true),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 

@@ -64,12 +64,12 @@ export function Navbar() {
   };
 
   const logoSrc = settings.logoUrl || "/logo.png";
+  const whatsappNumber = (settings.whatsapp || "+91 98450 12345").replace(/[^0-9]/g, "");
+  const whatsappUrl = `https://wa.me/${whatsappNumber}`;
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-200 ${isScrolled
-        ? "bg-surface-container-lowest/95 backdrop-blur-md shadow-sm border-b border-outline-variant py-1"
-        : "bg-surface-container-lowest/90 backdrop-blur-sm border-b border-outline-variant/40 py-0"
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-200 bg-surface-container-lowest border-b border-outline-variant ${isScrolled ? "shadow-sm py-1" : "py-0"
         }`}
     >
       <div className="h-16 md:h-20 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 transition-all duration-200">
@@ -77,7 +77,7 @@ export function Navbar() {
         {/* Brand / Logo */}
         <div className="flex items-center gap-3 shrink-0">
           <Link href="/" className="flex items-center" aria-label="Elite Vertex Home">
-            <div className="bg-white rounded-lg p-1.5 shadow-xs border border-slate-200/80 dark:border-slate-700">
+            <div className="flex items-center dark:bg-white dark:rounded-lg dark:p-1.5 transition-all">
               <img
                 alt="Elite Vertex Brand Logo"
                 className="h-8 md:h-10 w-auto object-contain transition-all"
@@ -127,8 +127,8 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`font-semibold text-xs uppercase tracking-wider transition-colors py-2 relative ${active
-                  ? "text-primary font-bold after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:rounded-full"
+                className={`font-semibold text-xs uppercase tracking-wider py-2 nav-link-anim transition-colors duration-200 ${active
+                  ? "text-primary font-bold active-link"
                   : "text-on-surface-variant hover:text-primary"
                   }`}
               >
@@ -139,28 +139,35 @@ export function Navbar() {
         </nav>
 
         {/* Action Buttons, Theme Toggle & Mobile Menu Trigger */}
-        <div className="flex items-center gap-3 shrink-0">
-          <Link
-            href="/book-counselling"
-            className="hidden sm:inline-flex items-center justify-center bg-secondary hover:bg-on-secondary-container text-on-secondary font-semibold text-xs uppercase tracking-wider px-4 py-2.5 rounded-lg transition-colors shadow-xs"
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* WhatsApp Action Button */}
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-[#007a55] hover:bg-[#006747] text-white font-semibold text-xs sm:text-sm px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full transition-all duration-200 shadow-xs hover:shadow-md active:scale-95 cursor-pointer select-none btn-press hover-lift"
+            title="Chat on WhatsApp"
+            aria-label="Chat on WhatsApp"
           >
-            Book Free Counselling
-          </Link>
+            <svg
+              className="w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M2.5 4C2.5 2.62 3.62 1.5 5 1.5H19C20.38 1.5 21.5 2.62 21.5 4V15C21.5 16.38 20.38 17.5 19 17.5H5.8L2.5 21V4ZM5.5 5.5H18.5V7.5H5.5V5.5ZM5.5 9H18.5V11H5.5V9ZM5.5 12.5H14V14.5H5.5V12.5Z"
+                fill="white"
+              />
+            </svg>
+            <span className="tracking-wide">WhatsApp</span>
+          </a>
 
           {/* Theme Toggle (Desktop) */}
           <ThemeToggle className="w-10 h-10" />
-
-          {/* Login Action */}
-          <Link
-            href="/login"
-            className="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity"
-            title="Account Login"
-            aria-label="Account Login"
-          >
-            <span className="material-symbols-outlined text-[20px]">
-              person
-            </span>
-          </Link>
 
           {/* Mobile Menu Button */}
           <button
@@ -214,12 +221,28 @@ export function Navbar() {
 
             <div className="pt-3 mt-2 border-t border-outline-variant flex flex-col gap-2">
               <ThemeToggle showLabel className="w-full justify-start py-2.5 px-3" />
-              <Link
-                href="/book-counselling"
-                className="w-full flex items-center justify-center bg-secondary text-on-secondary font-semibold text-xs uppercase tracking-wider px-4 py-3 rounded-lg transition-colors sm:hidden"
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 bg-[#007a55] hover:bg-[#006747] text-white font-semibold text-sm px-4 py-2.5 rounded-full transition-colors shadow-xs"
               >
-                Book Free Counselling
-              </Link>
+                <svg
+                  className="w-5 h-5 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M2.5 4C2.5 2.62 3.62 1.5 5 1.5H19C20.38 1.5 21.5 2.62 21.5 4V15C21.5 16.38 20.38 17.5 19 17.5H5.8L2.5 21V4ZM5.5 5.5H18.5V7.5H5.5V5.5ZM5.5 9H18.5V11H5.5V9ZM5.5 12.5H14V14.5H5.5V12.5Z"
+                    fill="white"
+                  />
+                </svg>
+                <span>WhatsApp</span>
+              </a>
             </div>
           </nav>
         </div >

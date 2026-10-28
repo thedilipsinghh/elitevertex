@@ -26,7 +26,6 @@ export default function AdminCertificatesCmsPage() {
   const [seedCertificates, { isLoading: isSeeding }] = useSeedCertificatesMutation();
 
   const certificatesList = response?.data || [];
-  const authorityData = response?.authoritySignatures || {};
   const coursesList = coursesResponse?.data || [];
 
   const [activeTab, setActiveTab] = useState<"list" | "issue" | "signatures">("list");
@@ -61,17 +60,26 @@ export default function AdminCertificatesCmsPage() {
   };
 
   useEffect(() => {
-    if (authorityData) {
-      setSignaturesForm({
-        sig1Name: authorityData.sig1Name || "Dr. Aris Thorne",
-        sig1Title: authorityData.sig1Title || "Authorized Signatory",
-        sig1Sign: authorityData.sig1Sign || "",
-        sig2Name: authorityData.sig2Name || "Prof. Marcus Vance",
-        sig2Title: authorityData.sig2Title || "Director / Principal",
-        sig2Sign: authorityData.sig2Sign || "",
-      });
+    if (response?.authoritySignatures) {
+      const a = response.authoritySignatures;
+      setSignaturesForm((prev) => ({
+        ...prev,
+        sig1Name: a.sig1Name || prev.sig1Name,
+        sig1Title: a.sig1Title || prev.sig1Title,
+        sig1Sign: a.sig1Sign || prev.sig1Sign,
+        sig2Name: a.sig2Name || prev.sig2Name,
+        sig2Title: a.sig2Title || prev.sig2Title,
+        sig2Sign: a.sig2Sign || prev.sig2Sign,
+      }));
     }
-  }, [authorityData]);
+  }, [
+    response?.authoritySignatures?.sig1Name,
+    response?.authoritySignatures?.sig1Title,
+    response?.authoritySignatures?.sig1Sign,
+    response?.authoritySignatures?.sig2Name,
+    response?.authoritySignatures?.sig2Title,
+    response?.authoritySignatures?.sig2Sign,
+  ]);
 
   const generateCertNumber = () => {
     const year = new Date().getFullYear();

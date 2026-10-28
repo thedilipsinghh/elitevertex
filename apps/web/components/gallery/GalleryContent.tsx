@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useGetGalleryQuery } from "@/lib/features/api/apiSlice";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 type FilterType = "all" | "classroom" | "events" | "workshops" | "milestones";
 
@@ -119,70 +120,72 @@ export function GalleryContent() {
         <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start mb-space-xl">
-            {filteredItems.slice(0, 2).map((item: any) => (
-              <article 
-                key={item.id} 
-                onClick={() => setLightboxItem(item)}
-                className={`${item.gridSpan} group cursor-pointer bg-surface-container-lowest p-space-sm rounded shadow-sm hover:shadow-md transition-all duration-300`}
-              >
-                <div className={`relative w-full ${item.aspectRatio} overflow-hidden rounded bg-surface-container`}>
-                  <img alt={item.title} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]" loading="lazy" src={item.image} />
-                  <div className="absolute top-space-xs left-space-xs">
-                    <span className={`${item.tagClass} font-label-sm text-label-sm uppercase px-space-2xs py-space-3xs tracking-widest rounded`}>
-                      {item.tag}
-                    </span>
-                  </div>
-                  <div className="absolute bottom-space-xs right-space-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <div className="bg-surface-container-lowest text-primary p-space-2xs rounded shadow-sm flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[20px]">fullscreen</span>
+            {filteredItems.slice(0, 2).map((item: any, idx: number) => (
+              <ScrollReveal key={item.id} direction="up" delay={idx * 100} className={item.gridSpan}>
+                <article 
+                  onClick={() => setLightboxItem(item)}
+                  className="group cursor-pointer bg-surface-container-lowest p-space-sm rounded-2xl border border-outline-variant/40 shadow-xs hover:shadow-xl transition-all duration-300 hover-lift img-zoom-parent"
+                >
+                  <div className={`relative w-full ${item.aspectRatio} overflow-hidden rounded-xl bg-surface-container`}>
+                    <img alt={item.title} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" loading="lazy" src={item.image} />
+                    <div className="absolute top-space-xs left-space-xs">
+                      <span className={`${item.tagClass} font-label-sm text-label-sm uppercase px-space-2xs py-space-3xs tracking-widest rounded-md shadow-2xs`}>
+                        {item.tag}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-space-xs right-space-xs opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-1 group-hover:translate-y-0">
+                      <div className="bg-surface-container-lowest text-primary p-space-2xs rounded-lg shadow-md flex items-center justify-center">
+                        <span className="material-symbols-outlined text-[20px]">fullscreen</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="pt-space-md pb-space-2xs flex flex-col md:flex-row md:items-baseline justify-between gap-space-xs">
-                  <div>
-                    <h2 className="font-headline-sm text-headline-sm text-primary group-hover:text-secondary transition-colors">{item.title}</h2>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant mt-space-3xs max-w-xl">{item.description}</p>
+                  <div className="pt-space-md pb-space-2xs flex flex-col md:flex-row md:items-baseline justify-between gap-space-xs">
+                    <div>
+                      <h2 className="font-headline-sm text-headline-sm text-primary group-hover:text-secondary transition-colors">{item.title}</h2>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant mt-space-3xs max-w-xl">{item.description}</p>
+                    </div>
+                    <div className="flex flex-col items-start md:items-end font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider shrink-0 mt-space-sm md:mt-0">
+                      <span className="font-semibold text-secondary">{item.location}</span>
+                      {item.subLocation && <span>{item.subLocation}</span>}
+                    </div>
                   </div>
-                  <div className="flex flex-col items-start md:items-end font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider shrink-0 mt-space-sm md:mt-0">
-                    <span>{item.location}</span>
-                    {item.subLocation && <span>{item.subLocation}</span>}
-                  </div>
-                </div>
-              </article>
+                </article>
+              </ScrollReveal>
             ))}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
-            {filteredItems.slice(2, 4).map((item: any) => (
-              <article 
-                key={item.id} 
-                onClick={() => setLightboxItem(item)}
-                className={`${item.gridSpan} group cursor-pointer bg-surface-container-lowest p-space-sm rounded shadow-sm hover:shadow-md transition-all duration-300`}
-              >
-                <div className={`relative w-full ${item.aspectRatio} overflow-hidden rounded bg-surface-container`}>
-                  <img alt={item.title} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]" loading="lazy" src={item.image} />
-                  <div className="absolute top-space-xs left-space-xs">
-                    <span className={`${item.tagClass} font-label-sm text-label-sm uppercase px-space-2xs py-space-3xs tracking-widest rounded`}>
-                      {item.tag}
-                    </span>
-                  </div>
-                  <div className="absolute bottom-space-xs right-space-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <div className="bg-surface-container-lowest text-primary p-space-2xs rounded shadow-sm flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[20px]">fullscreen</span>
+            {filteredItems.slice(2, 4).map((item: any, idx: number) => (
+              <ScrollReveal key={item.id} direction="up" delay={(idx + 2) * 100} className={item.gridSpan}>
+                <article 
+                  onClick={() => setLightboxItem(item)}
+                  className="group cursor-pointer bg-surface-container-lowest p-space-sm rounded-2xl border border-outline-variant/40 shadow-xs hover:shadow-xl transition-all duration-300 hover-lift img-zoom-parent"
+                >
+                  <div className={`relative w-full ${item.aspectRatio} overflow-hidden rounded-xl bg-surface-container`}>
+                    <img alt={item.title} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" loading="lazy" src={item.image} />
+                    <div className="absolute top-space-xs left-space-xs">
+                      <span className={`${item.tagClass} font-label-sm text-label-sm uppercase px-space-2xs py-space-3xs tracking-widest rounded-md shadow-2xs`}>
+                        {item.tag}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-space-xs right-space-xs opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-1 group-hover:translate-y-0">
+                      <div className="bg-surface-container-lowest text-primary p-space-2xs rounded-lg shadow-md flex items-center justify-center">
+                        <span className="material-symbols-outlined text-[20px]">fullscreen</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="pt-space-md pb-space-2xs flex flex-col md:flex-row md:items-baseline justify-between gap-space-xs">
-                  <div>
-                    <h2 className="font-headline-sm text-headline-sm text-primary group-hover:text-secondary transition-colors">{item.title}</h2>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant mt-space-3xs max-w-xl">{item.description}</p>
+                  <div className="pt-space-md pb-space-2xs flex flex-col md:flex-row md:items-baseline justify-between gap-space-xs">
+                    <div>
+                      <h2 className="font-headline-sm text-headline-sm text-primary group-hover:text-secondary transition-colors">{item.title}</h2>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant mt-space-3xs max-w-xl">{item.description}</p>
+                    </div>
+                    <div className="flex flex-col items-start md:items-end font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider shrink-0 mt-space-sm md:mt-0">
+                      <span className="font-semibold text-secondary">{item.location}</span>
+                      {item.subLocation && <span>{item.subLocation}</span>}
+                    </div>
                   </div>
-                  <div className="flex flex-col items-start md:items-end font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider shrink-0 mt-space-sm md:mt-0">
-                    <span>{item.location}</span>
-                    {item.subLocation && <span>{item.subLocation}</span>}
-                  </div>
-                </div>
-              </article>
+                </article>
+              </ScrollReveal>
             ))}
           </div>
 
@@ -247,11 +250,11 @@ export function GalleryContent() {
       {/* Interactive Lightbox Modal */}
       {lightboxItem && (
         <div 
-          className="fixed inset-0 z-50 bg-primary/95 flex items-center justify-center p-space-sm md:p-space-lg transition-opacity duration-300"
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300"
           onClick={() => setLightboxItem(null)}
         >
           <div 
-            className="relative max-w-5xl w-full bg-surface-container-lowest rounded overflow-hidden shadow-2xl flex flex-col"
+            className="relative max-w-5xl w-full bg-surface-container-lowest rounded-2xl overflow-hidden shadow-2xl flex flex-col border border-outline-variant/30 animate-in zoom-in-95 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Lightbox Header */}

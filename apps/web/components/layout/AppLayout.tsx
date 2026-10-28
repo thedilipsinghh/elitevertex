@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { VerticalSocialSticky } from "@/components/ui/VerticalSocialSticky";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -15,6 +16,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navbar />
+      <VerticalSocialSticky />
       <main className="w-full pt-16 md:pt-20 bg-surface min-h-[calc(100vh-20rem)] transition-colors duration-150">
         {children}
       </main>

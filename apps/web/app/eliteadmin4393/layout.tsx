@@ -3,7 +3,15 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import type { Metadata } from "next";
 import { useLogoutMutation, useGetMeQuery } from "@/lib/features/api/apiSlice";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 interface MenuItem {
   name: string;

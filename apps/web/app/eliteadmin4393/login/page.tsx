@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useLoginMutation, useGetWebsiteSettingsQuery } from "@/lib/features/api/apiSlice";
+import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export default function AdminLogin() {
@@ -10,6 +11,7 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const router = useRouter();
   const [login, { isLoading }] = useLoginMutation();
 
   const { data: settingsResponse } = useGetWebsiteSettingsQuery({});
@@ -24,7 +26,7 @@ export default function AdminLogin() {
       const res = await login({ email, password }).unwrap();
       if (res.success) {
         // Hard redirect so middleware picks up the new HttpOnly cookie fresh
-        window.location.href = "/eliteadmin4393/dashboard";
+        router.replace("/eliteadmin4393/dashboard");
       }
     } catch (err: any) {
       setError(err?.data?.message || "Invalid credentials. Please verify your administrative email and password.");

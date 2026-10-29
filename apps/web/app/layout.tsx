@@ -14,11 +14,12 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: "Elite Vertex — Institute of Communication",
-  description: "Premier institute for Spoken English, Public Speaking, and Career Communication.",
+  description: "Premier institute for Spoken English, Public Speaking, and Career Communication in Mairwa, Siwan, Bihar.",
+  metadataBase: new URL("https://elitevertex-web.vercel.app"),
   openGraph: {
     title: "Elite Vertex — Institute of Communication",
-    description: "Premier institute for Spoken English, Public Speaking, and Career Communication.",
-    url: "https://elitevertex.com",
+    description: "Premier institute for Spoken English, Public Speaking, and Career Communication in Mairwa, Siwan, Bihar.",
+    url: "https://elitevertex-web.vercel.app",
     siteName: "Elite Vertex",
     images: [
       {
@@ -30,6 +31,16 @@ export const metadata: Metadata = {
     ],
     locale: "en_US",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Elite Vertex — Institute of Communication",
+    description: "Premier institute for Spoken English, Public Speaking, and Career Communication in Mairwa, Siwan, Bihar.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

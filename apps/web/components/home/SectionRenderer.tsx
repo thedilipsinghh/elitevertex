@@ -16,6 +16,17 @@ const str = (v: unknown, fallback = ""): string =>
 
 const arr = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
 
+// Safely duplicate array items until at least `min` elements are reached without any while loops
+const duplicateToMin = <T,>(list: T[], min = 6): T[] => {
+  if (!Array.isArray(list) || list.length === 0) return [];
+  const times = Math.ceil(min / list.length);
+  const result: T[] = [];
+  for (let i = 0; i < Math.max(1, times); i++) {
+    result.push(...list);
+  }
+  return result;
+};
+
 const DEFAULT_HERO_IMAGE =
   "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80";
 const DEFAULT_ABOUT_IMAGE =
@@ -339,12 +350,7 @@ function TestimonialsSection({ content }: RenderProps) {
   const list = apiTestimonials.length > 0 ? apiTestimonials : DEFAULT_TESTIMONIALS;
 
   const trackItems = useMemo(() => {
-    if (!list || list.length === 0) return [];
-    let items = [...list];
-    while (items.length > 0 && items.length < 6) {
-      items = [...items, ...list];
-    }
-    return items;
+    return duplicateToMin(list, 6);
   }, [list]);
 
   return (
@@ -517,12 +523,7 @@ function GallerySection({ content }: RenderProps) {
   }, [apiGallery]);
 
   const trackItems = useMemo(() => {
-    if (!baseGallery || baseGallery.length === 0) return [];
-    let items = [...baseGallery];
-    while (items.length > 0 && items.length < 6) {
-      items = [...items, ...baseGallery];
-    }
-    return items;
+    return duplicateToMin(baseGallery, 6);
   }, [baseGallery]);
 
   return (

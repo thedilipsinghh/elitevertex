@@ -27,8 +27,9 @@ export default function AdminLayoutClient({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { data: me } = useGetMeQuery(undefined, {
-    skip: pathname === "/eliteadmin4393/login",
+  const isLoginPage = pathname === "/eliteadmin4393/login";
+  const { data: me, isLoading, isError } = useGetMeQuery(undefined, {
+    skip: isLoginPage,
   });
   const [logout] = useLogoutMutation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -38,8 +39,30 @@ export default function AdminLayoutClient({
     setMobileMenuOpen(false);
   }, [pathname]);
 
-  if (pathname === "/eliteadmin4393/login") {
+  // If session is invalid/expired on a protected route, clear credentials and redirect to login
+  useEffect(() => {
+    if (isError && !isLoginPage) {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("admin_token");
+        document.cookie = "admin_token=; path=/; max-age=0; SameSite=Lax";
+        window.location.href = "/eliteadmin4393/login";
+      }
+    }
+  }, [isError, isLoginPage]);
+
+  if (isLoginPage) {
     return <>{children}</>;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-surface">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-semibold text-on-surface-variant">Authenticating...</span>
+        </div>
+      </div>
+    );
   }
 
   const currentUser = me?.data as
@@ -52,7 +75,11 @@ export default function AdminLayoutClient({
     } catch {
       // ignore network errors; still clear local state
     }
-    router.push("/eliteadmin4393/login");
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("admin_token");
+      document.cookie = "admin_token=; path=/; max-age=0; SameSite=Lax";
+      window.location.href = "/eliteadmin4393/login";
+    }
   };
 
   const menuGroups: MenuGroup[] = [

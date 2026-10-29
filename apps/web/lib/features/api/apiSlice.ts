@@ -5,6 +5,15 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_URL ?? (typeof window !== 'undefined' ? '/api' : 'http://localhost:5000/api'),
     credentials: 'include',
+    prepareHeaders: (headers) => {
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('admin_token');
+        if (token) {
+          headers.set('authorization', `Bearer ${token}`);
+        }
+      }
+      return headers;
+    },
   }),
   tagTypes: ['Courses', 'Course', 'Gallery', 'Testimonials', 'Faqs', 'Settings', 'Mentors', 'About', 'Campuses', 'Messages', 'Pages', 'Page', 'Navigation', 'Media', 'Users', 'Dashboard', 'Certificates'],
   endpoints: (builder) => ({

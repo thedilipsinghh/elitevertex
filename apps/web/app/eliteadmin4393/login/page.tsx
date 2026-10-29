@@ -23,10 +23,16 @@ export default function AdminLogin() {
     setError("");
 
     try {
-      const res = await login({ email, password }).unwrap();
+      const res: any = await login({ email, password }).unwrap();
       if (res.success) {
-        // Hard redirect so middleware picks up the new HttpOnly cookie fresh
-        router.replace("/eliteadmin4393/dashboard");
+        if (res.token && typeof window !== "undefined") {
+          localStorage.setItem("admin_token", res.token);
+        }
+        if (typeof window !== "undefined") {
+          const isSecure = window.location.protocol === "https:";
+          document.cookie = `admin_token=1; path=/; max-age=86400; SameSite=Lax${isSecure ? "; Secure" : ""}`;
+          window.location.href = "/eliteadmin4393/dashboard";
+        }
       }
     } catch (err: any) {
       setError(err?.data?.message || "Invalid credentials. Please verify your administrative email and password.");

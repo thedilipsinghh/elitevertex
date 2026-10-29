@@ -16,7 +16,9 @@ export interface AuthenticatedRequest extends Request {
 
 export const requireAdmin = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const token = req.cookies.admin_token;
+    const authHeader = req.headers.authorization;
+    const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : undefined;
+    const token = req.cookies?.admin_token || bearerToken;
     if (!token) {
       return res.status(401).json({
         success: false,

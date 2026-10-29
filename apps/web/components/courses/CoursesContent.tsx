@@ -273,8 +273,8 @@ export function CoursesContent() {
   const { data: response, isLoading } = useGetCoursesQuery({});
   const apiCourses = response?.data || [];
 
-  // Use API courses if available. Only fallback to INSTITUTIONAL_COURSES when NOT loading and API returns empty.
-  const courses: CourseModule[] = !isLoading && apiCourses.length === 0 ? INSTITUTIONAL_COURSES : apiCourses;
+  // Use API courses if available, fallback to INSTITUTIONAL_COURSES
+  const courses: CourseModule[] = apiCourses.length > 0 ? apiCourses : INSTITUTIONAL_COURSES;
 
   // Auto-expand first item if none is selected
   const currentExpandedId = expandedCourseId === "none" ? null : (expandedCourseId ?? courses[0]?.id ?? null);

@@ -55,7 +55,7 @@ export function AboutContent() {
     profileImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80"
   };
 
-  const leadMentor = mentorsList[0] || (!isMentorsLoading ? defaultLeadMentor : null);
+  const leadMentor = mentorsList[0] || defaultLeadMentor;
 
   return (
     <div className="flex flex-col w-full font-sans bg-background text-foreground">

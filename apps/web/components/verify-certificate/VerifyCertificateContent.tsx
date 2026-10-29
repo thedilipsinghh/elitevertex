@@ -317,30 +317,21 @@ export function VerifyCertificateContent() {
                   </div>
 
                   {/* High-Resolution Certificate Parchment Card */}
-                  {isSettingsLoading && !settingsResponse ? (
-                    <div className="w-full aspect-[1.414/1] rounded-2xl bg-surface-container animate-pulse border border-outline-variant/60 flex items-center justify-center">
-                      <div className="flex flex-col items-center gap-2">
-                        <span className="material-symbols-outlined text-[36px] text-muted-foreground/40 animate-pulse">workspace_premium</span>
-                        <div className="h-4 w-32 bg-surface-container-high rounded animate-pulse" />
+                  <div
+                    onClick={() => setInspectModalOpen(true)}
+                    className="relative cursor-pointer rounded-2xl overflow-hidden shadow-lg border border-outline-variant/60 transition-transform duration-300 group-hover:scale-[1.01] bg-white"
+                    title="Click to inspect high-resolution parchment"
+                  >
+                    <CertificateTemplate data={showcaseCertData} className="w-full h-auto" />
+                    
+                    {/* Hover Inspection Overlay */}
+                    <div className="absolute inset-0 bg-slate-950/0 group-hover:bg-slate-950/20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 backdrop-blur-2xs">
+                      <div className="px-4 py-2 rounded-xl bg-surface/95 text-foreground text-xs font-bold shadow-xl flex items-center gap-2 border border-outline-variant/60">
+                        <span className="material-symbols-outlined text-[18px] text-secondary">zoom_in</span>
+                        <span>Click to Inspect High-Res Parchment</span>
                       </div>
                     </div>
-                  ) : (
-                    <div
-                      onClick={() => setInspectModalOpen(true)}
-                      className="relative cursor-pointer rounded-2xl overflow-hidden shadow-lg border border-outline-variant/60 transition-transform duration-300 group-hover:scale-[1.01] bg-white"
-                      title="Click to inspect high-resolution parchment"
-                    >
-                      <CertificateTemplate data={showcaseCertData} className="w-full h-auto" />
-                      
-                      {/* Hover Inspection Overlay */}
-                      <div className="absolute inset-0 bg-slate-950/0 group-hover:bg-slate-950/20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 backdrop-blur-2xs">
-                        <div className="px-4 py-2 rounded-xl bg-surface/95 text-foreground text-xs font-bold shadow-xl flex items-center gap-2 border border-outline-variant/60">
-                          <span className="material-symbols-outlined text-[18px] text-secondary">zoom_in</span>
-                          <span>Click to Inspect High-Res Parchment</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  </div>
 
                   {/* Specimen Credentials Footer Strip */}
                   <div className="pt-2 border-t border-outline-variant/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">

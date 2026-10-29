@@ -336,7 +336,7 @@ const DEFAULT_TESTIMONIALS = [
 function TestimonialsSection({ content }: RenderProps) {
   const { data: response, isLoading } = useGetTestimonialsQuery({});
   const apiTestimonials = response?.data || [];
-  const list = !isLoading && apiTestimonials.length === 0 ? DEFAULT_TESTIMONIALS : apiTestimonials;
+  const list = apiTestimonials.length > 0 ? apiTestimonials : DEFAULT_TESTIMONIALS;
 
   const trackItems = useMemo(() => {
     if (!list || list.length === 0) return [];
@@ -513,8 +513,8 @@ function GallerySection({ content }: RenderProps) {
     if (apiGallery.length > 0) {
       return [...apiGallery, ...fallbackGalleryItems];
     }
-    return !isLoading ? fallbackGalleryItems : [];
-  }, [apiGallery, isLoading]);
+    return fallbackGalleryItems;
+  }, [apiGallery]);
 
   const trackItems = useMemo(() => {
     if (!baseGallery || baseGallery.length === 0) return [];

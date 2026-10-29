@@ -339,8 +339,9 @@ function TestimonialsSection({ content }: RenderProps) {
   const list = !isLoading && apiTestimonials.length === 0 ? DEFAULT_TESTIMONIALS : apiTestimonials;
 
   const trackItems = useMemo(() => {
+    if (!list || list.length === 0) return [];
     let items = [...list];
-    while (items.length < 6) {
+    while (items.length > 0 && items.length < 6) {
       items = [...items, ...list];
     }
     return items;
@@ -396,7 +397,7 @@ function TestimonialsSection({ content }: RenderProps) {
             ))}
           </div>
         </div>
-      ) : (
+      ) : trackItems.length > 0 ? (
         /* Infinite Horizontal Marquee moving LEFT */
         <div className="w-full relative overflow-hidden py-4 marquee-group">
           {/* Soft edge fade masks */}
@@ -497,7 +498,7 @@ function TestimonialsSection({ content }: RenderProps) {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </section>
   );
 }
@@ -516,9 +517,9 @@ function GallerySection({ content }: RenderProps) {
   }, [apiGallery, isLoading]);
 
   const trackItems = useMemo(() => {
-    if (baseGallery.length === 0) return [];
+    if (!baseGallery || baseGallery.length === 0) return [];
     let items = [...baseGallery];
-    while (items.length < 6) {
+    while (items.length > 0 && items.length < 6) {
       items = [...items, ...baseGallery];
     }
     return items;

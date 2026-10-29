@@ -4,4 +4,4 @@ Allow: /
 # Block admin UI and internal API routes
 Disallow: /app/eliteadmin4393/
 Disallow: /api/
-Sitemap: https://elitevertex-web.vercel.app/sitemap.xml
+Sitemap: https://www.elitevertex.in/sitemap.xml

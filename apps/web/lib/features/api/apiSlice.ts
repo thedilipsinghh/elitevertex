@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_API_URL ?? (typeof window !== 'undefined' ? '/api/v1' : 'http://localhost:5000/api/v1'),
+    baseUrl: process.env.NEXT_PUBLIC_API_URL ?? (typeof window !== 'undefined' ? '/api' : 'http://localhost:5000/api'),
     credentials: 'include',
   }),
   tagTypes: ['Courses', 'Course', 'Gallery', 'Testimonials', 'Faqs', 'Settings', 'Mentors', 'About', 'Campuses', 'Messages', 'Pages', 'Page', 'Navigation', 'Media', 'Users', 'Dashboard', 'Certificates'],

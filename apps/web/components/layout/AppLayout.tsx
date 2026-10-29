@@ -16,7 +16,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navbar />
-      <VerticalSocialSticky />
+      <div className="hidden sm:block"><VerticalSocialSticky /></div>
       <main className="w-full pt-16 md:pt-20 bg-surface min-h-[calc(100vh-20rem)] transition-colors duration-150">
         {children}
       </main>

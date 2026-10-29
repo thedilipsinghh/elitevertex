@@ -103,7 +103,7 @@ export function Navbar() {
                       }`}
                   >
                     {item.name}
-                    <span className="material-symbols-outlined text-[16px]">expand_more</span>
+                    <span className="material-symbols-outlined text-[48px]">expand_more</span>
                   </Link>
                   <div className="absolute left-0 top-full pt-2 hidden group-hover:block">
                     <div className="bg-surface-container-lowest rounded-lg shadow-lg border border-outline-variant min-w-[200px] py-2">

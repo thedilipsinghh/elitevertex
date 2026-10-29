@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { FaInstagram, FaFacebookF, FaWhatsapp } from "react-icons/fa";
 import { useGetPublicNavigationQuery, useGetWebsiteSettingsQuery } from "@/lib/features/api/apiSlice";
 
 interface NavNode {
@@ -163,27 +164,63 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-          <p>© {new Date().getFullYear()} Elite Vertex Institute of Communication. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <Link href="/privacy" className="hover:text-slate-900 dark:hover:text-white transition-colors">
-              Privacy Policy
-            </Link>
-            <span className="text-slate-300 dark:text-slate-700">•</span>
-            <Link href="/terms" className="hover:text-slate-900 dark:hover:text-white transition-colors">
-              Terms of Service
-            </Link>
-            <span className="text-slate-300 dark:text-slate-700">•</span>
-            <button
-              type="button"
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-1 cursor-pointer"
-            >
-              Back to Top
-              <span className="material-symbols-outlined text-[14px]">arrow_upward</span>
-            </button>
-          </div>
-        </div>
-      </div>
+  <p>© {new Date().getFullYear()} Elite Vertex Institute of Communication. All rights reserved.</p>
+  <div className="flex items-center gap-6">
+    <Link href="/privacy" className="hover:text-slate-900 dark:hover:text-white transition-colors">Privacy Policy</Link>
+    <span className="text-slate-300 dark:text-slate-700">•</span>
+    <Link href="/terms" className="hover:text-slate-900 dark:hover:text-white transition-colors">Terms of Service</Link>
+    <span className="text-slate-300 dark:text-slate-700">•</span>
+    <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-1 cursor-pointer">
+      Back to Top
+      <span className="material-symbols-outlined text-[14px]">arrow_upward</span>
+    </button>
+  </div>
+</div>
+</div>
+{/* Mobile Social Icons – visible only on small screens */}
+<div className="flex sm:hidden justify-center gap-4 mt-4">
+  {settings.socialShowInstagram !== false && (
+    <a
+      href={settings.instagramUrl || "https://www.instagram.com/elitevertex"}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Instagram"
+      className="flex items-center justify-center w-10 h-10 rounded-full bg-pink-600 dark:bg-pink-400 text-white hover:bg-pink-700 dark:hover:bg-pink-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-300 transition-colors"
+    >
+      <FaInstagram className="text-xl" />
+    </a>
+  )}
+  {settings.socialShowFacebook !== false && (
+    <a
+      href={settings.facebookUrl || "https://www.facebook.com/elitevertex"}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Facebook"
+      className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 dark:bg-blue-400 text-white hover:bg-blue-700 dark:hover:bg-blue-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 transition-colors"
+    >
+      <FaFacebookF className="text-xl" />
+    </a>
+  )}
+  {settings.socialShowWhatsapp !== false && (
+    <a
+      href={(() => {
+        const raw = settings.whatsapp || "+918049208800";
+        return raw.startsWith("http") ? raw : `https://wa.me/${raw.replace(/[^0-9]/g, "")}`;
+      })()}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="WhatsApp"
+      className="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-600 dark:bg-emerald-400 text-white hover:bg-emerald-700 dark:hover:bg-emerald-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 transition-colors"
+    >
+      <FaWhatsapp className="text-xl" />
+    </a>
+  )}
+</div>
+  
+
+
+
+      
     </footer>
   );
 }

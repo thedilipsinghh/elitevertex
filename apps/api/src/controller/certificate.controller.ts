@@ -31,7 +31,12 @@ export const verifyCertificate = async (req: Request, res: Response, next: NextF
     }
 
     // Query authority signatories from website settings
-    const settings = await db.query.websiteSettings.findFirst();
+    let settings: any = null;
+    try {
+      settings = await db.query.websiteSettings.findFirst();
+    } catch (e) {
+      console.warn("Could not load authority settings for verification:", e);
+    }
 
     const data = {
       id: certificate.id,
@@ -85,7 +90,12 @@ export const getAdminCertificates = async (req: AuthenticatedRequest, res: Respo
     }
 
     // Also include current authority signatures and hero showcase settings in metadata
-    const settings = await db.query.websiteSettings.findFirst();
+    let settings: any = null;
+    try {
+      settings = await db.query.websiteSettings.findFirst();
+    } catch (e) {
+      console.warn("Could not load website settings for certificates metadata:", e);
+    }
     const authoritySignatures = {
       sig1Name: settings?.certSig1Name || "Dr. Aris Thorne",
       sig1Title: settings?.certSig1Title || "Authorized Signatory",

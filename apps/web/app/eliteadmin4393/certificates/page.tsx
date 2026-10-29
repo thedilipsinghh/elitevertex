@@ -17,7 +17,7 @@ import DualImageInput from "@/components/admin/DualImageInput";
 
 export default function AdminCertificatesCmsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: response, isLoading, refetch } = useGetAdminCertificatesQuery({ q: searchQuery });
+  const { data: response, isLoading, isError, error, refetch } = useGetAdminCertificatesQuery({ q: searchQuery });
   const { data: coursesResponse } = useGetCoursesQuery({});
 
   const [createCertificate, { isLoading: isCreating }] = useCreateCertificateMutation();
@@ -415,6 +415,23 @@ export default function AdminCertificatesCmsPage() {
               <div className="p-12 text-center text-sm text-on-surface-variant">
                 <div className="w-8 h-8 border-4 border-secondary border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
                 Loading certificates...
+              </div>
+            ) : isError ? (
+              <div className="p-12 text-center flex flex-col items-center gap-3">
+                <span className="material-symbols-outlined text-4xl text-error">
+                  error
+                </span>
+                <h3 className="font-bold text-on-surface text-base">Failed to Load Certificates</h3>
+                <p className="text-xs text-on-surface-variant max-w-sm">
+                  {(error as any)?.data?.message || "There was an error communicating with the academic registry."}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => refetch()}
+                  className="px-4 py-2 bg-secondary text-white rounded-lg text-xs font-bold hover:bg-on-secondary-container transition-colors"
+                >
+                  Retry Loading
+                </button>
               </div>
             ) : certificatesList.length === 0 ? (
               <div className="p-12 text-center flex flex-col items-center gap-3">

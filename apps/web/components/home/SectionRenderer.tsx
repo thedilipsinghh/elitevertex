@@ -334,8 +334,9 @@ const DEFAULT_TESTIMONIALS = [
 ];
 
 function TestimonialsSection({ content }: RenderProps) {
-  const { data: response } = useGetTestimonialsQuery({});
-  const list = response?.data && response.data.length > 0 ? response.data : DEFAULT_TESTIMONIALS;
+  const { data: response, isLoading } = useGetTestimonialsQuery({});
+  const apiTestimonials = response?.data || [];
+  const list = !isLoading && apiTestimonials.length === 0 ? DEFAULT_TESTIMONIALS : apiTestimonials;
 
   const trackItems = useMemo(() => {
     let items = [...list];
@@ -365,98 +366,29 @@ function TestimonialsSection({ content }: RenderProps) {
         </p>
       </div>
 
-      {/* Infinite Horizontal Marquee moving LEFT */}
-      <div className="w-full relative overflow-hidden py-4 marquee-group">
-        {/* Soft edge fade masks */}
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-28 md:w-44 bg-gradient-to-r from-surface-container-low to-transparent z-10" />
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-28 md:w-44 bg-gradient-to-l from-surface-container-low to-transparent z-10" />
-
-        <div className="flex w-fit">
-          {/* Track 1 */}
-          <div className="flex shrink-0 gap-6 pr-6 animate-marquee-left">
-            {trackItems.map((item: any, idx: number) => (
+      {isLoading && !response ? (
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[0, 1, 2].map((i) => (
               <div
-                key={`t1-${item.id || idx}-${idx}`}
-                className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-md transition-all flex flex-col justify-between shrink-0 w-[290px] sm:w-[340px] lg:w-[360px] hover:-translate-y-1"
+                key={`test-skel-${i}`}
+                className="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 sm:p-7 shadow-xs flex flex-col justify-between gap-6 animate-pulse"
               >
                 <div>
-                  <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[36px] font-bold block mb-2 select-none">
-                    format_quote
-                  </span>
-                  <p className="text-on-surface text-sm sm:text-base font-normal leading-relaxed text-left">
-                    &quot;{item.message}&quot;
-                  </p>
-                </div>
-                <div>
-                  <div className="w-full h-px bg-outline-variant my-5"></div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <img
-                        alt={item.name}
-                        className="w-10 h-10 rounded-full object-cover border border-outline-variant shadow-2xs"
-                        src={
-                          item.avatar ||
-                          item.image ||
-                          `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=0b132b&color=fff`
-                        }
-                      />
-                      <div className="flex flex-col text-left">
-                        <span className="font-bold text-on-surface text-sm sm:text-base leading-tight">
-                          {item.name}
-                        </span>
-                        <span className="text-xs text-on-surface-variant font-normal mt-0.5">
-                          {item.role}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center text-amber-500 text-sm gap-0.5 shrink-0 select-none">
-                      {"★".repeat(item.rating || 5)}
-                    </div>
+                  <div className="w-8 h-8 rounded bg-surface-container mb-3" />
+                  <div className="space-y-2">
+                    <div className="h-4 bg-surface-container rounded w-full" />
+                    <div className="h-4 bg-surface-container rounded w-5/6" />
+                    <div className="h-4 bg-surface-container rounded w-2/3" />
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Track 2 (Seamless loop replica) */}
-          <div className="flex shrink-0 gap-6 pr-6 animate-marquee-left" aria-hidden="true">
-            {trackItems.map((item: any, idx: number) => (
-              <div
-                key={`t2-${item.id || idx}-${idx}`}
-                className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-md transition-all flex flex-col justify-between shrink-0 w-[290px] sm:w-[340px] lg:w-[360px] hover:-translate-y-1"
-              >
                 <div>
-                  <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[36px] font-bold block mb-2 select-none">
-                    format_quote
-                  </span>
-                  <p className="text-on-surface text-sm sm:text-base font-normal leading-relaxed text-left">
-                    &quot;{item.message}&quot;
-                  </p>
-                </div>
-                <div>
-                  <div className="w-full h-px bg-outline-variant my-5"></div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <img
-                        alt={item.name}
-                        className="w-10 h-10 rounded-full object-cover border border-outline-variant shadow-2xs"
-                        src={
-                          item.avatar ||
-                          item.image ||
-                          `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=0b132b&color=fff`
-                        }
-                      />
-                      <div className="flex flex-col text-left">
-                        <span className="font-bold text-on-surface text-sm sm:text-base leading-tight">
-                          {item.name}
-                        </span>
-                        <span className="text-xs text-on-surface-variant font-normal mt-0.5">
-                          {item.role}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center text-amber-500 text-sm gap-0.5 shrink-0 select-none">
-                      {"★".repeat(item.rating || 5)}
+                  <div className="w-full h-px bg-outline-variant my-4" />
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-surface-container" />
+                    <div className="space-y-1.5 flex-1">
+                      <div className="h-4 bg-surface-container rounded w-24" />
+                      <div className="h-3 bg-surface-container rounded w-32" />
                     </div>
                   </div>
                 </div>
@@ -464,7 +396,108 @@ function TestimonialsSection({ content }: RenderProps) {
             ))}
           </div>
         </div>
-      </div>
+      ) : (
+        /* Infinite Horizontal Marquee moving LEFT */
+        <div className="w-full relative overflow-hidden py-4 marquee-group">
+          {/* Soft edge fade masks */}
+          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-28 md:w-44 bg-gradient-to-r from-surface-container-low to-transparent z-10" />
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-28 md:w-44 bg-gradient-to-l from-surface-container-low to-transparent z-10" />
+
+          <div className="flex w-fit">
+            {/* Track 1 */}
+            <div className="flex shrink-0 gap-6 pr-6 animate-marquee-left">
+              {trackItems.map((item: any, idx: number) => (
+                <div
+                  key={`t1-${item.id || idx}-${idx}`}
+                  className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-md transition-all flex flex-col justify-between shrink-0 w-[290px] sm:w-[340px] lg:w-[360px] hover:-translate-y-1"
+                >
+                  <div>
+                    <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[36px] font-bold block mb-2 select-none">
+                      format_quote
+                    </span>
+                    <p className="text-on-surface text-sm sm:text-base font-normal leading-relaxed text-left">
+                      &quot;{item.message}&quot;
+                    </p>
+                  </div>
+                  <div>
+                    <div className="w-full h-px bg-outline-variant my-5"></div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <img
+                          alt={item.name}
+                          className="w-10 h-10 rounded-full object-cover border border-outline-variant shadow-2xs"
+                          src={
+                            item.avatar ||
+                            item.image ||
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=0b132b&color=fff`
+                          }
+                        />
+                        <div className="flex flex-col text-left">
+                          <span className="font-bold text-on-surface text-sm sm:text-base leading-tight">
+                            {item.name}
+                          </span>
+                          <span className="text-xs text-on-surface-variant font-normal mt-0.5">
+                            {item.role}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center text-amber-500 text-sm gap-0.5 shrink-0 select-none">
+                        {"★".repeat(item.rating || 5)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Track 2 (Seamless loop replica) */}
+            <div className="flex shrink-0 gap-6 pr-6 animate-marquee-left" aria-hidden="true">
+              {trackItems.map((item: any, idx: number) => (
+                <div
+                  key={`t2-${item.id || idx}-${idx}`}
+                  className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-md transition-all flex flex-col justify-between shrink-0 w-[290px] sm:w-[340px] lg:w-[360px] hover:-translate-y-1"
+                >
+                  <div>
+                    <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[36px] font-bold block mb-2 select-none">
+                      format_quote
+                    </span>
+                    <p className="text-on-surface text-sm sm:text-base font-normal leading-relaxed text-left">
+                      &quot;{item.message}&quot;
+                    </p>
+                  </div>
+                  <div>
+                    <div className="w-full h-px bg-outline-variant my-5"></div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <img
+                          alt={item.name}
+                          className="w-10 h-10 rounded-full object-cover border border-outline-variant shadow-2xs"
+                          src={
+                            item.avatar ||
+                            item.image ||
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=0b132b&color=fff`
+                          }
+                        />
+                        <div className="flex flex-col text-left">
+                          <span className="font-bold text-on-surface text-sm sm:text-base leading-tight">
+                            {item.name}
+                          </span>
+                          <span className="text-xs text-on-surface-variant font-normal mt-0.5">
+                            {item.role}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center text-amber-500 text-sm gap-0.5 shrink-0 select-none">
+                        {"★".repeat(item.rating || 5)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
@@ -479,10 +512,11 @@ function GallerySection({ content }: RenderProps) {
     if (apiGallery.length > 0) {
       return [...apiGallery, ...fallbackGalleryItems];
     }
-    return fallbackGalleryItems;
-  }, [apiGallery]);
+    return !isLoading ? fallbackGalleryItems : [];
+  }, [apiGallery, isLoading]);
 
   const trackItems = useMemo(() => {
+    if (baseGallery.length === 0) return [];
     let items = [...baseGallery];
     while (items.length < 6) {
       items = [...items, ...baseGallery];
@@ -503,70 +537,82 @@ function GallerySection({ content }: RenderProps) {
           )}
         </p>
 
-        {isLoading && <p className="text-on-surface-variant mt-2 text-sm">Loading gallery...</p>}
         {error && <p className="text-red-500 mt-2 text-sm">Failed to load gallery.</p>}
       </div>
 
-      {/* Infinite Horizontal Marquee moving RIGHT (Opposite direction to Testimonials) */}
-      <div className="w-full relative overflow-hidden py-4 marquee-group">
-        {/* Soft edge fade masks */}
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-28 md:w-44 bg-gradient-to-r from-surface-container-low/90 to-transparent z-10" />
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-28 md:w-44 bg-gradient-to-l from-surface-container-low/90 to-transparent z-10" />
-
-        <div className="flex w-fit">
-          {/* Track 1 */}
-          <div className="flex shrink-0 gap-6 pr-6 animate-marquee-right">
-            {trackItems.map((item: any, idx: number) => (
+      {isLoading && !response ? (
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[0, 1, 2, 3].map((i) => (
               <div
-                key={`g1-${item.id || idx}-${idx}`}
-                className="relative group/card overflow-hidden rounded-2xl shadow-xs hover:shadow-xl transition-all duration-300 shrink-0 w-[280px] sm:w-[340px] lg:w-[380px] aspect-[16/10] cursor-pointer border border-outline-variant hover:-translate-y-1"
-              >
-                <img
-                  alt={item.title}
-                  src={item.image}
-                  className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-5 sm:p-6 transition-opacity">
-                  {item.category && (
-                    <span className="text-amber-400 text-[11px] font-extrabold uppercase tracking-wider mb-1">
-                      {item.category}
-                    </span>
-                  )}
-                  <span className="text-white font-bold text-base sm:text-lg leading-snug drop-shadow-sm">
-                    {item.title}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Track 2 (Seamless loop replica) */}
-          <div className="flex shrink-0 gap-6 pr-6 animate-marquee-right" aria-hidden="true">
-            {trackItems.map((item: any, idx: number) => (
-              <div
-                key={`g2-${item.id || idx}-${idx}`}
-                className="relative group/card overflow-hidden rounded-2xl shadow-xs hover:shadow-xl transition-all duration-300 shrink-0 w-[280px] sm:w-[340px] lg:w-[380px] aspect-[16/10] cursor-pointer border border-outline-variant hover:-translate-y-1"
-              >
-                <img
-                  alt={item.title}
-                  src={item.image}
-                  className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-5 sm:p-6 transition-opacity">
-                  {item.category && (
-                    <span className="text-amber-400 text-[11px] font-extrabold uppercase tracking-wider mb-1">
-                      {item.category}
-                    </span>
-                  )}
-                  <span className="text-white font-bold text-base sm:text-lg leading-snug drop-shadow-sm">
-                    {item.title}
-                  </span>
-                </div>
-              </div>
+                key={`gal-skel-${i}`}
+                className="aspect-[16/10] bg-surface-container rounded-2xl animate-pulse border border-outline-variant/40"
+              />
             ))}
           </div>
         </div>
-      </div>
+      ) : trackItems.length > 0 ? (
+        /* Infinite Horizontal Marquee moving RIGHT (Opposite direction to Testimonials) */
+        <div className="w-full relative overflow-hidden py-4 marquee-group">
+          {/* Soft edge fade masks */}
+          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-28 md:w-44 bg-gradient-to-r from-surface-container-low/90 to-transparent z-10" />
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-28 md:w-44 bg-gradient-to-l from-surface-container-low/90 to-transparent z-10" />
+
+          <div className="flex w-fit">
+            {/* Track 1 */}
+            <div className="flex shrink-0 gap-6 pr-6 animate-marquee-right">
+              {trackItems.map((item: any, idx: number) => (
+                <div
+                  key={`g1-${item.id || idx}-${idx}`}
+                  className="relative group/card overflow-hidden rounded-2xl shadow-xs hover:shadow-xl transition-all duration-300 shrink-0 w-[280px] sm:w-[340px] lg:w-[380px] aspect-[16/10] cursor-pointer border border-outline-variant hover:-translate-y-1"
+                >
+                  <img
+                    alt={item.title}
+                    src={item.image}
+                    className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-5 sm:p-6 transition-opacity">
+                    {item.category && (
+                      <span className="text-amber-400 text-[11px] font-extrabold uppercase tracking-wider mb-1">
+                        {item.category}
+                      </span>
+                    )}
+                    <span className="text-white font-bold text-base sm:text-lg leading-snug drop-shadow-sm">
+                      {item.title}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Track 2 (Seamless loop replica) */}
+            <div className="flex shrink-0 gap-6 pr-6 animate-marquee-right" aria-hidden="true">
+              {trackItems.map((item: any, idx: number) => (
+                <div
+                  key={`g2-${item.id || idx}-${idx}`}
+                  className="relative group/card overflow-hidden rounded-2xl shadow-xs hover:shadow-xl transition-all duration-300 shrink-0 w-[280px] sm:w-[340px] lg:w-[380px] aspect-[16/10] cursor-pointer border border-outline-variant hover:-translate-y-1"
+                >
+                  <img
+                    alt={item.title}
+                    src={item.image}
+                    className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-5 sm:p-6 transition-opacity">
+                    {item.category && (
+                      <span className="text-amber-400 text-[11px] font-extrabold uppercase tracking-wider mb-1">
+                        {item.category}
+                      </span>
+                    )}
+                    <span className="text-white font-bold text-base sm:text-lg leading-snug drop-shadow-sm">
+                      {item.title}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

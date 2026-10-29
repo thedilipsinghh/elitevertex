@@ -225,16 +225,56 @@ const getCourseModules = (course: CourseModule): string[] => {
   ];
 };
 
+function CourseCardSkeleton({ index }: { index: number }) {
+  return (
+    <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/60 shadow-xs overflow-hidden flex flex-col animate-pulse">
+      <div className="flex flex-col lg:flex-row">
+        {/* Course Image Skeleton */}
+        <div className="lg:w-[340px] xl:w-[380px] shrink-0 relative bg-surface-container min-h-[220px] lg:min-h-[280px] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-surface-container-high/60" />
+        </div>
+
+        {/* Course Details Skeleton */}
+        <div className="flex-1 p-6 sm:p-8 flex flex-col justify-between gap-5">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between border-b border-outline-variant/40 pb-3">
+              <div className="h-5 w-28 bg-surface-container rounded" />
+              <div className="h-5 w-32 bg-surface-container rounded" />
+            </div>
+
+            <div className="h-7 w-3/4 bg-surface-container-high rounded-lg mt-1" />
+            <div className="space-y-2 mt-2">
+              <div className="h-4 w-full bg-surface-container rounded" />
+              <div className="h-4 w-5/6 bg-surface-container rounded" />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-3">
+              <div className="h-10 bg-surface-container-low rounded-xl" />
+              <div className="h-10 bg-surface-container-low rounded-xl" />
+              <div className="h-10 bg-surface-container-low rounded-xl" />
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-outline-variant/40 flex flex-wrap items-center justify-between gap-3">
+            <div className="h-10 w-36 bg-surface-container rounded-xl" />
+            <div className="h-10 w-32 bg-surface-container rounded-xl" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function CoursesContent() {
   const [activeCategory, setActiveCategory] = useState<CourseCategory>("all");
   const [expandedCourseId, setExpandedCourseId] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
 
-  const { data: response } = useGetCoursesQuery({});
+  const { data: response, isLoading } = useGetCoursesQuery({});
   const apiCourses = response?.data || [];
 
-  // Merge courses: use API courses if available, fallback to INSTITUTIONAL_COURSES
-  const courses: CourseModule[] = apiCourses.length > 0 ? apiCourses : INSTITUTIONAL_COURSES;
+  // Use API courses if available. Only fallback to INSTITUTIONAL_COURSES when NOT loading and API returns empty.
+  const courses: CourseModule[] = !isLoading && apiCourses.length === 0 ? INSTITUTIONAL_COURSES : apiCourses;
 
   // Auto-expand first item if none is selected
   const currentExpandedId = expandedCourseId === "none" ? null : (expandedCourseId ?? courses[0]?.id ?? null);
@@ -361,7 +401,16 @@ export function CoursesContent() {
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="flex flex-col gap-8">
-            {filteredCourses.map((course, cIdx) => {
+            {isLoading && !response ? (
+              [0, 1, 2, 3].map((idx) => (
+                <CourseCardSkeleton key={`skeleton-${idx}`} index={idx} />
+              ))
+            ) : filteredCourses.length === 0 ? (
+              <div className="text-center py-12 bg-surface-container-lowest rounded-2xl border border-outline-variant">
+                <p className="text-on-surface-variant font-medium">No courses available in this category.</p>
+              </div>
+            ) : (
+              filteredCourses.map((course, cIdx) => {
               const isExpanded = currentExpandedId === course.id;
               const moduleItems = getCourseModules(course);
               const courseImg = getCourseImage(course);
@@ -573,7 +622,8 @@ export function CoursesContent() {
                 </div>
               </ScrollReveal>
             );
-            })}
+            })
+          )}
           </div>
 
         </div>

@@ -5,8 +5,8 @@ import { useGetAboutPageQuery, useGetMentorsQuery } from "@/lib/features/api/api
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 export function AboutContent() {
-  const { data: aboutResponse } = useGetAboutPageQuery({});
-  const { data: mentorsResponse } = useGetMentorsQuery({});
+  const { data: aboutResponse, isLoading: isAboutLoading } = useGetAboutPageQuery({});
+  const { data: mentorsResponse, isLoading: isMentorsLoading } = useGetMentorsQuery({});
 
   const aboutData = aboutResponse?.data || {};
   const mentorsList = mentorsResponse?.data || [];
@@ -46,7 +46,7 @@ export function AboutContent() {
     ? extra.facilities
     : defaultFacilities;
 
-  const leadMentor = mentorsList[0] || {
+  const defaultLeadMentor = {
     name: "Dr. Meenakshi Sundaram",
     designation: "Chief Linguist & Academic Dean",
     accreditation: "British Council Accredited Fellow",
@@ -54,6 +54,8 @@ export function AboutContent() {
     bio: "With over 22 years of forensic linguistic research and corporate communication advisory across Oxford, Singapore, and India, Dr. Sundaram directs the curriculum standards at Elite Vertex.",
     profileImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80"
   };
+
+  const leadMentor = mentorsList[0] || (!isMentorsLoading ? defaultLeadMentor : null);
 
   return (
     <div className="flex flex-col w-full font-sans bg-background text-foreground">
@@ -223,12 +225,16 @@ export function AboutContent() {
             <div className="lg:col-span-6">
               <ScrollReveal direction="scale" delay={120}>
                 <div className="bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 shadow-md hover-lift img-zoom-parent">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    alt="Elite Vertex interactive speech workshop"
-                    className="w-full aspect-[4/3] object-cover rounded-xl"
-                    src={aboutData.paradigmImage || "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=80"}
-                  />
+                  {isAboutLoading && !aboutResponse ? (
+                    <div className="w-full aspect-[4/3] bg-surface-container rounded-xl animate-pulse" />
+                  ) : (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      alt="Elite Vertex interactive speech workshop"
+                      className="w-full aspect-[4/3] object-cover rounded-xl"
+                      src={aboutData.paradigmImage || "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=80"}
+                    />
+                  )}
                 </div>
               </ScrollReveal>
             </div>
@@ -252,54 +258,86 @@ export function AboutContent() {
           </ScrollReveal>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-5">
-              <ScrollReveal direction="scale" delay={80}>
-                <div className="bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 shadow-md hover-lift img-zoom-parent">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    alt={leadMentor.name}
-                    className="w-full aspect-[4/5] object-cover rounded-xl"
-                    src={leadMentor.profileImage || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"}
-                  />
-                  <div className="p-4 flex flex-col gap-1">
-                    <span className="font-bold text-foreground text-lg">{leadMentor.name}</span>
-                    <span className="text-xs font-semibold text-secondary uppercase tracking-wider">{leadMentor.designation}</span>
+            {isMentorsLoading && !mentorsResponse ? (
+              <>
+                <div className="lg:col-span-5">
+                  <div className="bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 shadow-md">
+                    <div className="w-full aspect-[4/5] bg-surface-container rounded-xl animate-pulse" />
+                    <div className="p-4 flex flex-col gap-2">
+                      <div className="h-5 w-44 bg-surface-container rounded animate-pulse" />
+                      <div className="h-3 w-32 bg-surface-container rounded animate-pulse" />
+                    </div>
                   </div>
                 </div>
-              </ScrollReveal>
-            </div>
-
-            <div className="lg:col-span-7 flex flex-col gap-6">
-              <ScrollReveal direction="up" delay={120}>
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-secondary/10 text-secondary rounded-full text-xs font-bold uppercase tracking-wider w-fit">
-                  <span className="material-symbols-outlined text-[16px]">verified</span>
-                  <span>{leadMentor.accreditation || "British Council Accredited Fellow"}</span>
+                <div className="lg:col-span-7 flex flex-col gap-6">
+                  <div className="h-7 w-52 bg-surface-container rounded-full animate-pulse" />
+                  <div className="space-y-3 mt-4">
+                    <div className="h-7 w-full bg-surface-container rounded-lg animate-pulse" />
+                    <div className="h-7 w-5/6 bg-surface-container rounded-lg animate-pulse" />
+                  </div>
+                  <div className="space-y-2 mt-2">
+                    <div className="h-4 w-full bg-surface-container rounded animate-pulse" />
+                    <div className="h-4 w-4/5 bg-surface-container rounded animate-pulse" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                    {[0, 1, 2].map((f) => (
+                      <div key={f} className="h-24 bg-surface-container-low rounded-xl animate-pulse" />
+                    ))}
+                  </div>
                 </div>
-                
-                <h3 className="text-xl sm:text-2xl font-bold text-foreground leading-relaxed mt-4">
-                  &quot;{leadMentor.quote || "We do not teach you to impersonate a native speaker. We coach you to speak with total clarity, natural gravitas, and unflinching presence."}&quot;
-                </h3>
-                
-                <p className="text-muted-foreground text-sm sm:text-base leading-relaxed font-normal mt-3">
-                  {leadMentor.bio}
-                </p>
-              </ScrollReveal>
-
-              {/* Dynamic Facilities / Studios */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                {facilities.map((fac: any, fIdx: number) => (
-                  <ScrollReveal key={fIdx} direction="up" delay={180 + fIdx * 80}>
-                    <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/30 flex flex-col gap-1 hover-lift h-full">
-                      <span className="material-symbols-outlined text-secondary text-[24px]">
-                        {fac.icon || "meeting_room"}
-                      </span>
-                      <h4 className="font-bold text-foreground text-sm mt-1">{fac.title}</h4>
-                      <p className="text-xs text-muted-foreground leading-normal">{fac.description}</p>
+              </>
+            ) : leadMentor ? (
+              <>
+                <div className="lg:col-span-5">
+                  <ScrollReveal direction="scale" delay={80}>
+                    <div className="bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 shadow-md hover-lift img-zoom-parent">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        alt={leadMentor.name}
+                        className="w-full aspect-[4/5] object-cover rounded-xl"
+                        src={leadMentor.profileImage || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"}
+                      />
+                      <div className="p-4 flex flex-col gap-1">
+                        <span className="font-bold text-foreground text-lg">{leadMentor.name}</span>
+                        <span className="text-xs font-semibold text-secondary uppercase tracking-wider">{leadMentor.designation}</span>
+                      </div>
                     </div>
                   </ScrollReveal>
-                ))}
-              </div>
-            </div>
+                </div>
+
+                <div className="lg:col-span-7 flex flex-col gap-6">
+                  <ScrollReveal direction="up" delay={120}>
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-secondary/10 text-secondary rounded-full text-xs font-bold uppercase tracking-wider w-fit">
+                      <span className="material-symbols-outlined text-[16px]">verified</span>
+                      <span>{leadMentor.accreditation || "British Council Accredited Fellow"}</span>
+                    </div>
+                    
+                    <h3 className="text-xl sm:text-2xl font-bold text-foreground leading-relaxed mt-4">
+                      &quot;{leadMentor.quote || "We do not teach you to impersonate a native speaker. We coach you to speak with total clarity, natural gravitas, and unflinching presence."}&quot;
+                    </h3>
+                    
+                    <p className="text-muted-foreground text-sm sm:text-base leading-relaxed font-normal mt-3">
+                      {leadMentor.bio}
+                    </p>
+                  </ScrollReveal>
+
+                  {/* Dynamic Facilities / Studios */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                    {facilities.map((fac: any, fIdx: number) => (
+                      <ScrollReveal key={fIdx} direction="up" delay={180 + fIdx * 80}>
+                        <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/30 flex flex-col gap-1 hover-lift h-full">
+                          <span className="material-symbols-outlined text-secondary text-[24px]">
+                            {fac.icon || "meeting_room"}
+                          </span>
+                          <h4 className="font-bold text-foreground text-sm mt-1">{fac.title}</h4>
+                          <p className="text-xs text-muted-foreground leading-normal">{fac.description}</p>
+                        </div>
+                      </ScrollReveal>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : null}
           </div>
         </div>
       </section>

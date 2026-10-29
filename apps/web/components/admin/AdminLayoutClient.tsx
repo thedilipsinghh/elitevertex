@@ -1,7 +1,8 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { Metadata } from "next";
 import {
   useLogoutMutation,
   useGetMeQuery,
@@ -101,7 +102,7 @@ export default function AdminLayoutClient({
           </span>
           <div className="flex flex-col gap-0.5">
             {group.items.map((item) => {
-              const isActive = pathname.startsWith(item.path);
+              const isActive = pathname ? pathname.startsWith(item.path) : false;
               return (
                 <Link
                   key={item.path}

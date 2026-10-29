@@ -1,10 +1,8 @@
-// "use client"
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { Metadata } from "next";
 import { useLogoutMutation, useGetMeQuery } from "@/lib/features/api/apiSlice";
 
 export default function AdminLayoutClient({ children }: { children: React.ReactNode }) {
@@ -81,7 +79,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
           <span className="px-3 text-[10px] font-extrabold uppercase tracking-widest text-on-surface-variant/70">{group.group}</span>
           <div className="flex flex-col gap-0.5">
             {group.items.map((item) => {
-              const isActive = pathname.startsWith(item.path);
+              const isActive = pathname ? pathname.startsWith(item.path) : false;
               return (
                 <Link
                   key={item.path}

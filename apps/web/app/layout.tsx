@@ -15,7 +15,10 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Elite Vertex — Institute of Communication",
   description: "Premier institute for Spoken English, Public Speaking, and Career Communication in Mairwa, Siwan, Bihar.",
-  metadataBase: new URL("https://elitevertex-web.vercel.app"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitevertex.in"),
+  verification: {
+    google: "FjH0Aahah1JwDNkQDaaWNUnInECJ2dQzV7OXACHE6t0",
+  },
   openGraph: {
     title: "Elite Vertex — Institute of Communication",
     description: "Premier institute for Spoken English, Public Speaking, and Career Communication in Mairwa, Siwan, Bihar.",
@@ -52,6 +55,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`scroll-smooth ${montserrat.variable}`}>
       <head>
+        <meta name="google-site-verification" content="FjH0Aahah1JwDNkQDaaWNUnInECJ2dQzV7OXACHE6t0" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

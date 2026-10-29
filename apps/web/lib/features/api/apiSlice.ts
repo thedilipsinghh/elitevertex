@@ -106,6 +106,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Certificates', 'Settings'],
     }),
+    updateCertificateShowcase: builder.mutation({
+      query: (body) => ({
+        url: '/admin/certificates/showcase',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Certificates', 'Settings'],
+    }),
     seedCertificates: builder.mutation({
       query: () => ({
         url: '/admin/certificates/seed',
@@ -545,6 +553,7 @@ export const {
   useUpdateCertificateMutation,
   useDeleteCertificateMutation,
   useUpdateAuthoritySignaturesMutation,
+  useUpdateCertificateShowcaseMutation,
   useSeedCertificatesMutation,
 } = apiSlice;
 

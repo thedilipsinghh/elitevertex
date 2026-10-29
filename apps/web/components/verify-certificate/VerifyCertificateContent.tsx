@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useLazyVerifyCertificateQuery } from "@/lib/features/api/apiSlice";
+import { useLazyVerifyCertificateQuery, useGetWebsiteSettingsQuery } from "@/lib/features/api/apiSlice";
 import { CertificateTemplate, CertificateData, downloadCertificateImage } from "@/components/certificate/CertificateTemplate";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
@@ -11,7 +11,39 @@ export function VerifyCertificateContent() {
   const searchParams = useSearchParams();
   const urlId = searchParams?.get("id") || "";
 
-  const [certId, setCertId] = useState(urlId || "EV-2025-ENG-8492");
+  const { data: settingsResponse } = useGetWebsiteSettingsQuery({});
+  const settings = settingsResponse?.data || {};
+
+  const showcaseEnabled = settings.certShowcaseEnabled !== false;
+  const showcaseTitle = settings.certShowcaseTitle || "Official Institutional Attestation";
+  const showcaseSubtitle = settings.certShowcaseSubtitle || "Tamper-proof verifiable credentials backed by central academic registrar ledger.";
+  const showcaseBadge = settings.certShowcaseBadgeText || "OFFICIAL SPECIMEN";
+  const showcaseStudent = settings.certShowcaseStudentName || "Aditi Sharma";
+  const showcaseCourse = settings.certShowcaseCourseName || "Executive Spoken English & Global Communication";
+  const showcaseNumber = settings.certShowcaseCertNumber || "EV-2025-ENG-8492";
+  const showcaseDate = settings.certShowcaseIssueDate || "14 Nov 2025";
+  const showcaseGrade = settings.certShowcaseGrade || "Distinction (CEFR C1)";
+
+  const showcaseCertData: CertificateData = {
+    certificateNumber: showcaseNumber,
+    studentName: showcaseStudent,
+    courseName: showcaseCourse,
+    issueDate: showcaseDate,
+    grade: showcaseGrade,
+    status: "valid",
+    signatory1: {
+      name: settings.certSig1Name || "Dr. Aris Thorne",
+      title: settings.certSig1Title || "Authorized Signatory",
+      signUrl: settings.certSig1Sign || "",
+    },
+    signatory2: {
+      name: settings.certSig2Name || "Prof. Marcus Vance",
+      title: settings.certSig2Title || "Director / Principal",
+      signUrl: settings.certSig2Sign || "",
+    },
+  };
+
+  const [certId, setCertId] = useState(urlId || showcaseNumber);
   const [triggerVerify, { isLoading }] = useLazyVerifyCertificateQuery();
 
   const [hasSearched, setHasSearched] = useState(false);
@@ -19,6 +51,7 @@ export function VerifyCertificateContent() {
   const [certData, setCertData] = useState<CertificateData | null>(null);
   const [searchedId, setSearchedId] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [inspectModalOpen, setInspectModalOpen] = useState(false);
 
   const loading = isVerifying || isLoading;
 
@@ -28,6 +61,16 @@ export function VerifyCertificateContent() {
 
     setHasSearched(true);
     setSearchedId(query);
+    setCertData(null); // Clear previous certificate immediately
+    setIsVerifying(true);
+
+    // Smooth scroll to result section
+    setTimeout(() => {
+      const el = document.getElementById("verification-result");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
     setCertData(null); // Clear previous certificate immediately
     setIsVerifying(true);
 
@@ -122,102 +165,327 @@ export function VerifyCertificateContent() {
         }
       `}</style>
 
-      {/* SECTION 1: SEARCH HEADER & INPUT */}
-      <section className="w-full bg-background py-12 md:py-20 border-b border-outline-variant/30 print:hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ScrollReveal direction="up" className="max-w-3xl mx-auto text-center flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary font-bold text-xs uppercase tracking-widest mb-3">
-              <span className="material-symbols-outlined text-[16px]">verified</span>
-              <span>ACADEMIC REGISTRY &bull; ISO 9001:2015</span>
-            </div>
-            
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mb-4">
-              Verify an Elite Vertex Certificate
-            </h1>
-            
-            <p className="text-muted-foreground text-sm sm:text-base max-w-xl leading-relaxed">
-              Enter the official credential ID printed on physical parchments or digital completion records to verify authentic institutional attestation.
-            </p>
-          </ScrollReveal>
+      {/* SECTION 1: SEARCH HEADER & SHOWCASE HERO */}
+      <section className="w-full bg-background py-12 md:py-20 border-b border-outline-variant/30 print:hidden relative overflow-hidden">
+        {/* Subtle decorative glow */}
+        <div className="pointer-events-none absolute top-[-10%] right-[-5%] w-[450px] h-[450px] rounded-full bg-secondary/5 blur-[120px]" />
+        <div className="pointer-events-none absolute bottom-[-10%] left-[-5%] w-[450px] h-[450px] rounded-full bg-amber-500/5 blur-[120px]" />
 
-          {/* Search Box */}
-          <ScrollReveal direction="scale" delay={120} className="mt-8 max-w-xl mx-auto">
-            <div className="bg-surface-container-lowest p-6 sm:p-8 rounded-2xl shadow-xl border border-outline-variant/30 flex flex-col gap-4 hover-lift">
-              <form onSubmit={handleVerify} className="flex flex-col gap-3">
-                <label
-                  htmlFor="certIdInput"
-                  className="text-xs font-bold uppercase tracking-wider text-muted-foreground text-left"
-                >
-                  Certificate Credential ID
-                </label>
-                
-                <div className="relative flex items-center">
-                  <span className="material-symbols-outlined absolute left-3.5 text-secondary text-[22px] pointer-events-none">
-                    pin
-                  </span>
-                  <input
-                    id="certIdInput"
-                    type="text"
-                    required
-                    placeholder="e.g., EV-2025-ENG-8492"
-                    value={certId}
-                    onChange={(e) => setCertId(e.target.value.toUpperCase())}
-                    className="w-full pl-12 pr-4 py-3.5 bg-surface-container-low font-mono font-bold text-foreground text-sm sm:text-base rounded-xl border border-outline-variant/40 focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition-all uppercase placeholder:normal-case placeholder:font-sans"
-                  />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {showcaseEnabled ? (
+            /* SPLIT HERO: LEFT FORM & RIGHT SPECIMEN PARCHMENT */
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+              
+              {/* LEFT COLUMN: TITLE, BADGE, SEARCH FORM */}
+              <div className="lg:col-span-6 flex flex-col gap-6">
+                <ScrollReveal direction="up">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary font-bold text-xs uppercase tracking-widest mb-3.5">
+                    <span className="material-symbols-outlined text-[16px]">verified</span>
+                    <span>ACADEMIC REGISTRY &bull; ISO 9001:2015</span>
+                  </div>
+
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-[1.15]">
+                    {showcaseTitle}
+                  </h1>
+
+                  <p className="text-muted-foreground text-sm sm:text-base mt-3 leading-relaxed">
+                    {showcaseSubtitle}
+                  </p>
+                </ScrollReveal>
+
+                {/* The Search Form */}
+                <ScrollReveal direction="up" delay={100}>
+                  <div className="bg-surface-container-lowest p-6 sm:p-7 rounded-2xl shadow-xl border border-outline-variant/40 flex flex-col gap-4">
+                    <form onSubmit={handleVerify} className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <label
+                          htmlFor="certIdInput"
+                          className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+                        >
+                          Certificate Credential ID
+                        </label>
+                        <span className="text-[11px] text-secondary font-semibold">
+                          Case-Insensitive
+                        </span>
+                      </div>
+
+                      <div className="relative flex items-center">
+                        <span className="material-symbols-outlined absolute left-3.5 text-secondary text-[22px] pointer-events-none">
+                          pin
+                        </span>
+                        <input
+                          id="certIdInput"
+                          type="text"
+                          required
+                          placeholder="e.g., EV-2025-ENG-8492"
+                          value={certId}
+                          onChange={(e) => setCertId(e.target.value.toUpperCase())}
+                          className="w-full pl-12 pr-4 py-3.5 bg-surface-container-low font-mono font-bold text-foreground text-sm sm:text-base rounded-xl border border-outline-variant/40 focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition-all uppercase placeholder:normal-case placeholder:font-sans"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full py-4 bg-secondary hover:bg-on-secondary-container text-white font-bold text-sm uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-1 btn-press"
+                      >
+                        {loading ? (
+                          <svg className="animate-spin h-5 w-5 text-white mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                          </svg>
+                        ) : (
+                          <span className="material-symbols-outlined text-[20px]">verified_user</span>
+                        )}
+                        <span>{loading ? "Verifying Registry..." : "Verify Certificate"}</span>
+                      </button>
+                    </form>
+
+                    {/* Quick Demo Presets */}
+                    <div className="pt-2 flex flex-wrap items-center justify-start gap-2 text-xs text-muted-foreground border-t border-outline-variant/30">
+                      <span className="font-bold uppercase tracking-wider text-[11px]">Quick Try:</span>
+                      <button
+                        type="button"
+                        onClick={() => loadDemo(showcaseNumber)}
+                        className="font-mono text-secondary hover:underline font-bold transition-transform active:scale-95"
+                      >
+                        {showcaseNumber}
+                      </button>
+                      <span>&bull;</span>
+                      <button
+                        type="button"
+                        onClick={() => loadDemo("EV-2026-ENG-9014")}
+                        className="font-mono text-secondary hover:underline font-bold transition-transform active:scale-95"
+                      >
+                        EV-2026-ENG-9014
+                      </button>
+                      <span>&bull;</span>
+                      <button
+                        type="button"
+                        onClick={() => loadDemo("EV-INVALID-0000")}
+                        className="text-error hover:underline transition-transform active:scale-95"
+                      >
+                        Invalid ID Demo
+                      </button>
+                    </div>
+                  </div>
+                </ScrollReveal>
+
+                {/* Trust Highlights Row */}
+                <div className="grid grid-cols-3 gap-2.5 pt-1">
+                  <div className="p-3 rounded-xl bg-surface-container-low/70 border border-outline-variant/30 flex flex-col gap-0.5">
+                    <div className="flex items-center gap-1.5 font-bold text-foreground text-xs">
+                      <span className="material-symbols-outlined text-emerald-500 text-[16px]">verified</span>
+                      <span>Attested</span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground leading-tight">ISO 9001:2015</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-surface-container-low/70 border border-outline-variant/30 flex flex-col gap-0.5">
+                    <div className="flex items-center gap-1.5 font-bold text-foreground text-xs">
+                      <span className="material-symbols-outlined text-secondary text-[16px]">fingerprint</span>
+                      <span>Tamper-Proof</span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground leading-tight">Cryptographic Ledger</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-surface-container-low/70 border border-outline-variant/30 flex flex-col gap-0.5">
+                    <div className="flex items-center gap-1.5 font-bold text-foreground text-xs">
+                      <span className="material-symbols-outlined text-primary text-[16px]">public</span>
+                      <span>Global Proof</span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground leading-tight">Employer Accepted</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT COLUMN: SHOWCASE CERTIFICATE PARCHMENT */}
+              <ScrollReveal direction="up" delay={150} className="lg:col-span-6 flex flex-col gap-3.5">
+                <div className="relative group rounded-3xl p-3 sm:p-4 bg-gradient-to-br from-amber-500/10 via-secondary/5 to-primary/10 border border-secondary/25 shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col gap-3">
+                  
+                  {/* Floating Header Badge */}
+                  <div className="flex items-center justify-between px-1 text-xs">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-white font-extrabold text-[10px] sm:text-[11px] uppercase tracking-wider shadow-sm">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>{showcaseBadge}</span>
+                    </div>
+
+                    <div className="inline-flex items-center gap-1 text-[11px] font-bold text-muted-foreground">
+                      <span className="material-symbols-outlined text-[16px] text-emerald-500">verified</span>
+                      <span>OFFICIAL ACADEMIC CREDENTIAL</span>
+                    </div>
+                  </div>
+
+                  {/* High-Resolution Certificate Parchment Card */}
+                  <div
+                    onClick={() => setInspectModalOpen(true)}
+                    className="relative cursor-pointer rounded-2xl overflow-hidden shadow-lg border border-outline-variant/60 transition-transform duration-300 group-hover:scale-[1.01] bg-white"
+                    title="Click to inspect high-resolution parchment"
+                  >
+                    <CertificateTemplate data={showcaseCertData} className="w-full h-auto" />
+                    
+                    {/* Hover Inspection Overlay */}
+                    <div className="absolute inset-0 bg-slate-950/0 group-hover:bg-slate-950/20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 backdrop-blur-2xs">
+                      <div className="px-4 py-2 rounded-xl bg-surface/95 text-foreground text-xs font-bold shadow-xl flex items-center gap-2 border border-outline-variant/60">
+                        <span className="material-symbols-outlined text-[18px] text-secondary">zoom_in</span>
+                        <span>Click to Inspect High-Res Parchment</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Specimen Credentials Footer Strip */}
+                  <div className="pt-2 border-t border-outline-variant/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                    <div className="flex flex-col min-w-0">
+                      <div className="flex items-center gap-1.5 font-bold text-foreground truncate">
+                        <span className="truncate">{showcaseStudent}</span>
+                        <span className="text-muted-foreground font-normal">&bull;</span>
+                        <span className="font-mono text-secondary text-[11px] font-bold shrink-0">{showcaseNumber}</span>
+                      </div>
+                      <span className="text-[11px] text-muted-foreground truncate">{showcaseCourse}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCertId(showcaseNumber);
+                          executeVerification(showcaseNumber);
+                        }}
+                        className="px-3.5 py-1.5 bg-secondary hover:bg-on-secondary-container text-white font-bold text-xs rounded-lg shadow-sm transition-all flex items-center gap-1.5 btn-press"
+                      >
+                        <span className="material-symbols-outlined text-[15px]">verified</span>
+                        <span>Verify This Specimen</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setInspectModalOpen(true)}
+                        className="px-3 py-1.5 bg-surface-container-low hover:bg-surface-container text-foreground font-semibold text-xs rounded-lg border border-outline-variant/40 transition-colors flex items-center gap-1 btn-press"
+                        title="Inspect High-Resolution Parchment"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">visibility</span>
+                        <span className="hidden sm:inline">Inspect</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-4 bg-secondary hover:bg-on-secondary-container text-white font-bold text-sm uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-1 btn-press"
-                >
-                  {loading ? (
-                    <svg className="animate-spin h-5 w-5 text-white mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                    </svg>
-                  ) : (
-                    <span className="material-symbols-outlined text-[20px]">verified_user</span>
-                  )}
-                  <span>{loading ? "Verifying Registry..." : "Verify Certificate"}</span>
-                </button>
-              </form>
+                {/* Micro Security Badges */}
+                <div className="grid grid-cols-3 gap-2 text-center text-[11px] font-semibold text-muted-foreground">
+                  <div className="p-2 rounded-xl bg-surface-container-low/70 border border-outline-variant/30 flex items-center justify-center gap-1.5">
+                    <span className="material-symbols-outlined text-secondary text-[15px]">military_tech</span>
+                    <span>Gold Foil Seal</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-surface-container-low/70 border border-outline-variant/30 flex items-center justify-center gap-1.5">
+                    <span className="material-symbols-outlined text-secondary text-[15px]">qr_code_2</span>
+                    <span>QR Verification</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-surface-container-low/70 border border-outline-variant/30 flex items-center justify-center gap-1.5">
+                    <span className="material-symbols-outlined text-secondary text-[15px]">school</span>
+                    <span>CEFR Attested</span>
+                  </div>
+                </div>
+              </ScrollReveal>
 
-              {/* Quick Demo Presets */}
-              <div className="pt-2 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground border-t border-outline-variant/30">
-                <span className="font-bold uppercase tracking-wider text-[11px]">Quick Try:</span>
-                <button
-                  type="button"
-                  onClick={() => loadDemo("EV-2025-ENG-8492")}
-                  className="font-mono text-secondary hover:underline font-bold transition-transform active:scale-95"
-                >
-                  EV-2025-ENG-8492
-                </button>
-                <span>&bull;</span>
-                <button
-                  type="button"
-                  onClick={() => loadDemo("EV-2026-ENG-9014")}
-                  className="font-mono text-secondary hover:underline font-bold transition-transform active:scale-95"
-                >
-                  EV-2026-ENG-9014
-                </button>
-                <span>&bull;</span>
-                <button
-                  type="button"
-                  onClick={() => loadDemo("EV-INVALID-0000")}
-                  className="text-error hover:underline transition-transform active:scale-95"
-                >
-                  Invalid ID Demo
-                </button>
-              </div>
             </div>
-          </ScrollReveal>
+          ) : (
+            /* CENTERED FALLBACK HERO WHEN SHOWCASE IS DISABLED BY ADMIN */
+            <div>
+              <ScrollReveal direction="up" className="max-w-3xl mx-auto text-center flex flex-col items-center">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary font-bold text-xs uppercase tracking-widest mb-3">
+                  <span className="material-symbols-outlined text-[16px]">verified</span>
+                  <span>ACADEMIC REGISTRY &bull; ISO 9001:2015</span>
+                </div>
+                
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mb-4">
+                  Verify an Elite Vertex Certificate
+                </h1>
+                
+                <p className="text-muted-foreground text-sm sm:text-base max-w-xl leading-relaxed">
+                  Enter the official credential ID printed on physical parchments or digital completion records to verify authentic institutional attestation.
+                </p>
+              </ScrollReveal>
+
+              {/* Centered Search Box */}
+              <ScrollReveal direction="scale" delay={120} className="mt-8 max-w-xl mx-auto">
+                <div className="bg-surface-container-lowest p-6 sm:p-8 rounded-2xl shadow-xl border border-outline-variant/30 flex flex-col gap-4 hover-lift">
+                  <form onSubmit={handleVerify} className="flex flex-col gap-3">
+                    <label
+                      htmlFor="certIdInputCentered"
+                      className="text-xs font-bold uppercase tracking-wider text-muted-foreground text-left"
+                    >
+                      Certificate Credential ID
+                    </label>
+                    
+                    <div className="relative flex items-center">
+                      <span className="material-symbols-outlined absolute left-3.5 text-secondary text-[22px] pointer-events-none">
+                        pin
+                      </span>
+                      <input
+                        id="certIdInputCentered"
+                        type="text"
+                        required
+                        placeholder="e.g., EV-2025-ENG-8492"
+                        value={certId}
+                        onChange={(e) => setCertId(e.target.value.toUpperCase())}
+                        className="w-full pl-12 pr-4 py-3.5 bg-surface-container-low font-mono font-bold text-foreground text-sm sm:text-base rounded-xl border border-outline-variant/40 focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition-all uppercase placeholder:normal-case placeholder:font-sans"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full py-4 bg-secondary hover:bg-on-secondary-container text-white font-bold text-sm uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-1 btn-press"
+                    >
+                      {loading ? (
+                        <svg className="animate-spin h-5 w-5 text-white mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                        </svg>
+                      ) : (
+                        <span className="material-symbols-outlined text-[20px]">verified_user</span>
+                      )}
+                      <span>{loading ? "Verifying Registry..." : "Verify Certificate"}</span>
+                    </button>
+                  </form>
+
+                  {/* Quick Demo Presets */}
+                  <div className="pt-2 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground border-t border-outline-variant/30">
+                    <span className="font-bold uppercase tracking-wider text-[11px]">Quick Try:</span>
+                    <button
+                      type="button"
+                      onClick={() => loadDemo("EV-2025-ENG-8492")}
+                      className="font-mono text-secondary hover:underline font-bold transition-transform active:scale-95"
+                    >
+                      EV-2025-ENG-8492
+                    </button>
+                    <span>&bull;</span>
+                    <button
+                      type="button"
+                      onClick={() => loadDemo("EV-2026-ENG-9014")}
+                      className="font-mono text-secondary hover:underline font-bold transition-transform active:scale-95"
+                    >
+                      EV-2026-ENG-9014
+                    </button>
+                    <span>&bull;</span>
+                    <button
+                      type="button"
+                      onClick={() => loadDemo("EV-INVALID-0000")}
+                      className="text-error hover:underline transition-transform active:scale-95"
+                    >
+                      Invalid ID Demo
+                    </button>
+                  </div>
+                </div>
+              </ScrollReveal>
+            </div>
+          )}
         </div>
       </section>
 
       {/* SECTION 2: VERIFICATION RESULT */}
       {hasSearched && (
-        <section className="w-full py-12 lg:py-16 bg-surface-container-low/50 print:bg-white print:p-0">
+        <section id="verification-result" className="w-full py-12 lg:py-16 bg-surface-container-low/50 print:bg-white print:p-0">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             {/* SUCCESS STATE */}
@@ -521,6 +789,69 @@ export function VerifyCertificateContent() {
           </ScrollReveal>
         </div>
       </section>
+
+      {/* INSPECT MODAL FOR SPECIMEN PARCHMENT */}
+      {inspectModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fade-in print:hidden">
+          <div className="bg-surface rounded-3xl max-w-4xl w-full p-4 sm:p-6 border border-outline-variant shadow-2xl flex flex-col gap-4 max-h-[95vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-outline-variant/60 pb-3">
+              <div className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-secondary text-[24px]">verified</span>
+                <div>
+                  <h3 className="font-extrabold text-foreground text-sm sm:text-base">
+                    {showcaseTitle}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Credential #{showcaseNumber} &bull; Conferred to {showcaseStudent}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setInspectModalOpen(false)}
+                className="p-2 text-muted-foreground hover:text-foreground rounded-xl hover:bg-surface-container transition-colors"
+                aria-label="Close modal"
+              >
+                <span className="material-symbols-outlined text-[22px]">close</span>
+              </button>
+            </div>
+
+            <div className="flex justify-center p-2 sm:p-4 bg-slate-900/5 dark:bg-black/40 rounded-2xl border border-outline-variant/40 overflow-hidden">
+              <CertificateTemplate data={showcaseCertData} className="w-full h-auto" />
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <span className="material-symbols-outlined text-emerald-500 text-[18px]">lock</span>
+                <span>ISO 9001:2015 compliant tamper-proof digital attestation specimen.</span>
+              </div>
+
+              <div className="flex items-center gap-2.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInspectModalOpen(false);
+                    setCertId(showcaseNumber);
+                    executeVerification(showcaseNumber);
+                  }}
+                  className="px-5 py-2.5 bg-secondary hover:bg-on-secondary-container text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 btn-press"
+                >
+                  <span className="material-symbols-outlined text-[16px]">verified</span>
+                  <span>Verify in Ledger</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setInspectModalOpen(false)}
+                  className="px-4 py-2.5 bg-surface-container-low text-foreground border border-outline-variant text-xs font-semibold rounded-xl hover:bg-surface-container transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

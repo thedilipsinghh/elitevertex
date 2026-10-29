@@ -8,6 +8,7 @@ import {
   useUpdateCertificateMutation,
   useDeleteCertificateMutation,
   useUpdateAuthoritySignaturesMutation,
+  useUpdateCertificateShowcaseMutation,
   useSeedCertificatesMutation,
   useGetCoursesQuery,
 } from "@/lib/features/api/apiSlice";
@@ -23,12 +24,13 @@ export default function AdminCertificatesCmsPage() {
   const [updateCertificate, { isLoading: isUpdating }] = useUpdateCertificateMutation();
   const [deleteCertificate] = useDeleteCertificateMutation();
   const [updateSignatures, { isLoading: isSavingSignatures }] = useUpdateAuthoritySignaturesMutation();
+  const [updateShowcase, { isLoading: isSavingShowcase }] = useUpdateCertificateShowcaseMutation();
   const [seedCertificates, { isLoading: isSeeding }] = useSeedCertificatesMutation();
 
   const certificatesList = response?.data || [];
   const coursesList = coursesResponse?.data || [];
 
-  const [activeTab, setActiveTab] = useState<"list" | "issue" | "signatures">("list");
+  const [activeTab, setActiveTab] = useState<"list" | "issue" | "signatures" | "showcase">("list");
   const [toastMessage, setToastMessage] = useState("");
   const [editingCertId, setEditingCertId] = useState<string | null>(null);
   const [previewCert, setPreviewCert] = useState<CertificateData | null>(null);
@@ -52,6 +54,19 @@ export default function AdminCertificatesCmsPage() {
     sig2Name: "Prof. Marcus Vance",
     sig2Title: "Director / Principal",
     sig2Sign: "",
+  });
+
+  // Hero Showcase Certificate CMS State
+  const [showcaseForm, setShowcaseForm] = useState({
+    enabled: true,
+    title: "Official Institutional Attestation",
+    subtitle: "Tamper-proof verifiable credentials backed by central academic registrar ledger.",
+    studentName: "Aditi Sharma",
+    courseName: "Executive Spoken English & Global Communication",
+    certNumber: "EV-2025-ENG-8492",
+    issueDate: "14 Nov 2025",
+    grade: "Distinction (CEFR C1)",
+    badgeText: "OFFICIAL SPECIMEN",
   });
 
   const showToast = (msg: string) => {
@@ -80,6 +95,50 @@ export default function AdminCertificatesCmsPage() {
     response?.authoritySignatures?.sig2Title,
     response?.authoritySignatures?.sig2Sign,
   ]);
+
+  useEffect(() => {
+    if (response?.showcaseSettings) {
+      const s = response.showcaseSettings;
+      setShowcaseForm((prev) => ({
+        ...prev,
+        enabled: s.enabled !== undefined ? s.enabled : prev.enabled,
+        title: s.title || prev.title,
+        subtitle: s.subtitle || prev.subtitle,
+        studentName: s.studentName || prev.studentName,
+        courseName: s.courseName || prev.courseName,
+        certNumber: s.certNumber || prev.certNumber,
+        issueDate: s.issueDate || prev.issueDate,
+        grade: s.grade || prev.grade,
+        badgeText: s.badgeText || prev.badgeText,
+      }));
+    }
+  }, [response?.showcaseSettings]);
+
+  const handleSaveShowcase = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await updateShowcase(showcaseForm).unwrap();
+      showToast("✓ Hero Showcase Certificate settings updated successfully!");
+      refetch();
+    } catch (err: any) {
+      showToast("❌ Failed to save showcase settings.");
+    }
+  };
+
+  const handleApplyIssuedCertToShowcase = (certNumber: string) => {
+    const found = certificatesList.find((c: any) => c.certificateNumber === certNumber);
+    if (found) {
+      setShowcaseForm((prev) => ({
+        ...prev,
+        studentName: found.studentName,
+        courseName: found.courseName,
+        certNumber: found.certificateNumber,
+        issueDate: found.issueDate,
+        grade: found.grade || "Distinction (CEFR C1)",
+      }));
+      showToast(`✓ Loaded details from ${found.certificateNumber}`);
+    }
+  };
 
   const generateCertNumber = () => {
     const year = new Date().getFullYear();
@@ -292,6 +351,27 @@ export default function AdminCertificatesCmsPage() {
         >
           <span className="material-symbols-outlined text-[18px]">draw</span>
           Authority Signatures &amp; Seal CMS
+        </button>
+
+        <button
+          onClick={() => setActiveTab("showcase")}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-colors whitespace-nowrap ${
+            activeTab === "showcase"
+              ? "bg-secondary text-white"
+              : "text-on-surface-variant hover:bg-surface-container-high"
+          }`}
+        >
+          <span className="material-symbols-outlined text-[18px]">visibility</span>
+          Hero Showcase CMS
+          <span
+            className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
+              showcaseForm.enabled
+                ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
+                : "bg-zinc-500/20 text-zinc-600 dark:text-zinc-400 border border-zinc-500/30"
+            }`}
+          >
+            {showcaseForm.enabled ? "Active" : "Disabled"}
+          </span>
         </button>
       </div>
 
@@ -819,6 +899,340 @@ export default function AdminCertificatesCmsPage() {
                 </span>
                 <span>{isSavingSignatures ? "Saving..." : "Save Authority Signatures"}</span>
               </button>
+            </div>
+
+          </form>
+        </div>
+      )}
+
+      {/* TAB 4: HERO SHOWCASE CMS */}
+      {activeTab === "showcase" && (
+        <div className="flex flex-col gap-6">
+          {/* Header Banner */}
+          <div className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-secondary text-[26px]">visibility</span>
+                <h3 className="font-extrabold text-lg text-on-surface">
+                  Hero Showcase Certificate Configuration
+                </h3>
+              </div>
+              <p className="text-xs sm:text-sm text-on-surface-variant mt-1 max-w-2xl">
+                Configure the interactive certificate specimen featured prominently in the hero section of the public{" "}
+                <Link href="/verify-certificate" target="_blank" className="text-secondary font-bold hover:underline">
+                  /verify-certificate
+                </Link>{" "}
+                page. Control visibility, specimen credentials, and branding attestation.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 shrink-0">
+              <Link
+                href="/verify-certificate"
+                target="_blank"
+                className="flex items-center gap-1.5 px-4 py-2 bg-surface-container-low hover:bg-surface-container text-on-surface text-xs font-bold rounded-xl border border-outline-variant transition-colors"
+              >
+                <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                <span>View Public Hero</span>
+              </Link>
+            </div>
+          </div>
+
+          <form onSubmit={handleSaveShowcase} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            {/* LEFT COLUMN: CONTROLS & INPUTS (7 cols) */}
+            <div className="lg:col-span-7 flex flex-col gap-5">
+              
+              {/* CARD 1: VISIBILITY & PRESET IMPORT */}
+              <div className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant flex flex-col gap-5 shadow-xs">
+                
+                {/* Main Toggle Switch */}
+                <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-outline-variant/60">
+                  <div className="flex flex-col gap-1 pr-4">
+                    <span className="font-bold text-sm text-on-surface">
+                      Showcase Active on Public Verification Portal
+                    </span>
+                    <span className="text-xs text-on-surface-variant">
+                      When enabled, visitors see a realistic specimen preview of the certificate in the hero section.
+                    </span>
+                  </div>
+                  
+                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={showcaseForm.enabled}
+                      onChange={(e) => setShowcaseForm({ ...showcaseForm, enabled: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-12 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+                  </label>
+                </div>
+
+                {/* Quick Import from Issued Certificate */}
+                {certificatesList.length > 0 && (
+                  <div className="pt-2">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
+                      Quick Import from Issued Certificate
+                    </label>
+                    <div className="relative">
+                      <select
+                        onChange={(e) => {
+                          if (e.target.value) handleApplyIssuedCertToShowcase(e.target.value);
+                        }}
+                        defaultValue=""
+                        className="w-full px-4 py-2.5 bg-surface border border-outline-variant rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-secondary appearance-none pr-10"
+                      >
+                        <option value="">-- Choose an existing certificate to copy credentials --</option>
+                        {certificatesList.map((cert: any) => (
+                          <option key={cert.id} value={cert.certificateNumber}>
+                            {cert.studentName} ({cert.certificateNumber}) &bull; {cert.courseName}
+                          </option>
+                        ))}
+                      </select>
+                      <span className="material-symbols-outlined absolute right-3 top-2.5 text-on-surface-variant pointer-events-none text-[20px]">
+                        arrow_drop_down
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-on-surface-variant/80 mt-1 block">
+                      Instantly copies the student name, course, serial number, and issue date into the showcase card.
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* CARD 2: SECTION HEADLINE & BADGE */}
+              <div className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant flex flex-col gap-4 shadow-xs">
+                <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/50 text-sm font-bold text-on-surface">
+                  <span className="material-symbols-outlined text-secondary text-[20px]">title</span>
+                  <span>Hero Showcase Typography &amp; Badges</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
+                      Showcase Section Headline
+                    </label>
+                    <input
+                      type="text"
+                      value={showcaseForm.title}
+                      onChange={(e) => setShowcaseForm({ ...showcaseForm, title: e.target.value })}
+                      placeholder="e.g. Official Institutional Attestation"
+                      className="w-full px-4 py-2.5 bg-surface border border-outline-variant rounded-xl text-sm font-semibold focus:outline-none focus:border-secondary"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
+                      Showcase Subtitle / Tagline
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={showcaseForm.subtitle}
+                      onChange={(e) => setShowcaseForm({ ...showcaseForm, subtitle: e.target.value })}
+                      placeholder="e.g. Tamper-proof verifiable credentials backed by central academic registrar ledger."
+                      className="w-full px-4 py-2.5 bg-surface border border-outline-variant rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:border-secondary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
+                      Specimen Badge Ribbon Text
+                    </label>
+                    <input
+                      type="text"
+                      value={showcaseForm.badgeText}
+                      onChange={(e) => setShowcaseForm({ ...showcaseForm, badgeText: e.target.value })}
+                      placeholder="e.g. OFFICIAL SPECIMEN"
+                      className="w-full px-4 py-2.5 bg-surface border border-outline-variant rounded-xl text-sm font-semibold focus:outline-none focus:border-secondary"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* CARD 3: SPECIMEN CREDENTIAL DETAILS */}
+              <div className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant flex flex-col gap-4 shadow-xs">
+                <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/50 text-sm font-bold text-on-surface">
+                  <span className="material-symbols-outlined text-secondary text-[20px]">badge</span>
+                  <span>Specimen Certificate Content</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
+                      Student Full Name
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={showcaseForm.studentName}
+                      onChange={(e) => setShowcaseForm({ ...showcaseForm, studentName: e.target.value })}
+                      placeholder="e.g. Aditi Sharma"
+                      className="w-full px-4 py-2.5 bg-surface border border-outline-variant rounded-xl text-sm font-semibold focus:outline-none focus:border-secondary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
+                      Certificate Credential ID
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={showcaseForm.certNumber}
+                      onChange={(e) => setShowcaseForm({ ...showcaseForm, certNumber: e.target.value.toUpperCase() })}
+                      placeholder="e.g. EV-2025-ENG-8492"
+                      className="w-full px-4 py-2.5 bg-surface border border-outline-variant rounded-xl text-sm font-mono font-bold uppercase focus:outline-none focus:border-secondary"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
+                      Qualification / Program Conferred
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={showcaseForm.courseName}
+                      onChange={(e) => setShowcaseForm({ ...showcaseForm, courseName: e.target.value })}
+                      placeholder="e.g. Executive Spoken English & Global Communication"
+                      className="w-full px-4 py-2.5 bg-surface border border-outline-variant rounded-xl text-sm font-semibold focus:outline-none focus:border-secondary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
+                      Issue Date
+                    </label>
+                    <input
+                      type="text"
+                      value={showcaseForm.issueDate}
+                      onChange={(e) => setShowcaseForm({ ...showcaseForm, issueDate: e.target.value })}
+                      placeholder="e.g. 14 Nov 2025"
+                      className="w-full px-4 py-2.5 bg-surface border border-outline-variant rounded-xl text-sm font-semibold focus:outline-none focus:border-secondary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
+                      Attainment / Grade
+                    </label>
+                    <input
+                      type="text"
+                      value={showcaseForm.grade}
+                      onChange={(e) => setShowcaseForm({ ...showcaseForm, grade: e.target.value })}
+                      placeholder="e.g. Distinction (CEFR C1)"
+                      className="w-full px-4 py-2.5 bg-surface border border-outline-variant rounded-xl text-sm font-semibold focus:outline-none focus:border-secondary"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SAVE BUTTON */}
+              <div className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xs">
+                <span className="text-xs text-on-surface-variant">
+                  Changes save directly to website settings and reflect instantly on the public portal.
+                </span>
+
+                <button
+                  type="submit"
+                  disabled={isSavingShowcase}
+                  className="flex items-center gap-2 px-8 py-3 bg-secondary hover:bg-on-secondary-container text-white font-bold text-sm rounded-xl shadow-md transition-all disabled:opacity-50 shrink-0"
+                >
+                  <span className="material-symbols-outlined text-[20px]">
+                    {isSavingShowcase ? "hourglass_empty" : "save"}
+                  </span>
+                  <span>{isSavingShowcase ? "Saving Changes..." : "Save Showcase Settings"}</span>
+                </button>
+              </div>
+
+            </div>
+
+            {/* RIGHT COLUMN: LIVE INTERACTIVE PREVIEW (5 cols) */}
+            <div className="lg:col-span-5 flex flex-col gap-4 lg:sticky lg:top-6">
+              <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant shadow-sm flex flex-col gap-4">
+                <div className="flex items-center justify-between pb-3 border-b border-outline-variant">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-secondary text-[20px]">preview</span>
+                    <h4 className="font-bold text-sm text-on-surface">Real-Time Hero Preview</h4>
+                  </div>
+                  <span
+                    className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                      showcaseForm.enabled
+                        ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
+                        : "bg-zinc-500/20 text-zinc-600 dark:text-zinc-400 border border-zinc-500/30"
+                    }`}
+                  >
+                    {showcaseForm.enabled ? "Visible on Portal" : "Hidden on Portal"}
+                  </span>
+                </div>
+
+                {/* Frame with Parchment Certificate */}
+                <div className="relative rounded-2xl overflow-hidden border border-outline-variant/60 shadow-lg bg-slate-950/5 p-2">
+                  <div className="relative w-full aspect-[1.414/1] rounded-xl overflow-hidden shadow-inner">
+                    <CertificateTemplate
+                      data={{
+                        certificateNumber: showcaseForm.certNumber || "EV-2025-ENG-8492",
+                        studentName: showcaseForm.studentName || "Student Name",
+                        courseName: showcaseForm.courseName || "Program Name",
+                        issueDate: showcaseForm.issueDate || "14 Nov 2025",
+                        grade: showcaseForm.grade,
+                        status: "valid",
+                        signatory1: {
+                          name: signaturesForm.sig1Name,
+                          title: signaturesForm.sig1Title,
+                          signUrl: signaturesForm.sig1Sign,
+                        },
+                        signatory2: {
+                          name: signaturesForm.sig2Name,
+                          title: signaturesForm.sig2Title,
+                          signUrl: signaturesForm.sig2Sign,
+                        },
+                      }}
+                      className="w-full h-full"
+                    />
+
+                    {/* Specimen Floating Badge */}
+                    <div className="absolute top-2 left-2 z-20">
+                      <span className="px-2.5 py-1 rounded-md bg-secondary/90 text-white font-extrabold text-[9px] uppercase tracking-wider shadow-md backdrop-blur-xs flex items-center gap-1 border border-white/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        {showcaseForm.badgeText || "OFFICIAL SPECIMEN"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Preview Metadata Summary */}
+                <div className="p-3.5 bg-surface-container-low rounded-xl border border-outline-variant/60 text-xs flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-on-surface-variant font-medium">Recipient:</span>
+                    <span className="font-extrabold text-on-surface truncate max-w-[200px]">
+                      {showcaseForm.studentName || "—"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-on-surface-variant font-medium">Credential Serial:</span>
+                    <span className="font-mono font-bold text-secondary">
+                      {showcaseForm.certNumber || "—"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-on-surface-variant font-medium">Attainment:</span>
+                    <span className="font-semibold text-on-surface">
+                      {showcaseForm.grade || "Distinction"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-outline-variant/50 pt-2 text-[11px] text-on-surface-variant">
+                    <span>Signatures:</span>
+                    <span className="font-medium truncate max-w-[200px]">
+                      {signaturesForm.sig1Name} &amp; {signaturesForm.sig2Name}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-[11px] text-on-surface-variant text-center">
+                  Students and prospective employers can click <strong>&quot;Verify This Specimen&quot;</strong> on the public portal to run an instant ledger check.
+                </div>
+              </div>
             </div>
 
           </form>

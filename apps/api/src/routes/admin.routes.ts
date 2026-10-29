@@ -79,6 +79,8 @@ router.delete("/campuses/:id", adminCtrl.deleteCampus);
 // CMS: Certificates & Credentials
 router.get("/certificates", certCtrl.getAdminCertificates);
 router.post("/certificates/seed", certCtrl.seedSampleCertificates);
+router.post("/certificates/showcase", certCtrl.updateShowcaseSettings);
+router.patch("/certificates/showcase", certCtrl.updateShowcaseSettings);
 router.get("/certificates/:id", certCtrl.getAdminCertificateById);
 router.post("/certificates", validate(certificateSchema), certCtrl.createCertificate);
 router.patch("/certificates/:id", validate(certificateSchema.partial()), certCtrl.updateCertificate);

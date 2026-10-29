@@ -84,7 +84,7 @@ export const getAdminCertificates = async (req: AuthenticatedRequest, res: Respo
       });
     }
 
-    // Also include current authority signatures in metadata
+    // Also include current authority signatures and hero showcase settings in metadata
     const settings = await db.query.websiteSettings.findFirst();
     const authoritySignatures = {
       sig1Name: settings?.certSig1Name || "Dr. Aris Thorne",
@@ -95,10 +95,23 @@ export const getAdminCertificates = async (req: AuthenticatedRequest, res: Respo
       sig2Sign: settings?.certSig2Sign || "",
     };
 
+    const showcaseSettings = {
+      enabled: settings?.certShowcaseEnabled ?? true,
+      title: settings?.certShowcaseTitle || "Official Institutional Attestation",
+      subtitle: settings?.certShowcaseSubtitle || "Tamper-proof verifiable credentials backed by central academic registrar ledger.",
+      studentName: settings?.certShowcaseStudentName || "Aditi Sharma",
+      courseName: settings?.certShowcaseCourseName || "Executive Spoken English & Global Communication",
+      certNumber: settings?.certShowcaseCertNumber || "EV-2025-ENG-8492",
+      issueDate: settings?.certShowcaseIssueDate || "14 Nov 2025",
+      grade: settings?.certShowcaseGrade || "Distinction (CEFR C1)",
+      badgeText: settings?.certShowcaseBadgeText || "OFFICIAL SPECIMEN",
+    };
+
     return res.status(200).json({
       success: true,
       data: items,
       authoritySignatures,
+      showcaseSettings,
     });
   } catch (error) {
     next(error);
@@ -263,6 +276,54 @@ export const updateAuthoritySignatures = async (req: AuthenticatedRequest, res: 
     return res.status(200).json({
       success: true,
       message: "Authority signatures updated successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Admin: Update Hero Showcase Settings CMS
+export const updateShowcaseSettings = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const {
+      enabled,
+      title,
+      subtitle,
+      studentName,
+      courseName,
+      certNumber,
+      issueDate,
+      grade,
+      badgeText,
+    } = req.body;
+
+    const existing = await db.query.websiteSettings.findFirst();
+
+    const payload = {
+      certShowcaseEnabled: enabled !== undefined ? Boolean(enabled) : true,
+      certShowcaseTitle: title || "Official Institutional Attestation",
+      certShowcaseSubtitle: subtitle || "Tamper-proof verifiable credentials backed by central academic registrar ledger.",
+      certShowcaseStudentName: studentName || "Aditi Sharma",
+      certShowcaseCourseName: courseName || "Executive Spoken English & Global Communication",
+      certShowcaseCertNumber: certNumber || "EV-2025-ENG-8492",
+      certShowcaseIssueDate: issueDate || "14 Nov 2025",
+      certShowcaseGrade: grade || "Distinction (CEFR C1)",
+      certShowcaseBadgeText: badgeText || "OFFICIAL SPECIMEN",
+      updatedAt: new Date(),
+    };
+
+    if (existing) {
+      await db
+        .update(websiteSettings)
+        .set(payload)
+        .where(sql`id = ${existing.id}`);
+    } else {
+      await db.insert(websiteSettings).values(payload);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Hero showcase settings updated successfully",
     });
   } catch (error) {
     next(error);

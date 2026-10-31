@@ -515,10 +515,7 @@ function GallerySection({ content }: RenderProps) {
   const apiGallery = response?.data || [];
 
   const baseGallery = useMemo(() => {
-    if (apiGallery.length >= 4) return apiGallery;
-    if (apiGallery.length > 0) {
-      return [...apiGallery, ...fallbackGalleryItems];
-    }
+    if (apiGallery.length > 0) return apiGallery;
     return fallbackGalleryItems;
   }, [apiGallery]);
 

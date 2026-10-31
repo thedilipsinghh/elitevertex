@@ -33,6 +33,8 @@ export default function AdminSettingsPage() {
     socialShowInstagram: true,
     socialShowFacebook: true,
     socialShowWhatsapp: true,
+    linkedinUrl: "",
+    youtubeUrl: "",
   });
 
   const [message, setMessage] = useState("");
@@ -65,6 +67,8 @@ export default function AdminSettingsPage() {
         socialShowInstagram: response.data.socialShowInstagram !== false,
         socialShowFacebook: response.data.socialShowFacebook !== false,
         socialShowWhatsapp: response.data.socialShowWhatsapp !== false,
+        linkedinUrl: response.data.linkedinUrl || "",
+        youtubeUrl: response.data.youtubeUrl || "",
       });
     }
   }, [response]);
@@ -425,6 +429,58 @@ export default function AdminSettingsPage() {
                   name="facebookUrl"
                   placeholder="https://www.facebook.com/elitevertex"
                   value={formData.facebookUrl}
+                  onChange={handleChange}
+                  className="bg-surface-container p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-secondary text-on-surface text-xs"
+                />
+              </div>
+            </div>
+
+            {/* LinkedIn */}
+            <div className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/40 flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-7 h-7 rounded-lg flex items-center justify-center p-1 text-white shadow-xs"
+                  style={{ background: "#0077B5" }}
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76c-.95 0-1.72-.78-1.72-1.73a1.73 1.73 0 0 1 1.72-1.72c.96 0 1.73.77 1.73 1.72 0 .95-.77 1.73-1.73 1.73m1.39 9.74v-8.37H5.07v8.37h2.78Z" />
+                  </svg>
+                </div>
+                <span className="font-bold text-xs text-on-surface">LinkedIn Profile</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-bold text-on-surface-variant">LinkedIn URL</label>
+                <input
+                  type="text"
+                  name="linkedinUrl"
+                  placeholder="https://www.linkedin.com/company/elitevertex"
+                  value={formData.linkedinUrl}
+                  onChange={handleChange}
+                  className="bg-surface-container p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-secondary text-on-surface text-xs"
+                />
+              </div>
+            </div>
+
+            {/* YouTube */}
+            <div className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/40 flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-7 h-7 rounded-lg flex items-center justify-center p-1 text-white shadow-xs"
+                  style={{ background: "#FF0000" }}
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                  </svg>
+                </div>
+                <span className="font-bold text-xs text-on-surface">YouTube Channel</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-bold text-on-surface-variant">Channel URL</label>
+                <input
+                  type="text"
+                  name="youtubeUrl"
+                  placeholder="https://www.youtube.com/@elitevertex"
+                  value={formData.youtubeUrl}
                   onChange={handleChange}
                   className="bg-surface-container p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-secondary text-on-surface text-xs"
                 />

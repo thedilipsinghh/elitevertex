@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { AppLayout } from "@/components/layout/AppLayout";
 import StoreProvider from "@/lib/StoreProvider";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
-const montserrat = Montserrat({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-primary",
+  variable: "--font-inter",
   display: "swap",
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+  weight: ["500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -53,7 +59,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`scroll-smooth ${montserrat.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`scroll-smooth ${inter.variable} ${plusJakartaSans.variable}`}>
       <head>
         <meta name="google-site-verification" content="FjH0Aahah1JwDNkQDaaWNUnInECJ2dQzV7OXACHE6t0" />
         <script

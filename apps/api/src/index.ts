@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import { env } from "./config/env";
 import { db } from "./config/db";
-import { sql } from "drizzle-orm";
 import apiRoutes from "./routes/index";
 import { errorHandler } from "./middleware/error.middleware";
 
@@ -68,27 +67,6 @@ app.use("/api/v1", apiRoutes);
 
 // Error Handling
 app.use(errorHandler);
-
-// Safe idempotent check for certificate showcase columns
-async function ensureDatabaseColumns() {
-  if (!db) return;
-  try {
-    await db.execute(sql`
-      ALTER TABLE "website_settings" ADD COLUMN IF NOT EXISTS "cert_showcase_enabled" boolean DEFAULT true;
-      ALTER TABLE "website_settings" ADD COLUMN IF NOT EXISTS "cert_showcase_title" text;
-      ALTER TABLE "website_settings" ADD COLUMN IF NOT EXISTS "cert_showcase_subtitle" text;
-      ALTER TABLE "website_settings" ADD COLUMN IF NOT EXISTS "cert_showcase_student_name" varchar(255);
-      ALTER TABLE "website_settings" ADD COLUMN IF NOT EXISTS "cert_showcase_course_name" varchar(255);
-      ALTER TABLE "website_settings" ADD COLUMN IF NOT EXISTS "cert_showcase_cert_number" varchar(100);
-      ALTER TABLE "website_settings" ADD COLUMN IF NOT EXISTS "cert_showcase_issue_date" varchar(100);
-      ALTER TABLE "website_settings" ADD COLUMN IF NOT EXISTS "cert_showcase_grade" varchar(100);
-      ALTER TABLE "website_settings" ADD COLUMN IF NOT EXISTS "cert_showcase_badge_text" varchar(100);
-    `);
-  } catch (err) {
-    // Non-blocking: continue even if connection is delayed
-  }
-}
-ensureDatabaseColumns();
 
 if (!process.env.VERCEL) {
   app.listen(env.PORT, () => {

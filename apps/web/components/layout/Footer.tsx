@@ -1,8 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { FaInstagram, FaFacebookF, FaWhatsapp } from "react-icons/fa";
-import { useGetPublicNavigationQuery, useGetWebsiteSettingsQuery } from "@/lib/features/api/apiSlice";
+import { FaInstagram, FaFacebookF, FaWhatsapp, FaLinkedinIn, FaYoutube } from "react-icons/fa";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import {
+  useGetPublicNavigationQuery,
+  useGetWebsiteSettingsQuery,
+  useGetCampusesQuery,
+} from "@/lib/features/api/apiSlice";
 
 interface NavNode {
   id: string;
@@ -25,13 +30,23 @@ const FALLBACK_FOOTER: { name: string; href: string }[] = [
 export function Footer() {
   const { data: navResponse } = useGetPublicNavigationQuery("footer");
   const { data: settingsResponse } = useGetWebsiteSettingsQuery({});
+  const { data: campusesResponse } = useGetCampusesQuery({});
   const settings = settingsResponse?.data || {};
+
+  const campuses: any[] = (campusesResponse?.data || []).filter((c: any) => c.isPublished !== false);
+  const activeCampuses = campuses.length > 0 ? campuses : [
+    { name: "Mairwa Campus", address: "Apex Tower, Ghuthani More, Mairwa, Siwan, Bihar" },
+    { name: "Siwan Centre", address: "Ground Floor, Plaza 2, Shastri Nagar Registry Kachari, Siwan" }
+  ];
 
   const cmsNodes: NavNode[] = navResponse?.data || [];
   const navItems =
     cmsNodes.length > 0
       ? cmsNodes.map((n) => ({ name: n.label, href: n.url }))
       : FALLBACK_FOOTER;
+
+  const helplineNumber = settings.phone || settings.whatsapp || "+91 72194 47712";
+  const rawHelpline = helplineNumber.replace(/[^0-9+]/g, "");
 
   return (
     <footer className="w-full bg-slate-100 dark:bg-[#0B0F17] text-slate-800 dark:text-slate-300 border-t border-slate-200 dark:border-slate-800 transition-colors duration-200 relative">
@@ -61,6 +76,68 @@ export function Footer() {
                 verified
               </span>
               <span>ISO 9001:2015 Accredited Pedagogical Standards</span>
+            </div>
+
+            {/* Social Channels Strip (Persistent on all screens) */}
+            <div className="flex items-center gap-2.5 pt-2">
+              {settings.socialShowInstagram !== false && (
+                <a
+                  href={settings.instagramUrl || "https://www.instagram.com/elitevertex"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Elite Vertex Instagram"
+                  className="w-8 h-8 rounded-lg bg-pink-50 dark:bg-pink-950/40 border border-pink-200 dark:border-pink-800 text-pink-600 dark:text-pink-400 flex items-center justify-center hover:bg-pink-600 hover:text-white transition-all shadow-2xs"
+                >
+                  <FaInstagram className="text-sm" />
+                </a>
+              )}
+              {settings.socialShowFacebook !== false && (
+                <a
+                  href={settings.facebookUrl || "https://www.facebook.com/elitevertex"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Elite Vertex Facebook"
+                  className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-2xs"
+                >
+                  <FaFacebookF className="text-xs" />
+                </a>
+              )}
+              {settings.socialShowWhatsapp !== false && (
+                <a
+                  href={(() => {
+                    const raw = settings.whatsapp || settings.phone || "+917219447712";
+                    return raw.startsWith("http") ? raw : `https://wa.me/${raw.replace(/[^0-9]/g, "")}`;
+                  })()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Elite Vertex WhatsApp"
+                  className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all shadow-2xs"
+                >
+                  <FaWhatsapp className="text-sm" />
+                </a>
+              )}
+              {settings.linkedinUrl && (
+                <a
+                  href={settings.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Elite Vertex LinkedIn"
+                  className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 text-sky-600 dark:text-sky-400 flex items-center justify-center hover:bg-sky-600 hover:text-white transition-all shadow-2xs"
+                >
+                  <FaLinkedinIn className="text-xs" />
+                </a>
+              )}
+              {settings.youtubeUrl && (
+                <a
+                  href={settings.youtubeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Elite Vertex YouTube"
+                  className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all shadow-2xs"
+                >
+                  <FaYoutube className="text-sm" />
+                </a>
+              )}
             </div>
           </div>
 
@@ -117,44 +194,33 @@ export function Footer() {
             <span className="text-xs font-bold uppercase tracking-widest text-amber-800 dark:text-amber-400 flex items-center gap-1.5">
               Campuses &amp; Hotline
             </span>
-            <div className="flex flex-col gap-3.5 text-xs text-slate-600 dark:text-slate-300">
-              
-              <div className="flex items-start gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/20 flex items-center justify-center shrink-0 mt-0.5 text-amber-700 dark:text-amber-400">
-                  <span className="material-symbols-outlined text-[16px]">
-                    location_on
-                  </span>
+            <div className="flex flex-col gap-3 text-xs text-slate-600 dark:text-slate-300">
+              {activeCampuses.slice(0, 3).map((c: any, i: number) => (
+                <div key={c.id || i} className="flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/20 flex items-center justify-center shrink-0 mt-0.5 text-amber-700 dark:text-amber-400">
+                    <span className="material-symbols-outlined text-[16px]">
+                      location_on
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-slate-900 dark:text-white block text-sm">{c.name}</span>
+                    <span className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">{c.address}</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="font-semibold text-slate-900 dark:text-white block text-sm">Bengaluru Flagship</span>
-                  <span className="text-slate-600 dark:text-slate-400">42, Prestige Towers, M.G. Road, Bengaluru 560001</span>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/20 flex items-center justify-center shrink-0 mt-0.5 text-amber-700 dark:text-amber-400">
-                  <span className="material-symbols-outlined text-[16px]">
-                    location_on
-                  </span>
-                </div>
-                <div>
-                  <span className="font-semibold text-slate-900 dark:text-white block text-sm">New Delhi Centre</span>
-                  <span className="text-slate-600 dark:text-slate-400">Regal Building, Connaught Place, New Delhi 110001</span>
-                </div>
-              </div>
+              ))}
 
               <div className="pt-2">
                 <span className="text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold block mb-1.5">
-                  Admissions Helpline
+                  Admissions Hotline
                 </span>
                 <a
-                  href={`tel:${settings.whatsapp || "+918049208800"}`}
+                  href={`tel:${rawHelpline}`}
                   className="inline-flex items-center gap-2.5 text-sm sm:text-base font-bold text-amber-900 dark:text-amber-400 hover:text-amber-950 dark:hover:text-amber-300 transition-all bg-amber-100 dark:bg-amber-400/10 hover:bg-amber-200 dark:hover:bg-amber-400/20 px-4 py-2.5 rounded-xl border border-amber-300 dark:border-amber-400/30 shadow-xs hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <span className="material-symbols-outlined text-[18px] text-amber-700 dark:text-amber-400">
                     call
                   </span>
-                  +91 (80) 4920-8800
+                  {helplineNumber}
                 </a>
               </div>
             </div>
@@ -163,59 +229,25 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-  <p>© {new Date().getFullYear()} Elite Vertex Institute of Communication. All rights reserved.</p>
-  <div className="flex items-center gap-6">
-    <Link href="/privacy" className="hover:text-slate-900 dark:hover:text-white transition-colors">Privacy Policy</Link>
-    <span className="text-slate-300 dark:text-slate-700">•</span>
-    <Link href="/terms" className="hover:text-slate-900 dark:hover:text-white transition-colors">Terms of Service</Link>
-    <span className="text-slate-300 dark:text-slate-700">•</span>
-    <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-1 cursor-pointer">
-      Back to Top
-      <span className="material-symbols-outlined text-[14px]">arrow_upward</span>
-    </button>
-  </div>
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
+          <p>© {new Date().getFullYear()} Elite Vertex Institute of Communication. All rights reserved.</p>
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+            <div className="flex items-center border border-slate-200 dark:border-slate-800 rounded-lg px-2 py-0.5 bg-white dark:bg-slate-900/60 shadow-2xs">
+              <ThemeToggle showLabel className="text-xs py-1 px-1.5 hover:bg-transparent" />
+            </div>
+            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+            <Link href="/privacy" className="hover:text-slate-900 dark:hover:text-white transition-colors">Privacy Policy</Link>
+            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+            <Link href="/terms" className="hover:text-slate-900 dark:hover:text-white transition-colors">Terms of Service</Link>
+            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+            <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-1 cursor-pointer">
+              Back to Top
+              <span className="material-symbols-outlined text-[14px]">arrow_upward</span>
+            </button>
+          </div>
+        </div>
 </div>
-</div>
-{/* Mobile Social Icons – visible only on small screens */}
-<div className="flex sm:hidden justify-center gap-4 mt-4">
-  {settings.socialShowInstagram !== false && (
-    <a
-      href={settings.instagramUrl || "https://www.instagram.com/elitevertex"}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Instagram"
-      className="flex items-center justify-center w-10 h-10 rounded-full bg-pink-600 dark:bg-pink-400 text-white hover:bg-pink-700 dark:hover:bg-pink-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-300 transition-colors"
-    >
-      <FaInstagram className="text-xl" />
-    </a>
-  )}
-  {settings.socialShowFacebook !== false && (
-    <a
-      href={settings.facebookUrl || "https://www.facebook.com/elitevertex"}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Facebook"
-      className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 dark:bg-blue-400 text-white hover:bg-blue-700 dark:hover:bg-blue-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 transition-colors"
-    >
-      <FaFacebookF className="text-xl" />
-    </a>
-  )}
-  {settings.socialShowWhatsapp !== false && (
-    <a
-      href={(() => {
-        const raw = settings.whatsapp || "+918049208800";
-        return raw.startsWith("http") ? raw : `https://wa.me/${raw.replace(/[^0-9]/g, "")}`;
-      })()}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="WhatsApp"
-      className="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-600 dark:bg-emerald-400 text-white hover:bg-emerald-700 dark:hover:bg-emerald-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 transition-colors"
-    >
-      <FaWhatsapp className="text-xl" />
-    </a>
-  )}
-</div>
+
   
 
 

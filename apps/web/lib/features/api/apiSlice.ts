@@ -181,6 +181,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Faqs'],
     }),
+    updateFaq: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/admin/faqs/${id}`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['Faqs'],
+    }),
     deleteFaq: builder.mutation({
       query: (id) => ({
         url: `/admin/faqs/${id}`,
@@ -198,6 +206,14 @@ export const apiSlice = createApi({
       query: (body) => ({
         url: '/admin/testimonials',
         method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Testimonials'],
+    }),
+    updateTestimonial: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/admin/testimonials/${id}`,
+        method: 'PATCH',
         body,
       }),
       invalidatesTags: ['Testimonials'],
@@ -237,6 +253,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Mentors'],
     }),
+    updateMentor: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/admin/mentors/${id}`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['Mentors'],
+    }),
     deleteMentor: builder.mutation({
       query: (id) => ({
         url: `/admin/mentors/${id}`,
@@ -268,6 +292,14 @@ export const apiSlice = createApi({
       query: (body) => ({
         url: '/admin/campuses',
         method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Campuses'],
+    }),
+    updateCampus: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/admin/campuses/${id}`,
+        method: 'PATCH',
         body,
       }),
       invalidatesTags: ['Campuses'],
@@ -310,6 +342,14 @@ export const apiSlice = createApi({
       query: (body) => ({
         url: '/admin/gallery',
         method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Gallery'],
+    }),
+    updateGalleryItem: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/admin/gallery/${id}`,
+        method: 'PATCH',
         body,
       }),
       invalidatesTags: ['Gallery'],
@@ -499,25 +539,30 @@ export const {
   useDeleteCourseMutation,
   useGetAdminFaqsQuery,
   useCreateFaqMutation,
+  useUpdateFaqMutation,
   useDeleteFaqMutation,
   useGetAdminTestimonialsQuery,
   useCreateTestimonialMutation,
+  useUpdateTestimonialMutation,
   useDeleteTestimonialMutation,
   useGetAdminSettingsQuery,
   useUpdateSettingsMutation,
   useGetAdminMentorsQuery,
   useCreateMentorMutation,
+  useUpdateMentorMutation,
   useDeleteMentorMutation,
   useGetAdminAboutQuery,
   useUpdateAboutMutation,
   useGetAdminCampusesQuery,
   useCreateCampusMutation,
+  useUpdateCampusMutation,
   useDeleteCampusMutation,
   useGetAdminMessagesQuery,
   useUpdateMessageStatusMutation,
   useDeleteMessageMutation,
   useGetAdminGalleryQuery,
   useCreateGalleryItemMutation,
+  useUpdateGalleryItemMutation,
   useDeleteGalleryItemMutation,
   useLoginMutation,
   useLogoutMutation,

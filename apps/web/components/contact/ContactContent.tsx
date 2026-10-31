@@ -2,14 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useGetWebsiteSettingsQuery, useSubmitContactMutation } from "@/lib/features/api/apiSlice";
+import {
+  useGetWebsiteSettingsQuery,
+  useSubmitContactMutation,
+  useGetCampusesQuery,
+} from "@/lib/features/api/apiSlice";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 export function ContactContent() {
   const { data: settingsResponse } = useGetWebsiteSettingsQuery({});
+  const { data: campusesResponse } = useGetCampusesQuery({});
   const [submitContact, { isLoading: isSubmitting }] = useSubmitContactMutation();
 
   const siteSettings = settingsResponse?.data || {};
+  const campuses: any[] = (campusesResponse?.data || []).filter((c: any) => c.isPublished !== false);
 
   const phone = siteSettings.phone || "+91 (80) 4920-8800";
   const whatsapp = siteSettings.whatsapp || "+91 98450 12345";
@@ -463,6 +469,96 @@ export function ContactContent() {
           </div>
         </div>
       </section>
+
+      {/* SECTION 2.5: CAMPUS LOCATIONS DIRECTORY */}
+      {campuses.length > 0 && (
+        <section className="py-12 lg:py-16 bg-background border-b border-outline-variant/20">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="flex flex-col items-center text-center mb-10">
+              <span className="text-secondary font-bold text-xs uppercase tracking-widest block mb-2">
+                INSTITUTE BRANCHES
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+                Visit Our Campus Locations
+              </h2>
+              <p className="text-muted-foreground text-xs sm:text-sm mt-2 max-w-xl">
+                Walk into any of our learning centers for a complimentary diagnostic voice evaluation and personalized batch counseling.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {campuses.map((c: any, idx: number) => (
+                <ScrollReveal key={c.id || idx} direction="up" delay={idx * 80}>
+                  <div className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30 shadow-xs hover:shadow-md transition-all hover-lift flex flex-col justify-between h-full">
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-secondary/10 text-secondary border border-secondary/20">
+                          {c.city}
+                        </span>
+                        <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                          <span>Admissions Open</span>
+                        </div>
+                      </div>
+
+                      <h3 className="font-bold text-foreground text-lg mb-2 leading-snug">
+                        {c.name}
+                      </h3>
+
+                      <p className="text-xs text-muted-foreground leading-relaxed font-medium mb-4">
+                        {c.address}
+                      </p>
+
+                      <div className="space-y-1.5 pt-3 border-t border-outline-variant/30 text-xs text-muted-foreground">
+                        {c.landmark && (
+                          <div className="flex items-start gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-secondary shrink-0 mt-0.5">near_me</span>
+                            <span><strong>Landmark:</strong> {c.landmark}</span>
+                          </div>
+                        )}
+                        {c.metroAccess && (
+                          <div className="flex items-start gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-secondary shrink-0 mt-0.5">directions_subway</span>
+                            <span><strong>Transit:</strong> {c.metroAccess}</span>
+                          </div>
+                        )}
+                        {c.parkingInfo && (
+                          <div className="flex items-start gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-secondary shrink-0 mt-0.5">local_parking</span>
+                            <span>{c.parkingInfo}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="pt-4 mt-4 border-t border-outline-variant/30 flex items-center justify-between">
+                      <a
+                        href={c.mapUrl || `https://maps.google.com/?q=${encodeURIComponent(c.address + " " + c.name)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-secondary hover:text-on-secondary-container transition-colors"
+                      >
+                        <span>Open in Maps</span>
+                        <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                      </a>
+
+                      <a
+                        href={`https://wa.me/${(whatsapp || "").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello Elite Vertex, I would like to visit the ${c.name} campus.`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-300 dark:border-emerald-800"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">chat</span>
+                        <span>WhatsApp Desk</span>
+                      </a>
+                    </div>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* SECTION 3: MAP LOCATION & DIRECTIONS */}
       <section className="py-12 lg:py-20 bg-background">

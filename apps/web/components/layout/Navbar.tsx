@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useGetPublicNavigationQuery, useGetWebsiteSettingsQuery } from "@/lib/features/api/apiSlice";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 interface NavNode {
   id: string;
@@ -166,9 +165,6 @@ export function Navbar() {
             <span className="tracking-wide">WhatsApp</span>
           </a>
 
-          {/* Theme Toggle (Desktop) */}
-          <ThemeToggle className="w-10 h-10" />
-
           {/* Mobile Menu Button */}
           <button
             type="button"
@@ -220,7 +216,6 @@ export function Navbar() {
             })}
 
             <div className="pt-3 mt-2 border-t border-outline-variant flex flex-col gap-2">
-              <ThemeToggle showLabel className="w-full justify-start py-2.5 px-3" />
               <a
                 href={whatsappUrl}
                 target="_blank"

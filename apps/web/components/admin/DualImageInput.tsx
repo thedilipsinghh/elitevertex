@@ -39,9 +39,23 @@ export default function DualImageInput({
       fd.append("image", file);
       fd.append("alt", file.name);
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1";
+      const token = typeof window !== "undefined" ? localStorage.getItem("admin_token") : null;
+      const apiUrl =
+        process.env.NEXT_PUBLIC_API_URL ||
+        (typeof window !== "undefined"
+          ? window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+            ? "http://localhost:5000/api/v1"
+            : "https://elitevertex-api.vercel.app/api/v1"
+          : "http://localhost:5000/api/v1");
+
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers["authorization"] = `Bearer ${token}`;
+      }
+
       const res = await fetch(`${apiUrl}/admin/upload`, {
         method: "POST",
+        headers,
         body: fd,
         credentials: "include",
       });

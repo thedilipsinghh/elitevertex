@@ -2,6 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useGetAdminSettingsQuery, useUpdateSettingsMutation } from "@/lib/features/api/apiSlice";
+import {
+  extractSocialHandle,
+  formatWhatsAppDisplay,
+  formatWhatsAppUrl,
+  normalizeSocialUrl,
+} from "@/lib/social";
 
 export default function AdminSettingsPage() {
   const { data: response, isLoading } = useGetAdminSettingsQuery({});
@@ -32,12 +38,14 @@ export default function AdminSettingsPage() {
     socialStickyOffset: "center",
     socialShowInstagram: true,
     socialShowFacebook: true,
+    socialShowLinkedin: true,
+    socialShowYoutube: true,
     socialShowWhatsapp: true,
     linkedinUrl: "",
     youtubeUrl: "",
   });
 
-  const [message, setMessage] = useState("");
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     if (response?.data) {
@@ -66,6 +74,8 @@ export default function AdminSettingsPage() {
         socialStickyOffset: response.data.socialStickyOffset || "center",
         socialShowInstagram: response.data.socialShowInstagram !== false,
         socialShowFacebook: response.data.socialShowFacebook !== false,
+        socialShowLinkedin: response.data.socialShowLinkedin !== false,
+        socialShowYoutube: response.data.socialShowYoutube !== false,
         socialShowWhatsapp: response.data.socialShowWhatsapp !== false,
         linkedinUrl: response.data.linkedinUrl || "",
         youtubeUrl: response.data.youtubeUrl || "",
@@ -81,14 +91,33 @@ export default function AdminSettingsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage("");
+    setFeedback(null);
+
+    const payload = {
+      ...formData,
+      instagramUrl: formData.instagramUrl.trim()
+        ? normalizeSocialUrl(formData.instagramUrl, "instagram") || formData.instagramUrl.trim()
+        : "",
+      facebookUrl: formData.facebookUrl.trim()
+        ? normalizeSocialUrl(formData.facebookUrl, "facebook") || formData.facebookUrl.trim()
+        : "",
+      linkedinUrl: formData.linkedinUrl.trim()
+        ? normalizeSocialUrl(formData.linkedinUrl, "linkedin") || formData.linkedinUrl.trim()
+        : "",
+      youtubeUrl: formData.youtubeUrl.trim()
+        ? normalizeSocialUrl(formData.youtubeUrl, "youtube") || formData.youtubeUrl.trim()
+        : "",
+      whatsapp: formData.whatsapp.trim(),
+    };
 
     try {
-      await updateSettings(formData).unwrap();
-      setMessage("✓ Website & Contact Page CMS Settings saved successfully!");
-    } catch (err) {
+      await updateSettings(payload).unwrap();
+      setFormData(payload);
+      setFeedback({ type: "success", text: "Website & Social CMS settings saved cleanly." });
+    } catch (err: any) {
       console.error(err);
-      setMessage("Failed to save settings.");
+      const errMsg = err?.data?.message || err?.message || "Failed to save settings.";
+      setFeedback({ type: "error", text: errMsg });
     }
   };
 
@@ -101,9 +130,15 @@ export default function AdminSettingsPage() {
         <p className="text-body-md text-on-surface-variant">Manage all hero copy, contact page content, hotline numbers, working hours, and map links directly.</p>
       </div>
 
-      {message && (
-        <div className="bg-emerald-100 border border-emerald-300 text-emerald-900 p-4 rounded-xl font-label-md font-bold">
-          {message}
+      {feedback && (
+        <div
+          className={`p-4 rounded-xl font-label-md font-bold border ${
+            feedback.type === "error"
+              ? "bg-red-100 border-red-300 text-red-900"
+              : "bg-emerald-100 border-emerald-300 text-emerald-900"
+          }`}
+        >
+          {feedback.text}
         </div>
       )}
 
@@ -389,11 +424,16 @@ export default function AdminSettingsPage() {
                 <input
                   type="text"
                   name="instagramUrl"
-                  placeholder="https://www.instagram.com/elitevertex"
+                  placeholder="https://www.instagram.com/yourhandle"
                   value={formData.instagramUrl}
                   onChange={handleChange}
                   className="bg-surface-container p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-secondary text-on-surface text-xs"
                 />
+                <span className="text-[10px] text-on-surface-variant">
+                  {normalizeSocialUrl(formData.instagramUrl, "instagram")
+                    ? `Hover tooltip: ${extractSocialHandle(formData.instagramUrl, "instagram", "Instagram")}`
+                    : "Enter URL or @handle to display"}
+                </span>
               </div>
             </div>
 
@@ -427,63 +467,102 @@ export default function AdminSettingsPage() {
                 <input
                   type="text"
                   name="facebookUrl"
-                  placeholder="https://www.facebook.com/elitevertex"
+                  placeholder="https://www.facebook.com/yourpage"
                   value={formData.facebookUrl}
                   onChange={handleChange}
                   className="bg-surface-container p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-secondary text-on-surface text-xs"
                 />
+                <span className="text-[10px] text-on-surface-variant">
+                  {normalizeSocialUrl(formData.facebookUrl, "facebook")
+                    ? `Hover tooltip: ${extractSocialHandle(formData.facebookUrl, "facebook", "Official Page")}`
+                    : "Enter URL or page name to display"}
+                </span>
               </div>
             </div>
 
             {/* LinkedIn */}
             <div className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/40 flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center p-1 text-white shadow-xs"
-                  style={{ background: "#0077B5" }}
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76c-.95 0-1.72-.78-1.72-1.73a1.73 1.73 0 0 1 1.72-1.72c.96 0 1.73.77 1.73 1.72 0 .95-.77 1.73-1.73 1.73m1.39 9.74v-8.37H5.07v8.37h2.78Z" />
-                  </svg>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-7 h-7 rounded-lg flex items-center justify-center p-1 text-white shadow-xs"
+                    style={{ background: "#0077B5" }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76c-.95 0-1.72-.78-1.72-1.73a1.73 1.73 0 0 1 1.72-1.72c.96 0 1.73.77 1.73 1.72 0 .95-.77 1.73-1.73 1.73m1.39 9.74v-8.37H5.07v8.37h2.78Z" />
+                    </svg>
+                  </div>
+                  <span className="font-bold text-xs text-on-surface">LinkedIn Profile</span>
                 </div>
-                <span className="font-bold text-xs text-on-surface">LinkedIn Profile</span>
+                <label className="flex items-center gap-1.5 text-xs text-on-surface-variant cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="socialShowLinkedin"
+                    checked={formData.socialShowLinkedin}
+                    onChange={handleChange}
+                    className="w-3.5 h-3.5 text-secondary rounded cursor-pointer"
+                  />
+                  <span>Active</span>
+                </label>
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] font-bold text-on-surface-variant">LinkedIn URL</label>
                 <input
                   type="text"
                   name="linkedinUrl"
-                  placeholder="https://www.linkedin.com/company/elitevertex"
+                  placeholder="https://www.linkedin.com/company/yourpage"
                   value={formData.linkedinUrl}
                   onChange={handleChange}
                   className="bg-surface-container p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-secondary text-on-surface text-xs"
                 />
+                <span className="text-[10px] text-on-surface-variant">
+                  {normalizeSocialUrl(formData.linkedinUrl, "linkedin")
+                    ? `Hover tooltip: ${extractSocialHandle(formData.linkedinUrl, "linkedin", "LinkedIn Profile")}`
+                    : "Enter URL to display on site"}
+                </span>
               </div>
             </div>
 
             {/* YouTube */}
             <div className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/40 flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center p-1 text-white shadow-xs"
-                  style={{ background: "#FF0000" }}
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                  </svg>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-7 h-7 rounded-lg flex items-center justify-center p-1 text-white shadow-xs"
+                    style={{ background: "#FF0000" }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                    </svg>
+                  </div>
+                  <span className="font-bold text-xs text-on-surface">YouTube Channel</span>
                 </div>
-                <span className="font-bold text-xs text-on-surface">YouTube Channel</span>
+                <label className="flex items-center gap-1.5 text-xs text-on-surface-variant cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="socialShowYoutube"
+                    checked={formData.socialShowYoutube}
+                    onChange={handleChange}
+                    className="w-3.5 h-3.5 text-secondary rounded cursor-pointer"
+                  />
+                  <span>Active</span>
+                </label>
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] font-bold text-on-surface-variant">Channel URL</label>
                 <input
                   type="text"
                   name="youtubeUrl"
-                  placeholder="https://www.youtube.com/@elitevertex"
+                  placeholder="https://www.youtube.com/@yourchannel"
                   value={formData.youtubeUrl}
                   onChange={handleChange}
                   className="bg-surface-container p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-secondary text-on-surface text-xs"
                 />
+                <span className="text-[10px] text-on-surface-variant">
+                  {normalizeSocialUrl(formData.youtubeUrl, "youtube")
+                    ? `Hover tooltip: ${extractSocialHandle(formData.youtubeUrl, "youtube", "YouTube Channel")}`
+                    : "Enter URL or @handle to display"}
+                </span>
               </div>
             </div>
 
@@ -517,11 +596,16 @@ export default function AdminSettingsPage() {
                 <input
                   type="text"
                   name="whatsapp"
-                  placeholder="+91 (80) 4920-8800 or https://wa.me/..."
+                  placeholder="10-digit number, +91..., or https://wa.me/..."
                   value={formData.whatsapp}
                   onChange={handleChange}
                   className="bg-surface-container p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-secondary text-on-surface text-xs"
                 />
+                <span className="text-[10px] text-on-surface-variant">
+                  {formatWhatsAppUrl(formData.whatsapp)
+                    ? `Link: ${formatWhatsAppUrl(formData.whatsapp)} (${formatWhatsAppDisplay(formData.whatsapp)})`
+                    : "Enter phone number or direct wa.me link"}
+                </span>
               </div>
             </div>
 
@@ -537,52 +621,120 @@ export default function AdminSettingsPage() {
             </div>
 
             <div className="flex items-center gap-2 p-2 bg-surface-container-lowest rounded-2xl border border-outline-variant/60 shadow-xs">
-              {formData.socialShowInstagram && (
-                <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-transform hover:scale-110"
-                  style={{ background: "linear-gradient(45deg, #f09433, #dc2743, #bc1888)" }}
-                  title="Instagram Squircle"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="w-5 h-5">
-                    <rect x="2" y="2" width="20" height="20" rx="5" />
-                    <circle cx="12" cy="12" r="4" />
-                    <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" />
-                  </svg>
-                </div>
-              )}
+              {formData.socialStickyEnabled &&
+                formData.socialShowInstagram &&
+                normalizeSocialUrl(formData.instagramUrl, "instagram") && (
+                  <a
+                    href={normalizeSocialUrl(formData.instagramUrl, "instagram")!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-transform hover:scale-110"
+                    style={{ background: "linear-gradient(45deg, #f09433, #dc2743, #bc1888)" }}
+                    title={`Instagram (${extractSocialHandle(formData.instagramUrl, "instagram", "Instagram")})`}
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="w-5 h-5">
+                      <rect x="2" y="2" width="20" height="20" rx="5" />
+                      <circle cx="12" cy="12" r="4" />
+                      <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" />
+                    </svg>
+                  </a>
+                )}
 
-              {formData.socialShowFacebook && (
-                <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-transform hover:scale-110"
-                  style={{ background: "linear-gradient(180deg, #1877F2, #0F62D4)" }}
-                  title="Facebook Squircle"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                    <path d="M14 13.5h2.5l1-4H14v-2c0-1.03.44-1.5 1.7-1.5H18V2.3A22 22 0 0 0 15.3 2c-3.1 0-5.3 1.9-5.3 5.4v2.1H7v4h3v8.5h4v-8.5Z" />
-                  </svg>
-                </div>
-              )}
+              {formData.socialStickyEnabled &&
+                formData.socialShowFacebook &&
+                normalizeSocialUrl(formData.facebookUrl, "facebook") && (
+                  <a
+                    href={normalizeSocialUrl(formData.facebookUrl, "facebook")!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-transform hover:scale-110"
+                    style={{ background: "linear-gradient(180deg, #1877F2, #0F62D4)" }}
+                    title={`Facebook (${extractSocialHandle(formData.facebookUrl, "facebook", "Official Page")})`}
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                      <path d="M14 13.5h2.5l1-4H14v-2c0-1.03.44-1.5 1.7-1.5H18V2.3A22 22 0 0 0 15.3 2c-3.1 0-5.3 1.9-5.3 5.4v2.1H7v4h3v8.5h4v-8.5Z" />
+                    </svg>
+                  </a>
+                )}
 
-              {formData.socialShowWhatsapp && (
-                <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-transform hover:scale-110"
-                  style={{ background: "linear-gradient(180deg, #25D366, #1DA851)" }}
-                  title="WhatsApp Squircle"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                    <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Z" />
-                  </svg>
-                </div>
-              )}
+              {formData.socialStickyEnabled &&
+                formData.socialShowLinkedin &&
+                normalizeSocialUrl(formData.linkedinUrl, "linkedin") && (
+                  <a
+                    href={normalizeSocialUrl(formData.linkedinUrl, "linkedin")!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-transform hover:scale-110"
+                    style={{ background: "linear-gradient(180deg, #0A66C2, #004182)" }}
+                    title={`LinkedIn (${extractSocialHandle(formData.linkedinUrl, "linkedin", "LinkedIn Profile")})`}
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76c-.95 0-1.72-.78-1.72-1.73a1.73 1.73 0 0 1 1.72-1.72c.96 0 1.73.77 1.73 1.72 0 .95-.77 1.73-1.73 1.73m1.39 9.74v-8.37H5.07v8.37h2.78Z" />
+                    </svg>
+                  </a>
+                )}
 
-              {!formData.socialStickyEnabled && (
+              {formData.socialStickyEnabled &&
+                formData.socialShowYoutube &&
+                normalizeSocialUrl(formData.youtubeUrl, "youtube") && (
+                  <a
+                    href={normalizeSocialUrl(formData.youtubeUrl, "youtube")!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-transform hover:scale-110"
+                    style={{ background: "linear-gradient(180deg, #FF0000, #CC0000)" }}
+                    title={`YouTube (${extractSocialHandle(formData.youtubeUrl, "youtube", "YouTube Channel")})`}
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                    </svg>
+                  </a>
+                )}
+
+              {formData.socialStickyEnabled &&
+                formData.socialShowWhatsapp &&
+                formatWhatsAppUrl(formData.whatsapp) && (
+                  <a
+                    href={formatWhatsAppUrl(formData.whatsapp)!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-transform hover:scale-110"
+                    style={{ background: "linear-gradient(180deg, #25D366, #1DA851)" }}
+                    title={`WhatsApp (${formatWhatsAppDisplay(formData.whatsapp)})`}
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                      <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Z" />
+                    </svg>
+                  </a>
+                )}
+
+              {!formData.socialStickyEnabled ? (
                 <span className="text-[11px] font-bold text-red-500 px-2">Widget Disabled</span>
+              ) : (
+                !(
+                  (formData.socialShowInstagram && normalizeSocialUrl(formData.instagramUrl, "instagram")) ||
+                  (formData.socialShowFacebook && normalizeSocialUrl(formData.facebookUrl, "facebook")) ||
+                  (formData.socialShowLinkedin && normalizeSocialUrl(formData.linkedinUrl, "linkedin")) ||
+                  (formData.socialShowYoutube && normalizeSocialUrl(formData.youtubeUrl, "youtube")) ||
+                  (formData.socialShowWhatsapp && formatWhatsAppUrl(formData.whatsapp))
+                ) && <span className="text-[11px] font-medium text-on-surface-variant px-2">No active URLs configured</span>
               )}
             </div>
           </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between gap-4">
+          {feedback ? (
+            <span
+              className={`text-sm font-bold ${
+                feedback.type === "error" ? "text-red-600" : "text-emerald-700"
+              }`}
+            >
+              {feedback.text}
+            </span>
+          ) : (
+            <span />
+          )}
           <button
             type="submit"
             disabled={isSaving}
@@ -592,6 +744,26 @@ export default function AdminSettingsPage() {
           </button>
         </div>
       </form>
+
+      {feedback && (
+        <div
+          className={`fixed bottom-6 right-6 z-50 px-5 py-3.5 rounded-xl shadow-xl border flex items-center gap-3 text-sm font-bold ${
+            feedback.type === "error"
+              ? "bg-red-600 text-white border-red-700"
+              : "bg-emerald-700 text-white border-emerald-800"
+          }`}
+        >
+          <span>{feedback.text}</span>
+          <button
+            type="button"
+            onClick={() => setFeedback(null)}
+            aria-label="Dismiss notification"
+            className="text-white/80 hover:text-white text-base leading-none"
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
   );
 }

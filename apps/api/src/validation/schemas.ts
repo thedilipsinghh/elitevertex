@@ -142,6 +142,8 @@ export const settingsSchema = z.object({
   socialShowInstagram: z.boolean().optional(),
   socialShowFacebook: z.boolean().optional(),
   socialShowWhatsapp: z.boolean().optional(),
+  socialShowLinkedin: z.boolean().optional(),
+  socialShowYoutube: z.boolean().optional(),
 });
 
 export const aboutSchema = z.object({

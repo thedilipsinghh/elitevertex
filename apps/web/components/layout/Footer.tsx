@@ -8,6 +8,12 @@ import {
   useGetWebsiteSettingsQuery,
   useGetCampusesQuery,
 } from "@/lib/features/api/apiSlice";
+import {
+  extractSocialHandle,
+  formatWhatsAppDisplay,
+  formatWhatsAppUrl,
+  normalizeSocialUrl,
+} from "@/lib/social";
 
 interface NavNode {
   id: string;
@@ -29,7 +35,10 @@ const FALLBACK_FOOTER: { name: string; href: string }[] = [
 
 export function Footer() {
   const { data: navResponse } = useGetPublicNavigationQuery("footer");
-  const { data: settingsResponse } = useGetWebsiteSettingsQuery({});
+  const { data: settingsResponse, isLoading: isSettingsLoading } = useGetWebsiteSettingsQuery(
+    {},
+    { refetchOnFocus: true, refetchOnReconnect: true }
+  );
   const { data: campusesResponse } = useGetCampusesQuery({});
   const settings = settingsResponse?.data || {};
 
@@ -79,66 +88,76 @@ export function Footer() {
             </div>
 
             {/* Social Channels Strip (Persistent on all screens) */}
-            <div className="flex items-center gap-2.5 pt-2">
-              {settings.socialShowInstagram !== false && (
-                <a
-                  href={settings.instagramUrl || "https://www.instagram.com/elitevertex"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Elite Vertex Instagram"
-                  className="w-8 h-8 rounded-lg bg-pink-50 dark:bg-pink-950/40 border border-pink-200 dark:border-pink-800 text-pink-600 dark:text-pink-400 flex items-center justify-center hover:bg-pink-600 hover:text-white transition-all shadow-2xs"
-                >
-                  <FaInstagram className="text-sm" />
-                </a>
-              )}
-              {settings.socialShowFacebook !== false && (
-                <a
-                  href={settings.facebookUrl || "https://www.facebook.com/elitevertex"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Elite Vertex Facebook"
-                  className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-2xs"
-                >
-                  <FaFacebookF className="text-xs" />
-                </a>
-              )}
-              {settings.socialShowWhatsapp !== false && (
-                <a
-                  href={(() => {
-                    const raw = settings.whatsapp || settings.phone || "+917219447712";
-                    return raw.startsWith("http") ? raw : `https://wa.me/${raw.replace(/[^0-9]/g, "")}`;
-                  })()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Elite Vertex WhatsApp"
-                  className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all shadow-2xs"
-                >
-                  <FaWhatsapp className="text-sm" />
-                </a>
-              )}
-              {settings.linkedinUrl && (
-                <a
-                  href={settings.linkedinUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Elite Vertex LinkedIn"
-                  className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 text-sky-600 dark:text-sky-400 flex items-center justify-center hover:bg-sky-600 hover:text-white transition-all shadow-2xs"
-                >
-                  <FaLinkedinIn className="text-xs" />
-                </a>
-              )}
-              {settings.youtubeUrl && (
-                <a
-                  href={settings.youtubeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Elite Vertex YouTube"
-                  className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all shadow-2xs"
-                >
-                  <FaYoutube className="text-sm" />
-                </a>
-              )}
-            </div>
+            {!(isSettingsLoading && !settingsResponse) && (
+              <div className="flex items-center gap-2.5 pt-2">
+                {[
+                  settings.socialShowInstagram !== false &&
+                    normalizeSocialUrl(settings.instagramUrl, "instagram") && {
+                      id: "instagram",
+                      href: normalizeSocialUrl(settings.instagramUrl, "instagram")!,
+                      ariaLabel: "Elite Vertex Instagram",
+                      title: `Instagram (${extractSocialHandle(settings.instagramUrl, "instagram", "Instagram")})`,
+                      colorClass:
+                        "bg-pink-50 dark:bg-pink-950/40 border-pink-200 dark:border-pink-800 text-pink-600 dark:text-pink-400 hover:bg-pink-600 hover:text-white",
+                      icon: <FaInstagram className="text-sm" />,
+                    },
+                  settings.socialShowFacebook !== false &&
+                    normalizeSocialUrl(settings.facebookUrl, "facebook") && {
+                      id: "facebook",
+                      href: normalizeSocialUrl(settings.facebookUrl, "facebook")!,
+                      ariaLabel: "Elite Vertex Facebook",
+                      title: `Facebook (${extractSocialHandle(settings.facebookUrl, "facebook", "Official Page")})`,
+                      colorClass:
+                        "bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white",
+                      icon: <FaFacebookF className="text-xs" />,
+                    },
+                  settings.socialShowLinkedin !== false &&
+                    normalizeSocialUrl(settings.linkedinUrl, "linkedin") && {
+                      id: "linkedin",
+                      href: normalizeSocialUrl(settings.linkedinUrl, "linkedin")!,
+                      ariaLabel: "Elite Vertex LinkedIn",
+                      title: `LinkedIn (${extractSocialHandle(settings.linkedinUrl, "linkedin", "LinkedIn Profile")})`,
+                      colorClass:
+                        "bg-sky-50 dark:bg-sky-950/40 border-sky-200 dark:border-sky-800 text-sky-600 dark:text-sky-400 hover:bg-sky-600 hover:text-white",
+                      icon: <FaLinkedinIn className="text-xs" />,
+                    },
+                  settings.socialShowYoutube !== false &&
+                    normalizeSocialUrl(settings.youtubeUrl, "youtube") && {
+                      id: "youtube",
+                      href: normalizeSocialUrl(settings.youtubeUrl, "youtube")!,
+                      ariaLabel: "Elite Vertex YouTube",
+                      title: `YouTube (${extractSocialHandle(settings.youtubeUrl, "youtube", "YouTube Channel")})`,
+                      colorClass:
+                        "bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white",
+                      icon: <FaYoutube className="text-sm" />,
+                    },
+                  settings.socialShowWhatsapp !== false &&
+                    formatWhatsAppUrl(settings.whatsapp) && {
+                      id: "whatsapp",
+                      href: formatWhatsAppUrl(settings.whatsapp)!,
+                      ariaLabel: "Elite Vertex WhatsApp",
+                      title: `WhatsApp (${formatWhatsAppDisplay(settings.whatsapp)})`,
+                      colorClass:
+                        "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white",
+                      icon: <FaWhatsapp className="text-sm" />,
+                    },
+                ]
+                  .filter((item): item is Exclude<typeof item, false | null | ""> => Boolean(item))
+                  .map((item) => (
+                    <a
+                      key={item.id}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={item.ariaLabel}
+                      title={item.title}
+                      className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all shadow-2xs ${item.colorClass}`}
+                    >
+                      {item.icon}
+                    </a>
+                  ))}
+              </div>
+            )}
           </div>
 
           {/* Quick Navigation Column */}

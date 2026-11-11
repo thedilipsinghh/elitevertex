@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useGetCoursesQuery } from "@/lib/features/api/apiSlice";
+import { useGetCoursesQuery, useGetWebsiteSettingsQuery } from "@/lib/features/api/apiSlice";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 type CourseCategory = "all" | "spoken" | "career" | "advanced";
@@ -271,6 +271,12 @@ export function CoursesContent() {
   const [showToast, setShowToast] = useState(false);
 
   const { data: response, isLoading } = useGetCoursesQuery({});
+  const { data: settingsResponse } = useGetWebsiteSettingsQuery(
+    {},
+    { refetchOnFocus: true, refetchOnReconnect: true }
+  );
+  const admissionsPhone = settingsResponse?.data?.phone || "+91 72194 47712";
+  const admissionsTelHref = `tel:${admissionsPhone.replace(/[^0-9+]/g, "")}`;
   const apiCourses = response?.data || [];
 
   // Use API courses if available, fallback to INSTITUTIONAL_COURSES
@@ -336,11 +342,11 @@ export function CoursesContent() {
                   <span>Book Free Counselling</span>
                 </Link>
                 <a
-                  href="tel:+918049208800"
+                  href={admissionsTelHref}
                   className="inline-flex items-center justify-center gap-2 bg-surface-container hover:bg-surface-container-high text-on-surface text-xs sm:text-sm font-bold uppercase tracking-wider px-6 sm:px-7 py-3.5 rounded-xl transition-all border border-outline-variant shadow-xs btn-press hover-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
                 >
                   <span className="material-symbols-outlined text-[18px]">call</span>
-                  <span>Admissions: +91 (80) 4920-8800</span>
+                  <span>Admissions: {admissionsPhone}</span>
                 </a>
               </div>
             </div>
@@ -695,7 +701,7 @@ export function CoursesContent() {
                 <span>Book Free Assessment</span>
               </Link>
               <a
-                href="tel:+918049208800"
+                href={admissionsTelHref}
                 className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white text-sm font-bold uppercase tracking-wider px-8 py-4 rounded-xl transition-colors border border-white/20 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
               >
                 <span className="material-symbols-outlined text-[20px]">call</span>

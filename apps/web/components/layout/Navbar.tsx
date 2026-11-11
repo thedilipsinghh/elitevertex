@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useGetPublicNavigationQuery, useGetWebsiteSettingsQuery } from "@/lib/features/api/apiSlice";
+import { formatWhatsAppUrl } from "@/lib/social";
 
 interface NavNode {
   id: string;
@@ -27,7 +28,10 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { data: navResponse } = useGetPublicNavigationQuery("header");
-  const { data: settingsResponse } = useGetWebsiteSettingsQuery({});
+  const { data: settingsResponse } = useGetWebsiteSettingsQuery(
+    {},
+    { refetchOnFocus: true, refetchOnReconnect: true }
+  );
   const settings = settingsResponse?.data || {};
 
   const cmsNodes: NavNode[] = navResponse?.data || [];
@@ -63,8 +67,7 @@ export function Navbar() {
   };
 
   const logoSrc = settings.logoUrl || "/logo.png";
-  const whatsappNumber = (settings.whatsapp || "+91 98450 12345").replace(/[^0-9]/g, "");
-  const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+  const whatsappUrl = formatWhatsAppUrl(settings.whatsapp || settings.phone || "+91 72194 47712");
 
   return (
     <header
@@ -140,30 +143,32 @@ export function Navbar() {
         {/* Action Buttons, Theme Toggle & Mobile Menu Trigger */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* WhatsApp Action Button */}
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#007a55] hover:bg-[#006747] text-white font-semibold text-xs sm:text-sm px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full transition-all duration-200 shadow-xs hover:shadow-md active:scale-95 cursor-pointer select-none btn-press hover-lift"
-            title="Chat on WhatsApp"
-            aria-label="Chat on WhatsApp"
-          >
-            <svg
-              className="w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
+          {whatsappUrl && (
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-[#007a55] hover:bg-[#006747] text-white font-semibold text-xs sm:text-sm px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full transition-all duration-200 shadow-xs hover:shadow-md active:scale-95 cursor-pointer select-none btn-press hover-lift"
+              title="Chat on WhatsApp"
+              aria-label="Chat on WhatsApp"
             >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M2.5 4C2.5 2.62 3.62 1.5 5 1.5H19C20.38 1.5 21.5 2.62 21.5 4V15C21.5 16.38 20.38 17.5 19 17.5H5.8L2.5 21V4ZM5.5 5.5H18.5V7.5H5.5V5.5ZM5.5 9H18.5V11H5.5V9ZM5.5 12.5H14V14.5H5.5V12.5Z"
-                fill="white"
-              />
-            </svg>
-            <span className="tracking-wide">WhatsApp</span>
-          </a>
+              <svg
+                className="w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M2.5 4C2.5 2.62 3.62 1.5 5 1.5H19C20.38 1.5 21.5 2.62 21.5 4V15C21.5 16.38 20.38 17.5 19 17.5H5.8L2.5 21V4ZM5.5 5.5H18.5V7.5H5.5V5.5ZM5.5 9H18.5V11H5.5V9ZM5.5 12.5H14V14.5H5.5V12.5Z"
+                  fill="white"
+                />
+              </svg>
+              <span className="tracking-wide">WhatsApp</span>
+            </a>
+          )}
 
           {/* Mobile Menu Button */}
           <button
@@ -215,30 +220,32 @@ export function Navbar() {
               );
             })}
 
-            <div className="pt-3 mt-2 border-t border-outline-variant flex flex-col gap-2">
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 bg-[#007a55] hover:bg-[#006747] text-white font-semibold text-sm px-4 py-2.5 rounded-full transition-colors shadow-xs"
-              >
-                <svg
-                  className="w-5 h-5 shrink-0"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
+            {whatsappUrl && (
+              <div className="pt-3 mt-2 border-t border-outline-variant flex flex-col gap-2">
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2 bg-[#007a55] hover:bg-[#006747] text-white font-semibold text-sm px-4 py-2.5 rounded-full transition-colors shadow-xs"
                 >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M2.5 4C2.5 2.62 3.62 1.5 5 1.5H19C20.38 1.5 21.5 2.62 21.5 4V15C21.5 16.38 20.38 17.5 19 17.5H5.8L2.5 21V4ZM5.5 5.5H18.5V7.5H5.5V5.5ZM5.5 9H18.5V11H5.5V9ZM5.5 12.5H14V14.5H5.5V12.5Z"
-                    fill="white"
-                  />
-                </svg>
-                <span>WhatsApp</span>
-              </a>
-            </div>
+                  <svg
+                    className="w-5 h-5 shrink-0"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M2.5 4C2.5 2.62 3.62 1.5 5 1.5H19C20.38 1.5 21.5 2.62 21.5 4V15C21.5 16.38 20.38 17.5 19 17.5H5.8L2.5 21V4ZM5.5 5.5H18.5V7.5H5.5V5.5ZM5.5 9H18.5V11H5.5V9ZM5.5 12.5H14V14.5H5.5V12.5Z"
+                      fill="white"
+                    />
+                  </svg>
+                  <span>WhatsApp</span>
+                </a>
+              </div>
+            )}
           </nav>
         </div >
       )

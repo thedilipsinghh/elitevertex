@@ -43,6 +43,7 @@ export const apiSlice = createApi({
     getWebsiteSettings: builder.query({
       query: () => '/website-settings',
       providesTags: ['Settings'],
+      keepUnusedDataFor: 5,
     }),
     getMentors: builder.query({
       query: () => '/mentors',

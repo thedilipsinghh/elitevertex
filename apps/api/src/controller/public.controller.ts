@@ -74,6 +74,7 @@ export const getFaqs = async (req: Request, res: Response, next: NextFunction) =
 export const getWebsiteSettings = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const settings = await db.query.websiteSettings.findFirst();
+    res.setHeader("Cache-Control", "no-store, max-age=0");
 
     return res.status(200).json({
       success: true,

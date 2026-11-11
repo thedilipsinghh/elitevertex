@@ -51,6 +51,8 @@ export const websiteSettings = pgTable("website_settings", {
   socialShowInstagram: boolean("social_show_instagram").default(true),
   socialShowFacebook: boolean("social_show_facebook").default(true),
   socialShowWhatsapp: boolean("social_show_whatsapp").default(true),
+  socialShowLinkedin: boolean("social_show_linkedin").default(true),
+  socialShowYoutube: boolean("social_show_youtube").default(true),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 

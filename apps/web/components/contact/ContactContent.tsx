@@ -8,17 +8,23 @@ import {
   useGetCampusesQuery,
 } from "@/lib/features/api/apiSlice";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { formatWhatsAppDisplay, formatWhatsAppUrl } from "@/lib/social";
 
 export function ContactContent() {
-  const { data: settingsResponse } = useGetWebsiteSettingsQuery({});
+  const { data: settingsResponse } = useGetWebsiteSettingsQuery(
+    {},
+    { refetchOnFocus: true, refetchOnReconnect: true }
+  );
   const { data: campusesResponse } = useGetCampusesQuery({});
   const [submitContact, { isLoading: isSubmitting }] = useSubmitContactMutation();
 
   const siteSettings = settingsResponse?.data || {};
   const campuses: any[] = (campusesResponse?.data || []).filter((c: any) => c.isPublished !== false);
 
-  const phone = siteSettings.phone || "+91 (80) 4920-8800";
-  const whatsapp = siteSettings.whatsapp || "+91 98450 12345";
+  const phone = siteSettings.phone || "+91 72194 47712";
+  const rawWhatsapp = siteSettings.whatsapp || siteSettings.phone || "+91 72194 47712";
+  const whatsappHref = formatWhatsAppUrl(rawWhatsapp);
+  const whatsappDisplay = formatWhatsAppDisplay(rawWhatsapp, rawWhatsapp);
   const email = siteSettings.email || "admissions@elitevertex.edu.in";
   const address = siteSettings.address || "42, Apex Tower, M.G. Road, Bengaluru, Karnataka 560001";
   const workingHours = siteSettings.workingHours || "Mon - Sat: 8:30 AM - 8:00 PM\nSunday: Appointments Only";
@@ -131,22 +137,24 @@ export function ContactContent() {
                 </div>
               </a>
 
-              <a
-                href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 hover:opacity-85 transition-all group"
-              >
-                <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                  <span className="material-symbols-outlined text-emerald-600 text-[20px]">
-                    chat
-                  </span>
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-foreground">WhatsApp</div>
-                  <div className="text-xs text-muted-foreground font-medium">{whatsapp}</div>
-                </div>
-              </a>
+              {whatsappHref && (
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 hover:opacity-85 transition-all group"
+                >
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <span className="material-symbols-outlined text-emerald-600 text-[20px]">
+                      chat
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-foreground">WhatsApp</div>
+                    <div className="text-xs text-muted-foreground font-medium">{whatsappDisplay}</div>
+                  </div>
+                </a>
+              )}
 
               <a
                 href={`mailto:${email}`}
@@ -542,15 +550,25 @@ export function ContactContent() {
                         <span className="material-symbols-outlined text-[16px]">open_in_new</span>
                       </a>
 
-                      <a
-                        href={`https://wa.me/${(whatsapp || "").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello Elite Vertex, I would like to visit the ${c.name} campus.`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-300 dark:border-emerald-800"
-                      >
-                        <span className="material-symbols-outlined text-[14px]">chat</span>
-                        <span>WhatsApp Desk</span>
-                      </a>
+                      {formatWhatsAppUrl(
+                        rawWhatsapp,
+                        `Hello Elite Vertex, I would like to visit the ${c.name} campus.`
+                      ) && (
+                        <a
+                          href={
+                            formatWhatsAppUrl(
+                              rawWhatsapp,
+                              `Hello Elite Vertex, I would like to visit the ${c.name} campus.`
+                            )!
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-300 dark:border-emerald-800"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">chat</span>
+                          <span>WhatsApp Desk</span>
+                        </a>
+                      )}
                     </div>
                   </div>
                 </ScrollReveal>

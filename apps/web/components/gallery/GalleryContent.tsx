@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useGetGalleryQuery } from "@/lib/features/api/apiSlice";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { GradientShineText } from "@/components/ui/GradientShineText";
 
 export function GalleryContent() {
   const [filter, setFilter] = useState<string>("all");
@@ -66,7 +67,9 @@ export function GalleryContent() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-md items-end">
             <div className="lg:col-span-8 flex flex-col gap-space-2xs">
               <span className="font-label-md text-label-md uppercase tracking-widest text-secondary font-bold">Documentary Visual Index</span>
-              <h1 className="font-display text-headline-lg-mobile md:text-display text-primary tracking-tight">Inside Elite Vertex.</h1>
+              <h1 className="font-display text-headline-lg-mobile md:text-display text-primary tracking-tight leading-[1.12]">
+                <GradientShineText text="Inside Elite Vertex." tailWords={2} />
+              </h1>
             </div>
             <div className="lg:col-span-4">
               <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">

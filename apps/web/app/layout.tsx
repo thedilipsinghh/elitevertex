@@ -4,6 +4,16 @@ import "./globals.css";
 import { AppLayout } from "@/components/layout/AppLayout";
 import StoreProvider from "@/lib/StoreProvider";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import {
+  BRAND_NAME,
+  DEFAULT_OG_IMAGE_PATH,
+  HOMEPAGE_DESCRIPTION,
+  HOMEPAGE_OG_TITLE,
+  HOMEPAGE_TITLE,
+  HOMEPAGE_URL,
+  SITE_URL,
+  canonicalUrl,
+} from "@/lib/seo";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,37 +29,48 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Elite Vertex — Institute of Communication",
-  description: "Premier institute for Spoken English, Public Speaking, and Career Communication in Mairwa, Siwan, Bihar.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitevertex.in"),
+  title: {
+    default: HOMEPAGE_TITLE,
+    template: "%s",
+  },
+  description: HOMEPAGE_DESCRIPTION,
+  applicationName: BRAND_NAME,
+  metadataBase: new URL(SITE_URL),
   verification: {
     google: "FjH0Aahah1JwDNkQDaaWNUnInECJ2dQzV7OXACHE6t0",
   },
   openGraph: {
-    title: "Elite Vertex — Institute of Communication",
-    description: "Premier institute for Spoken English, Public Speaking, and Career Communication in Mairwa, Siwan, Bihar.",
-    url: "https://elitevertex-web.vercel.app",
-    siteName: "Elite Vertex",
+    title: HOMEPAGE_OG_TITLE,
+    description: HOMEPAGE_DESCRIPTION,
+    url: HOMEPAGE_URL,
+    siteName: BRAND_NAME,
     images: [
       {
-        url: "/og-image.png",
+        url: canonicalUrl(DEFAULT_OG_IMAGE_PATH),
         width: 1200,
         height: 630,
-        alt: "Elite Vertex branding",
+        alt: `${BRAND_NAME} — English Classes in Mairwa, Siwan, Bihar`,
       },
     ],
-    locale: "en_US",
+    locale: "en_IN",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Elite Vertex — Institute of Communication",
-    description: "Premier institute for Spoken English, Public Speaking, and Career Communication in Mairwa, Siwan, Bihar.",
-    images: ["/og-image.png"],
+    title: HOMEPAGE_OG_TITLE,
+    description: HOMEPAGE_DESCRIPTION,
+    images: [canonicalUrl(DEFAULT_OG_IMAGE_PATH)],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
+    },
   },
 };
 

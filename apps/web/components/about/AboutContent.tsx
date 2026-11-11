@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useGetAboutPageQuery, useGetMentorsQuery } from "@/lib/features/api/apiSlice";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { GradientShineText } from "@/components/ui/GradientShineText";
 
 export function AboutContent() {
   const { data: aboutResponse, isLoading: isAboutLoading } = useGetAboutPageQuery({});
@@ -59,7 +60,7 @@ export function AboutContent() {
 
   return (
     <div className="flex flex-col w-full font-sans bg-background text-foreground">
-      
+
       {/* 1. HERO BANNER SECTION */}
       <section className="w-full bg-background py-12 lg:py-16 border-b border-outline-variant/20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -69,8 +70,11 @@ export function AboutContent() {
                 <span className="w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-400 animate-pulse"></span>
                 <span>{extra.headerBadge || "ABOUT ELITE VERTEX"}</span>
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
-                {aboutData.headerTitle || "Empowering Communicators & Future Leaders"}
+              <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-primary leading-[1.15]">
+                <GradientShineText
+                  text={aboutData.headerTitle || "Empowering Communicators & Future Leaders"}
+                  tailWords={2}
+                />
               </h1>
               <p className="text-muted-foreground text-base sm:text-lg leading-relaxed mt-2 font-normal">
                 {aboutData.headerSubtitle || "Learn more about Elite Vertex Institute, our mission, vision, and the expert mentors guiding our students towards executive confidence and oral fluency."}
@@ -84,7 +88,7 @@ export function AboutContent() {
       <section className="py-16 lg:py-24 bg-surface-container-low/60 border-b border-outline-variant/20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
-            
+
             {/* Left Header */}
             <div className="lg:col-span-1">
               <ScrollReveal direction="up">
@@ -99,7 +103,7 @@ export function AboutContent() {
 
             {/* Right 2-Card Grid */}
             <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
-              
+
               {/* Our Vision Card */}
               <ScrollReveal direction="up" delay={80}>
                 <div className="bg-secondary/5 border border-secondary/20 rounded-3xl p-8 flex flex-col gap-4 shadow-sm hover:shadow-xl transition-all hover-lift">
@@ -181,7 +185,7 @@ export function AboutContent() {
       <section className="py-16 lg:py-24 bg-surface-container-low/60 border-t border-outline-variant/20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
+
             <div className="lg:col-span-6 flex flex-col gap-6">
               <ScrollReveal direction="up">
                 <span className="text-xs font-bold uppercase tracking-widest text-secondary">
@@ -191,7 +195,7 @@ export function AboutContent() {
                   {aboutData.paradigmTitle || "Fluency is a physical and psychological habit."}
                 </h2>
               </ScrollReveal>
-              
+
               <ScrollReveal direction="up" delay={80}>
                 <div className="flex flex-col gap-4 text-muted-foreground text-sm sm:text-base leading-relaxed font-normal">
                   <p>
@@ -230,7 +234,8 @@ export function AboutContent() {
                   ) : (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img
-                      alt="Elite Vertex interactive speech workshop"
+                      alt="Elite Vertex Mairwa Spoken English and communication workshop"
+                      loading="lazy"
                       className="w-full aspect-[4/3] object-cover rounded-xl"
                       src={aboutData.paradigmImage || "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=80"}
                     />
@@ -311,11 +316,11 @@ export function AboutContent() {
                       <span className="material-symbols-outlined text-[16px]">verified</span>
                       <span>{leadMentor.accreditation || "British Council Accredited Fellow"}</span>
                     </div>
-                    
+
                     <h3 className="text-xl sm:text-2xl font-bold text-foreground leading-relaxed mt-4">
                       &quot;{leadMentor.quote || "We do not teach you to impersonate a native speaker. We coach you to speak with total clarity, natural gravitas, and unflinching presence."}&quot;
                     </h3>
-                    
+
                     <p className="text-muted-foreground text-sm sm:text-base leading-relaxed font-normal mt-3">
                       {leadMentor.bio}
                     </p>
@@ -347,7 +352,7 @@ export function AboutContent() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <ScrollReveal direction="up">
             <div className="bg-primary p-8 sm:p-12 lg:p-16 rounded-[2rem] text-on-primary flex flex-col md:flex-row md:items-center justify-between gap-8 shadow-xl">
-              
+
               <div className="flex flex-col gap-3 max-w-xl">
                 <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">
                   {extra.ctaBadge || "DIRECT ADMISSIONS PORTAL"}

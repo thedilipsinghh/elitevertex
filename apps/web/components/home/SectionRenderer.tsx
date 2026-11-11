@@ -11,6 +11,7 @@ import {
 import { galleryItems as fallbackGalleryItems } from "@/data/gallery";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { StatsSection } from "@/components/home/StatsSection";
+import { GradientShineText } from "@/components/ui/GradientShineText";
 
 const str = (v: unknown, fallback = ""): string =>
   typeof v === "string" && v.length > 0 ? v : fallback;
@@ -40,25 +41,29 @@ interface RenderProps {
 /* ------------------------------- HERO ------------------------------- */
 function HeroSection({ content }: RenderProps) {
   return (
-    <section className="w-full bg-surface py-space-2xl md:py-space-3xl overflow-hidden">
-      <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
+    <section className="w-full bg-surface py-10 sm:py-14 lg:py-16 overflow-hidden">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           <div className="lg:col-span-6 flex flex-col items-start">
             <ScrollReveal direction="up" delay={0}>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 font-label-md text-label-md uppercase tracking-widest font-semibold mb-space-xs badge-shimmer">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 font-label-md text-label-md uppercase tracking-widest font-semibold mb-4 shadow-sm badge-shimmer">
                 <span className="w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-400 animate-pulse"></span>
                 <span>{str(content.tagline, "Spoken English • Communication • Career Skills")}</span>
               </div>
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={80}>
-              <h1 className="font-display text-display text-primary tracking-tight leading-none mb-space-md">
-                {str(content.heading, "Speak With Confidence. Go Further.")}
+              <h1 className="font-display text-[2.125rem] sm:text-[2.625rem] lg:text-[2.75rem] xl:text-[3rem] font-extrabold text-primary tracking-[-0.02em] leading-[1.12] mb-4 sm:mb-5">
+                <GradientShineText
+                  text={str(content.heading, "Speak With Confidence. Go Further.")}
+                  tailWords={2}
+                  breakBeforeHighlight
+                />
               </h1>
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={160}>
-              <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl mb-space-xl leading-relaxed">
+              <p className="font-body-lg text-base sm:text-[1.0625rem] text-on-surface-variant max-w-xl mb-6 sm:mb-7 leading-relaxed">
                 {str(
                   content.subheading,
                   "Build the English, communication skills, and executive confidence you need for classrooms, global careers, and everyday influence."
@@ -67,15 +72,15 @@ function HeroSection({ content }: RenderProps) {
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={240}>
-              <div className="flex flex-wrap items-center gap-space-sm w-full sm:w-auto">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full sm:w-auto">
                 <Link
-                  className="inline-flex items-center justify-center bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-md text-label-md uppercase tracking-wider px-space-lg py-space-xs rounded-lg transition-all duration-200 btn-press hover-lift shadow-sm"
+                  className="inline-flex items-center justify-center bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-md text-label-md uppercase tracking-wider px-6 py-3 sm:px-7 sm:py-3.5 rounded-lg transition-all duration-200 btn-press hover-lift shadow-sm"
                   href={str(content.primaryCtaUrl, "/book-counselling")}
                 >
                   {str(content.primaryCtaLabel, "Book Free Counselling")}
                 </Link>
                 <Link
-                  className="inline-flex items-center justify-center bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md uppercase tracking-wider px-space-lg py-space-xs rounded-lg border border-outline-variant/60 transition-all duration-200 btn-press hover-lift shadow-xs"
+                  className="inline-flex items-center justify-center bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md uppercase tracking-wider px-6 py-3 sm:px-7 sm:py-3.5 rounded-lg border border-outline-variant transition-all duration-200 btn-press hover-lift shadow-sm"
                   href={str(content.secondaryCtaUrl, "/courses")}
                 >
                   {str(content.secondaryCtaLabel, "Explore Courses")}
@@ -85,10 +90,12 @@ function HeroSection({ content }: RenderProps) {
           </div>
           <div className="lg:col-span-6 w-full">
             <ScrollReveal direction="scale" delay={150}>
-              <div className="relative overflow-hidden rounded-2xl bg-surface-container shadow-md hover:shadow-xl transition-all duration-500 aspect-[16/11] img-zoom-parent hover-lift">
+              <div className="relative overflow-hidden rounded-2xl bg-surface-container border border-outline-variant shadow-md hover:shadow-xl transition-all duration-500 aspect-[16/10] sm:aspect-[16/11] img-zoom-parent hover-lift">
                 <img
-                  alt={str(content.imageAlt, "Learners collaborating actively in executive seminar hall at Elite Vertex")}
+                  alt={str(content.imageAlt, "Students practicing Spoken English and communication skills at Elite Vertex Mairwa")}
                   className="w-full h-full object-cover"
+                  loading="eager"
+                  fetchPriority="high"
                   src={str(content.image, DEFAULT_HERO_IMAGE)}
                 />
               </div>
@@ -112,17 +119,18 @@ function PillarsSection({ content }: RenderProps) {
   const items = arr<{ label?: string; title?: string; description?: string }>(content.items);
   const pillars = items.length ? items : DEFAULT_PILLARS;
   return (
-    <section className="w-full bg-surface-container-lowest py-space-xl shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
-      <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-space-lg">
+    <section className="w-full bg-surface-container-lowest py-8 sm:py-12 border-t border-outline-variant">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="sr-only">Core Pillars of English Learning at Elite Vertex Mairwa</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 items-stretch">
           {pillars.map((p, i) => (
-            <ScrollReveal key={i} direction="up" delay={i * 80}>
-              <div className="flex flex-col p-4 rounded-xl hover:bg-surface-container-low transition-all duration-300 hover:-translate-y-1">
-                <span className="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-space-3xs font-bold">
+            <ScrollReveal key={i} direction="up" delay={i * 80} className="h-full">
+              <div className="h-full flex flex-col p-5 rounded-xl border border-outline-variant/70 sm:border-transparent hover:border-outline-variant hover:bg-surface-container-low transition-all duration-300 hover:-translate-y-1">
+                <span className="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-1.5 font-bold">
                   {str(p.label, `Pillar ${String(i + 1).padStart(2, "0")}`)}
                 </span>
-                <h3 className="font-headline-sm text-headline-sm text-primary">{str(p.title)}</h3>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-space-3xs leading-relaxed">{str(p.description)}</p>
+                <h3 className="font-headline-sm text-headline-sm text-primary mb-1.5">{str(p.title)}</h3>
+                <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">{str(p.description)}</p>
               </div>
             </ScrollReveal>
           ))}
@@ -135,15 +143,16 @@ function PillarsSection({ content }: RenderProps) {
 /* --------------------------- ABOUT PREVIEW -------------------------- */
 function AboutPreviewSection({ content }: RenderProps) {
   return (
-    <section className="w-full bg-surface py-space-3xl overflow-hidden">
-      <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-2xl items-center">
+    <section className="w-full bg-surface py-12 sm:py-16 lg:py-20 overflow-hidden">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           <div className="lg:col-span-5 order-2 lg:order-1">
             <ScrollReveal direction="scale" delay={80}>
-              <div className="rounded-2xl overflow-hidden bg-surface-container aspect-[4/5] img-zoom-parent hover-lift shadow-md">
+              <div className="rounded-2xl overflow-hidden bg-surface-container border border-outline-variant aspect-[5/4] lg:aspect-square img-zoom-parent hover-lift shadow-md">
                 <img
-                  alt={str(content.imageAlt, "Academic mentor guiding student presentation in modern learning acoustic pod")}
+                  alt={str(content.imageAlt, "Instructor guiding Spoken English practice at Elite Vertex Mairwa")}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                   src={str(content.image, DEFAULT_ABOUT_IMAGE)}
                 />
               </div>
@@ -151,16 +160,19 @@ function AboutPreviewSection({ content }: RenderProps) {
           </div>
           <div className="lg:col-span-7 order-1 lg:order-2 flex flex-col">
             <ScrollReveal direction="up" delay={50}>
-              <span className="font-label-md text-label-md uppercase tracking-widest text-secondary font-bold mb-space-2xs">
+              <span className="font-label-md text-label-md uppercase tracking-widest text-secondary font-bold block mb-3">
                 {str(content.label, "Pedagogical Framework")}
               </span>
-              <h2 className="font-headline-lg text-headline-lg text-primary tracking-tight mb-space-md">
-                {str(content.heading, "More Than English. We Build Confidence.")}
+              <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary tracking-[-0.02em] leading-[1.2] mb-4 sm:mb-5 text-balance">
+                <GradientShineText
+                  text={str(content.heading, "More Than English. We Build Confidence.")}
+                  tailWords={3}
+                />
               </h2>
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={150}>
-              <div className="flex flex-col gap-space-sm font-body-md text-body-md text-on-surface-variant max-w-2xl leading-relaxed mb-space-lg">
+              <div className="flex flex-col gap-4 font-body-md text-body-md text-on-surface-variant max-w-2xl leading-relaxed mb-6">
                 <p>
                   {str(
                     content.paragraph1,
@@ -176,7 +188,7 @@ function AboutPreviewSection({ content }: RenderProps) {
               </div>
               <div>
                 <Link
-                  className="inline-flex items-center gap-space-2xs font-label-md text-label-md uppercase tracking-wider text-secondary hover:text-on-secondary-container transition-all group font-bold"
+                  className="inline-flex items-center gap-2 font-label-md text-label-md uppercase tracking-wider text-secondary hover:text-on-secondary-container transition-all group font-bold"
                   href={str(content.linkUrl, "/about")}
                 >
                   <span>{str(content.linkLabel, "Discover Elite Vertex")}</span>
@@ -231,16 +243,16 @@ function CoursesPreviewSection({ content }: RenderProps) {
   const items = arr<{ title?: string; description?: string; meta?: string; image?: string; url?: string; badge?: string }>(content.items);
   const courses = items.length ? items : DEFAULT_COURSES;
   return (
-    <section className="w-full bg-surface-container-low py-16 lg:py-20 border-t border-outline-variant transition-colors">
+    <section className="w-full bg-surface-container-low py-12 sm:py-16 lg:py-20 border-t border-outline-variant transition-colors">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal direction="up">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10 gap-4">
             <div>
-              <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-400/10 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-400/30 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3 shadow-2xs">
+              <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-400/10 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-400/30 px-3.5 py-1.5 rounded-full font-label-md text-label-md font-bold uppercase tracking-wider mb-3 shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-400"></span>
                 <span>{str(content.label, "Curriculum Tracks")}</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-on-surface tracking-tight">
+              <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary tracking-[-0.02em] leading-[1.2]">
                 {str(content.heading, "Learn Skills That Move You Forward.")}
               </h2>
             </div>
@@ -255,7 +267,7 @@ function CoursesPreviewSection({ content }: RenderProps) {
         </ScrollReveal>
 
         {/* Card-based grid with img, title, description */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 items-stretch">
           {courses.map((c, i) => {
             const cardImg =
               c.image ||
@@ -263,10 +275,10 @@ function CoursesPreviewSection({ content }: RenderProps) {
               "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80";
 
             return (
-              <ScrollReveal key={i} direction="up" delay={i * 90}>
+              <ScrollReveal key={i} direction="up" delay={i * 90} className="h-full">
                 <Link
                   href={str(c.url, "/courses")}
-                  className="group flex flex-col h-full bg-surface-container-lowest rounded-2xl border border-outline-variant overflow-hidden shadow-xs hover:shadow-xl hover:border-secondary transition-all hover-lift img-zoom-parent"
+                  className="group flex flex-col h-full bg-surface-container-lowest rounded-2xl border border-outline-variant overflow-hidden shadow-[0_1px_3px_rgba(15,23,42,0.04)] hover:shadow-xl hover:border-secondary transition-all hover-lift img-zoom-parent"
                 >
                   {/* Course Card Image */}
                   <div className="w-full aspect-[16/10] relative bg-surface-container overflow-hidden">
@@ -274,6 +286,7 @@ function CoursesPreviewSection({ content }: RenderProps) {
                     <img
                       src={cardImg}
                       alt={str(c.title)}
+                      loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     />
                     <div className="absolute top-3 left-3">
@@ -355,18 +368,18 @@ function TestimonialsSection({ content }: RenderProps) {
   }, [list]);
 
   return (
-    <section className="w-full bg-surface-container-low py-16 lg:py-24 border-t border-outline-variant overflow-hidden transition-colors">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center mb-10">
-        <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-400/10 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-400/30 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-5 shadow-2xs">
+    <section className="w-full bg-surface-container-low py-12 sm:py-16 lg:py-20 border-t border-outline-variant overflow-hidden transition-colors">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center mb-8 sm:mb-10">
+        <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-400/10 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-400/30 px-4 py-1.5 rounded-full font-label-md text-label-md font-bold uppercase tracking-wider mb-4 shadow-sm">
           <span className="material-symbols-outlined text-[16px]">favorite</span>
           <span>{str(content.badge, "STUDENT LOVE")}</span>
         </div>
 
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-on-surface tracking-tight text-center mb-4">
+        <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary tracking-[-0.02em] leading-[1.2] text-center mb-3 text-balance">
           {str(content.heading, "Loved By Many Students")}
         </h2>
 
-        <p className="text-on-surface-variant text-sm sm:text-base max-w-xl mx-auto text-center font-normal leading-relaxed">
+        <p className="font-body-md text-body-md text-on-surface-variant max-w-xl mx-auto text-center leading-relaxed">
           {str(
             content.subheading,
             "We're proud to have a community of learners who trust us to help them grow their skills and achieve their goals."
@@ -433,6 +446,7 @@ function TestimonialsSection({ content }: RenderProps) {
                       <div className="flex items-center gap-3">
                         <img
                           alt={item.name}
+                          loading="lazy"
                           className="w-10 h-10 rounded-full object-cover border border-outline-variant shadow-2xs"
                           src={
                             item.avatar ||
@@ -478,7 +492,8 @@ function TestimonialsSection({ content }: RenderProps) {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <img
-                          alt={item.name}
+                          alt=""
+                          loading="lazy"
                           className="w-10 h-10 rounded-full object-cover border border-outline-variant shadow-2xs"
                           src={
                             item.avatar ||
@@ -525,12 +540,12 @@ function GallerySection({ content }: RenderProps) {
   }, [baseGallery]);
 
   return (
-    <section className="w-full bg-surface-container-low/60 py-16 lg:py-24 border-t border-outline-variant overflow-hidden transition-colors">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center mb-10">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-on-surface tracking-tight text-center mb-4">
+    <section className="w-full bg-surface py-12 sm:py-16 lg:py-20 border-t border-outline-variant overflow-hidden transition-colors">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center mb-8 sm:mb-10">
+        <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary tracking-[-0.02em] leading-[1.2] text-center mb-3 text-balance">
           {str(content.heading, "Be A Part Of Our Thriving Community")}
         </h2>
-        <p className="text-on-surface-variant text-sm sm:text-base max-w-xl mx-auto text-center font-normal leading-relaxed">
+        <p className="font-body-md text-body-md text-on-surface-variant max-w-xl mx-auto text-center leading-relaxed">
           {str(
             content.subheading,
             "Connect, share, and grow together with thousands of passionate learners across the globe."
@@ -555,8 +570,8 @@ function GallerySection({ content }: RenderProps) {
         /* Infinite Horizontal Marquee moving RIGHT (Opposite direction to Testimonials) */
         <div className="w-full relative overflow-hidden py-4 marquee-group">
           {/* Soft edge fade masks */}
-          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-28 md:w-44 bg-gradient-to-r from-surface-container-low/90 to-transparent z-10" />
-          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-28 md:w-44 bg-gradient-to-l from-surface-container-low/90 to-transparent z-10" />
+          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-28 md:w-44 bg-gradient-to-r from-surface to-transparent z-10" />
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-28 md:w-44 bg-gradient-to-l from-surface to-transparent z-10" />
 
           <div className="flex w-fit">
             {/* Track 1 */}
@@ -569,6 +584,7 @@ function GallerySection({ content }: RenderProps) {
                   <img
                     alt={item.title}
                     src={item.image}
+                    loading="lazy"
                     className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-5 sm:p-6 transition-opacity">
@@ -593,8 +609,9 @@ function GallerySection({ content }: RenderProps) {
                   className="relative group/card overflow-hidden rounded-2xl shadow-xs hover:shadow-xl transition-all duration-300 shrink-0 w-[280px] sm:w-[340px] lg:w-[380px] aspect-[16/10] cursor-pointer border border-outline-variant hover:-translate-y-1"
                 >
                   <img
-                    alt={item.title}
+                    alt=""
                     src={item.image}
+                    loading="lazy"
                     className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-5 sm:p-6 transition-opacity">
@@ -624,9 +641,10 @@ function CertificateFaqSection({ content }: RenderProps) {
   const faqsList = response?.data || [];
 
   return (
-    <section className="w-full bg-surface py-16 lg:py-24 transition-colors">
+    <section className="w-full bg-surface-container-low py-12 sm:py-16 lg:py-20 border-t border-outline-variant transition-colors">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+        <h2 className="sr-only">Certificate Verification, Speech Assessment &amp; Frequently Asked Questions</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
           <div className="lg:col-span-6 flex flex-col gap-6">
             <ScrollReveal direction="up" delay={50}>
               <div className="bg-surface-container-lowest p-6 sm:p-7 rounded-2xl border border-outline-variant shadow-xs flex items-center justify-between gap-4 hover-lift">
@@ -635,9 +653,9 @@ function CertificateFaqSection({ content }: RenderProps) {
                     <span className="material-symbols-outlined text-[22px]">verified</span>
                   </div>
                   <div>
-                    <h4 className="font-bold text-base sm:text-lg text-on-surface">
+                    <h3 className="font-bold text-base sm:text-lg text-on-surface">
                       {str(content.certificateCardTitle, "Official Attestation")}
-                    </h4>
+                    </h3>
                     <p className="text-xs sm:text-sm text-on-surface-variant mt-0.5">
                       {str(content.certificateCardText, "Verify any alumni completion credential or serial number online.")}
                     </p>
@@ -707,9 +725,8 @@ function CertificateFaqSection({ content }: RenderProps) {
                         <span className={`material-symbols-outlined text-[18px] text-on-surface-variant transition-transform duration-300 ${openFaqId === item.id ? "rotate-180" : ""}`}>expand_more</span>
                       </div>
                       <div
-                        className={`grid transition-all duration-300 ease-out ${
-                          openFaqId === item.id ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0"
-                        }`}
+                        className={`grid transition-all duration-300 ease-out ${openFaqId === item.id ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0"
+                          }`}
                       >
                         <div className="overflow-hidden text-sm text-on-surface-variant leading-relaxed">
                           {item.answer}
@@ -732,13 +749,13 @@ function CtaSection({ content }: RenderProps) {
   const headingText = str(content.heading, "Your Next Opportunity Starts With Better Communication.");
 
   return (
-    <section className="relative w-full bg-surface-container-low text-on-surface py-16 sm:py-24 border-t border-outline-variant transition-colors duration-200 overflow-hidden">
+    <section className="relative w-full bg-surface text-on-surface py-12 sm:py-16 lg:py-20 border-t border-outline-variant transition-colors duration-200 overflow-hidden">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal direction="up">
           <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
-            
+
             {/* Cohort Status Badge with live pulsing beacon */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 text-xs font-bold tracking-widest uppercase mb-5 shadow-2xs badge-shimmer">
+            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 font-label-md text-label-md font-bold tracking-widest uppercase mb-4 shadow-sm badge-shimmer">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600 dark:bg-amber-400"></span>
@@ -747,12 +764,12 @@ function CtaSection({ content }: RenderProps) {
             </div>
 
             {/* Heading */}
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface mb-5 leading-tight uppercase">
-              {headingText}
+            <h2 className="font-headline-lg text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-[-0.02em] text-primary mb-4 leading-[1.15] uppercase text-balance">
+              <GradientShineText text={headingText} tailWords={2} />
             </h2>
 
             {/* Subheading */}
-            <p className="text-base sm:text-lg text-on-surface-variant max-w-2xl mb-8 leading-relaxed font-normal">
+            <p className="font-body-md text-base sm:text-lg text-on-surface-variant max-w-2xl mb-7 leading-relaxed">
               {str(
                 content.subheading,
                 "Schedule an in-person or virtual speech evaluation with our academic directors. Discover your baseline fluency score and receive a personalized curriculum path."

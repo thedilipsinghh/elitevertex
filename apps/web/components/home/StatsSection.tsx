@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import type { SectionContent } from "@/lib/cms/sections";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { AnimatedCounter, parseCounterValue } from "@/components/ui/AnimatedCounter";
+import { GradientShineText } from "@/components/ui/GradientShineText";
 
 export interface StatItem {
   value?: string;
@@ -134,9 +135,9 @@ function StatCard({
       : "100%";
 
   return (
-    <ScrollReveal direction="up" delay={index * 95}>
+    <ScrollReveal direction="up" delay={index * 95} className="h-full">
       <article
-        className={`group relative h-full overflow-hidden rounded-2xl bg-surface-container-lowest border border-outline-variant ${style.borderHover} p-6 sm:p-7 shadow-[0_1px_3px_rgba(15,23,42,0.04)] hover:shadow-[0_18px_36px_-12px_rgba(15,23,42,0.12)] dark:hover:shadow-[0_18px_36px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between`}
+        className={`group relative h-full overflow-hidden rounded-2xl bg-surface-container-lowest border border-outline-variant ${style.borderHover} p-5 sm:p-6 shadow-[0_1px_3px_rgba(15,23,42,0.04)] hover:shadow-[0_18px_36px_-12px_rgba(15,23,42,0.12)] dark:hover:shadow-[0_18px_36px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between`}
       >
         {/* Top gradient accent hairline */}
         <div
@@ -230,23 +231,26 @@ export function StatsSection({
       : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4";
 
   return (
-    <section className="relative w-full bg-surface-container-low py-space-2xl md:py-space-3xl border-y border-outline-variant transition-colors overflow-hidden">
+    <section className="relative w-full bg-surface-container-low py-12 sm:py-16 lg:py-20 border-y border-outline-variant transition-colors overflow-hidden">
       {/* Subtle decorative backdrop */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-24 left-1/4 w-72 h-72 rounded-full bg-secondary/5 blur-3xl" />
         <div className="absolute -bottom-24 right-1/4 w-72 h-72 rounded-full bg-primary/5 blur-3xl" />
       </div>
 
-      <div className="relative max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
+      <div className="relative max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal direction="up">
-          <div className="max-w-3xl mx-auto text-center mb-space-xl flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 font-label-md text-label-md uppercase tracking-widest font-bold mb-space-xs shadow-sm badge-shimmer">
+          <div className="max-w-3xl mx-auto text-center mb-8 sm:mb-10 flex flex-col items-center">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 font-label-md text-label-md uppercase tracking-widest font-bold mb-3.5 shadow-sm badge-shimmer">
               <span className="w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-400 animate-pulse" />
               <span>{str(content.badge, DEFAULT_STATS_CONTENT.badge)}</span>
             </div>
 
-            <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary tracking-tight text-balance mb-space-2xs">
-              {str(content.heading, DEFAULT_STATS_CONTENT.heading)}
+            <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary tracking-[-0.02em] leading-[1.2] text-balance mb-3">
+              <GradientShineText
+                text={str(content.heading, DEFAULT_STATS_CONTENT.heading)}
+                tailWords={3}
+              />
             </h2>
 
             <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed max-w-2xl">

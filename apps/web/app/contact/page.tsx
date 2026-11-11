@@ -1,11 +1,26 @@
 import { Metadata } from "next";
 import { ContactContent } from "@/components/contact/ContactContent";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { BRAND_NAME, buildBreadcrumbJsonLd, buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Contact | Elite Vertex",
-  description: "Visit our flagship campuses in Bengaluru and Delhi, or connect directly with our academic admissions desk for structured guidance.",
-};
+export const metadata: Metadata = buildPageMetadata({
+  title: `Contact | ${BRAND_NAME}`,
+  description:
+    "Visit Elite Vertex Mairwa at Apex Tower, Ghuthani More, Mairwa or our Siwan centre, call admissions, or submit an online enquiry for English classes.",
+  path: "/contact",
+});
 
 export default function ContactPage() {
-  return <ContactContent />;
+  return (
+    <>
+      <JsonLd
+        id="schema-breadcrumb-contact"
+        data={buildBreadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Contact", path: "/contact" },
+        ])}
+      />
+      <ContactContent />
+    </>
+  );
 }

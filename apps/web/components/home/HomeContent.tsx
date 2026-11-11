@@ -3,6 +3,7 @@
 import { useGetPublicPageQuery } from "@/lib/features/api/apiSlice";
 import { SectionRenderer } from "./SectionRenderer";
 import type { SectionContent } from "@/lib/cms/sections";
+import type { PublishedPageData } from "@/lib/seo";
 
 const FALLBACK_SECTIONS: { type: string; content: SectionContent }[] = [
   { type: "hero", content: {} },
@@ -16,12 +17,12 @@ const FALLBACK_SECTIONS: { type: string; content: SectionContent }[] = [
   { type: "cta", content: {} },
 ];
 
-export function HomeContent() {
+export function HomeContent({ initialPage }: { initialPage?: PublishedPageData | null } = {}) {
   const { data: response, isLoading, isError } = useGetPublicPageQuery("home", {
     refetchOnFocus: true,
     refetchOnReconnect: true,
   });
-  const page = response?.data;
+  const page = response?.data || initialPage;
 
   // While loading or if the CMS page is unavailable, render the built-in
   // default section layout so the public site never appears broken.

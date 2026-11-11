@@ -8,9 +8,10 @@ import {
   useGetCampusesQuery,
 } from "@/lib/features/api/apiSlice";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { GradientShineText } from "@/components/ui/GradientShineText";
 import { formatWhatsAppDisplay, formatWhatsAppUrl } from "@/lib/social";
 
-export function ContactContent() {
+export function ContactContent({ mode = "contact" }: { mode?: "contact" | "counselling" } = {}) {
   const { data: settingsResponse } = useGetWebsiteSettingsQuery(
     {},
     { refetchOnFocus: true, refetchOnReconnect: true }
@@ -20,22 +21,27 @@ export function ContactContent() {
 
   const siteSettings = settingsResponse?.data || {};
   const campuses: any[] = (campusesResponse?.data || []).filter((c: any) => c.isPublished !== false);
+  const isCounselling = mode === "counselling";
 
-  const phone = siteSettings.phone || "+91 72194 47712";
-  const rawWhatsapp = siteSettings.whatsapp || siteSettings.phone || "+91 72194 47712";
+  const phone = siteSettings.phone || "+91 94045 65624";
+  const rawWhatsapp = siteSettings.whatsapp || siteSettings.phone || "+91 94045 65624";
   const whatsappHref = formatWhatsAppUrl(rawWhatsapp);
   const whatsappDisplay = formatWhatsAppDisplay(rawWhatsapp, rawWhatsapp);
-  const email = siteSettings.email || "admissions@elitevertex.edu.in";
-  const address = siteSettings.address || "42, Apex Tower, M.G. Road, Bengaluru, Karnataka 560001";
+  const email = siteSettings.email || "info@elitevertax.com";
+  const address = siteSettings.address || "Apex Tower, Ghuthani More, Railway Station Road, Mairwa, Siwan, Bihar";
   const workingHours = siteSettings.workingHours || "Mon - Sat: 8:30 AM - 8:00 PM\nSunday: Appointments Only";
-  const googleMapsUrl = siteSettings.googleMapsUrl || "https://maps.google.com/?q=Elite+Vertex+Bengaluru";
+  const googleMapsUrl = siteSettings.googleMapsUrl || "https://maps.google.com/?q=Elite+Vertex+Mairwa+Siwan+Bihar";
 
-  const contactTagline = siteSettings.contactTagline || "CONTACT US";
-  const contactTitle = siteSettings.contactTitle || "We're Here to Help You Start Your Learning Journey";
-  const contactSubtitle = siteSettings.contactSubtitle || "Have questions about our courses or admissions? Get in touch with us. Our academic team will respond to you shortly.";
+  const contactTagline = isCounselling ? "BOOK COUNSELLING" : siteSettings.contactTagline || "CONTACT ELITE VERTEX MAIRWA";
+  const contactTitle = isCounselling
+    ? "Book Free English Counselling in Mairwa"
+    : siteSettings.contactTitle || "We're Here to Help You Start Your Learning Journey";
+  const contactSubtitle = isCounselling
+    ? "Meet our English instructors at Elite Vertex Mairwa (Ghuthani More) or request a call back to find the right Spoken English or English Grammar batch."
+    : siteSettings.contactSubtitle || "Have questions about English classes in Mairwa or Siwan? Reach out to Elite Vertex Mairwa for batch details, admissions guidance, and classroom timings.";
 
-  const callToActionTitle = siteSettings.callToActionTitle || "Ready to Start Your Future?";
-  const callToActionSubtitle = siteSettings.callToActionSubtitle || "Join hundreds of students who are building successful careers with Elite Vertex Institute.";
+  const callToActionTitle = siteSettings.callToActionTitle || "Ready to Improve Your Spoken English?";
+  const callToActionSubtitle = siteSettings.callToActionSubtitle || "Visit Elite Vertex Mairwa at Ghuthani More, Mairwa or our Siwan centre to start practical English learning.";
 
   const [formData, setFormData] = useState({
     name: "",
@@ -96,26 +102,28 @@ export function ContactContent() {
       {/* SECTION 1: HERO & CONTACT FORM */}
       <section className="bg-background py-12 lg:py-20 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-          
+
           {/* Left Column: Info & Details */}
           <ScrollReveal direction="up" delay={0} className="z-10 flex flex-col">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/30 text-secondary font-bold tracking-widest text-xs uppercase mb-3 w-fit badge-shimmer">
               <span className="w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-400 animate-pulse"></span>
               <span>{contactTagline}</span>
             </div>
-            
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground mb-6 leading-tight">
+
+            <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-primary mb-6 leading-[1.15]">
               {contactTitle.includes("Start Your") ? (
                 <>
                   {contactTitle.split("Start Your")[0]}
                   <br />
-                  <span className="text-secondary">Start Your {contactTitle.split("Start Your")[1]}</span>
+                  <span className="gradient-text-shine font-extrabold tracking-[-0.02em]">
+                    Start Your {contactTitle.split("Start Your")[1]}
+                  </span>
                 </>
               ) : (
-                contactTitle
+                <GradientShineText text={contactTitle} tailWords={2} />
               )}
             </h1>
-            
+
             <p className="text-muted-foreground text-base sm:text-lg mb-8 max-w-lg leading-relaxed font-normal">
               {contactSubtitle}
             </p>
@@ -179,7 +187,7 @@ export function ContactContent() {
                   school
                 </span>
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-4 w-full">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-secondary text-[18px] shrink-0">
@@ -322,11 +330,10 @@ export function ContactContent() {
                           key={m}
                           type="button"
                           onClick={() => setFormData({ ...formData, mode: m })}
-                          className={`py-2 px-3 rounded-lg text-xs font-bold border transition-colors ${
-                            formData.mode === m
-                              ? "bg-secondary text-white border-secondary"
-                              : "bg-surface-container-low border-outline-variant/40 text-foreground hover:bg-surface-container"
-                          }`}
+                          className={`py-2 px-3 rounded-lg text-xs font-bold border transition-colors ${formData.mode === m
+                            ? "bg-secondary text-white border-secondary"
+                            : "bg-surface-container-low border-outline-variant/40 text-foreground hover:bg-surface-container"
+                            }`}
                         >
                           {m}
                         </button>
@@ -399,7 +406,7 @@ export function ContactContent() {
       <section className="py-12 lg:py-16 bg-surface-container-low/60 border-y border-outline-variant/20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
+
             {/* Card 1: Our Address */}
             <ScrollReveal direction="up" delay={0}>
               <div className="bg-surface-container-lowest p-7 rounded-2xl border border-outline-variant/30 shadow-xs flex items-start gap-4 hover-lift h-full">
@@ -554,21 +561,21 @@ export function ContactContent() {
                         rawWhatsapp,
                         `Hello Elite Vertex, I would like to visit the ${c.name} campus.`
                       ) && (
-                        <a
-                          href={
-                            formatWhatsAppUrl(
-                              rawWhatsapp,
-                              `Hello Elite Vertex, I would like to visit the ${c.name} campus.`
-                            )!
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-300 dark:border-emerald-800"
-                        >
-                          <span className="material-symbols-outlined text-[14px]">chat</span>
-                          <span>WhatsApp Desk</span>
-                        </a>
-                      )}
+                          <a
+                            href={
+                              formatWhatsAppUrl(
+                                rawWhatsapp,
+                                `Hello Elite Vertex, I would like to visit the ${c.name} campus.`
+                              )!
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-300 dark:border-emerald-800"
+                          >
+                            <span className="material-symbols-outlined text-[14px]">chat</span>
+                            <span>WhatsApp Desk</span>
+                          </a>
+                        )}
                     </div>
                   </div>
                 </ScrollReveal>
@@ -582,7 +589,7 @@ export function ContactContent() {
       <section className="py-12 lg:py-20 bg-background">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="w-full h-[420px] bg-surface-container-low rounded-[2rem] overflow-hidden relative border border-outline-variant/30 shadow-md">
-            
+
             {/* Google Map Embed */}
             <iframe
               title="Elite Vertex Campus Location"
@@ -623,7 +630,7 @@ export function ContactContent() {
       <section className="py-12 lg:py-20 pb-24 bg-surface-container-low/60">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="bg-secondary/5 rounded-[32px] border border-secondary/20 flex flex-col md:flex-row items-center overflow-hidden shadow-sm">
-            
+
             {/* Visual Icon Column */}
             <div className="w-full md:w-4/12 h-56 md:h-auto min-h-[260px] bg-secondary/10 flex items-center justify-center p-8">
               <div className="w-24 h-24 rounded-full bg-secondary/20 border border-secondary/30 flex items-center justify-center shadow-inner">

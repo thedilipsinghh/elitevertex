@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useGetCoursesQuery, useGetWebsiteSettingsQuery } from "@/lib/features/api/apiSlice";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { GradientShineText } from "@/components/ui/GradientShineText";
 
 type CourseCategory = "all" | "spoken" | "career" | "advanced";
 
@@ -275,7 +276,7 @@ export function CoursesContent() {
     {},
     { refetchOnFocus: true, refetchOnReconnect: true }
   );
-  const admissionsPhone = settingsResponse?.data?.phone || "+91 72194 47712";
+  const admissionsPhone = settingsResponse?.data?.phone || "+91 94045 65624";
   const admissionsTelHref = `tel:${admissionsPhone.replace(/[^0-9+]/g, "")}`;
   const apiCourses = response?.data || [];
 
@@ -313,20 +314,20 @@ export function CoursesContent() {
 
   return (
     <div className="flex flex-col w-full bg-surface text-on-surface min-h-screen transition-colors">
-      
+
       {/* ── 1. Hero Banner ── */}
       <section className="w-full bg-surface-container-lowest border-b border-outline-variant py-12 md:py-20 transition-colors overflow-hidden">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollReveal direction="up" delay={0}>
             <div className="flex flex-col max-w-3xl gap-4">
-              
+
               <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-amber-50 dark:bg-amber-400/10 border border-amber-300 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 text-xs font-bold tracking-widest uppercase w-fit shadow-2xs badge-shimmer">
                 <span className="w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-400 animate-pulse"></span>
                 <span>Comprehensive Spoken English Curriculum</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-on-surface tracking-tight leading-tight">
-                Structured English Programs For Every Skill Level.
+              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold text-primary tracking-tight leading-[1.15]">
+                <GradientShineText text="Structured English Programs For Every Skill Level." tailWords={4} />
               </h1>
 
               <p className="text-base sm:text-lg text-on-surface-variant max-w-2xl leading-relaxed font-normal">
@@ -360,41 +361,37 @@ export function CoursesContent() {
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-none" style={{ scrollbarWidth: "none" }}>
             <button
               onClick={() => setActiveCategory("all")}
-              className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
-                activeCategory === "all"
-                  ? "bg-primary text-on-primary shadow-sm"
-                  : "bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
-              }`}
+              className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${activeCategory === "all"
+                ? "bg-primary text-on-primary shadow-sm"
+                : "bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
+                }`}
             >
               All Programs ({courses.length})
             </button>
             <button
               onClick={() => setActiveCategory("spoken")}
-              className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
-                activeCategory === "spoken"
-                  ? "bg-primary text-on-primary shadow-sm"
-                  : "bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
-              }`}
+              className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${activeCategory === "spoken"
+                ? "bg-primary text-on-primary shadow-sm"
+                : "bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
+                }`}
             >
               Foundational Tracks (PFE / FE / BE)
             </button>
             <button
               onClick={() => setActiveCategory("career")}
-              className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
-                activeCategory === "career"
-                  ? "bg-primary text-on-primary shadow-sm"
-                  : "bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
-              }`}
+              className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${activeCategory === "career"
+                ? "bg-primary text-on-primary shadow-sm"
+                : "bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
+                }`}
             >
               Career &amp; Interview (IE)
             </button>
             <button
               onClick={() => setActiveCategory("advanced")}
-              className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
-                activeCategory === "advanced"
-                  ? "bg-primary text-on-primary shadow-sm"
-                  : "bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
-              }`}
+              className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${activeCategory === "advanced"
+                ? "bg-primary text-on-primary shadow-sm"
+                : "bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
+                }`}
             >
               Leadership &amp; Executive (AE)
             </button>
@@ -405,7 +402,7 @@ export function CoursesContent() {
       {/* ── 3. Course Modules List ── */}
       <section className="w-full py-12 md:py-16 bg-surface">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="flex flex-col gap-8">
             {isLoading && !response ? (
               [0, 1, 2, 3].map((idx) => (
@@ -417,219 +414,218 @@ export function CoursesContent() {
               </div>
             ) : (
               filteredCourses.map((course, cIdx) => {
-              const isExpanded = currentExpandedId === course.id;
-              const moduleItems = getCourseModules(course);
-              const courseImg = getCourseImage(course);
-              const fallbackTrackImg: string =
-                (course.category ? DEFAULT_TRACK_IMAGES[course.category.toLowerCase()] : undefined) ??
-                DEFAULT_TRACK_IMAGES.flagship ??
-                "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80";
+                const isExpanded = currentExpandedId === course.id;
+                const moduleItems = getCourseModules(course);
+                const courseImg = getCourseImage(course);
+                const fallbackTrackImg: string =
+                  (course.category ? DEFAULT_TRACK_IMAGES[course.category.toLowerCase()] : undefined) ??
+                  DEFAULT_TRACK_IMAGES.flagship ??
+                  "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80";
 
-              return (
-                <ScrollReveal key={course.id} direction="up" delay={cIdx * 70}>
-                  <div
-                    className={`bg-surface-container-lowest rounded-2xl border transition-all duration-300 overflow-hidden flex flex-col hover-lift ${
-                      isExpanded
+                return (
+                  <ScrollReveal key={course.id} direction="up" delay={cIdx * 70}>
+                    <div
+                      className={`bg-surface-container-lowest rounded-2xl border transition-all duration-300 overflow-hidden flex flex-col hover-lift ${isExpanded
                         ? "border-secondary/70 ring-1 ring-secondary/20 shadow-md"
                         : "border-outline-variant shadow-xs hover:shadow-xl"
-                    }`}
-                  >
-                  {/* Top / Main Card Content: Image + Details */}
-                  <div className="flex flex-col lg:flex-row">
-                    
-                    {/* 1. Course Image Card Header */}
-                    <div className="lg:w-[340px] xl:w-[380px] shrink-0 relative bg-surface-container overflow-hidden min-h-[220px] lg:min-h-[280px]">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={courseImg}
-                        alt={course.title}
-                        onError={(e) => {
-                          const target = e.currentTarget;
-                          if (target.src !== fallbackTrackImg) {
-                            target.src = fallbackTrackImg;
-                          }
-                        }}
-                        className="w-full h-56 lg:h-full object-cover transition-transform duration-500 hover:scale-105"
-                      />
-                      
-                      {/* Category Badge Pill Overlay */}
-                      <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10 pointer-events-none">
-                        <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-surface-container-lowest/95 backdrop-blur-sm text-on-surface border border-outline-variant shadow-2xs">
-                          {course.badge || `${course.category.toUpperCase()} TRACK`}
-                        </span>
+                        }`}
+                    >
+                      {/* Top / Main Card Content: Image + Details */}
+                      <div className="flex flex-col lg:flex-row">
+
+                        {/* 1. Course Image Card Header */}
+                        <div className="lg:w-[340px] xl:w-[380px] shrink-0 relative bg-surface-container overflow-hidden min-h-[220px] lg:min-h-[280px]">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={courseImg}
+                            alt={course.title}
+                            loading="lazy"
+                            onError={(e) => {
+                              const target = e.currentTarget;
+                              if (target.src !== fallbackTrackImg) {
+                                target.src = fallbackTrackImg;
+                              }
+                            }}
+                            className="w-full h-56 lg:h-full object-cover transition-transform duration-500 hover:scale-105"
+                          />
+
+                          {/* Category Badge Pill Overlay */}
+                          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10 pointer-events-none">
+                            <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-surface-container-lowest/95 backdrop-blur-sm text-on-surface border border-outline-variant shadow-2xs">
+                              {course.badge || `${course.category.toUpperCase()} TRACK`}
+                            </span>
+                          </div>
+
+                          {course.level && (
+                            <div className="absolute bottom-3 left-3 z-10 pointer-events-none">
+                              <span className="px-2.5 py-1 rounded text-[11px] font-bold bg-primary/95 backdrop-blur-sm text-on-primary shadow-xs">
+                                {course.level}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 2. Course Details: Title, Description, Specs & Actions */}
+                        <div className="flex-1 p-6 sm:p-8 flex flex-col justify-between gap-5">
+                          <div className="flex flex-col gap-3">
+
+                            {/* Track Code & Duration Bar */}
+                            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-outline-variant/60 pb-2">
+                              <div className="flex items-center gap-2">
+                                {course.code && (
+                                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-surface-container text-on-surface-variant border border-outline-variant/60">
+                                    {course.code}
+                                  </span>
+                                )}
+                                <span className="text-xs font-bold uppercase tracking-wider text-secondary">
+                                  {course.category} Track
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-4 text-xs font-semibold text-on-surface-variant">
+                                <span className="flex items-center gap-1.5">
+                                  <span className="material-symbols-outlined text-[16px] text-secondary">schedule</span>
+                                  {course.duration || "6–8 Weeks"}
+                                </span>
+                                <span className="flex items-center gap-1.5">
+                                  <span className="material-symbols-outlined text-[16px] text-secondary">groups</span>
+                                  {course.cohortCap || "12 Scholars"}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Course Title */}
+                            <h2 className="text-xl sm:text-2xl font-extrabold text-on-surface tracking-tight leading-snug">
+                              {course.title}
+                            </h2>
+
+                            {/* Course Short Description */}
+                            <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed font-normal">
+                              {course.shortDescription}
+                            </p>
+
+                            {/* Specifications Pills */}
+                            <div className="flex flex-wrap items-center gap-2 pt-1">
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-surface-container text-on-surface border border-outline-variant/60">
+                                <span className="material-symbols-outlined text-[15px] text-secondary">apartment</span>
+                                {course.format || "Classroom & Hybrid"}
+                              </span>
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-surface-container text-on-surface border border-outline-variant/60">
+                                <span className="material-symbols-outlined text-[15px] text-secondary">format_list_numbered</span>
+                                {moduleItems.length} Curriculum Modules
+                              </span>
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-surface-container text-on-surface border border-outline-variant/60">
+                                <span className="material-symbols-outlined text-[15px] text-secondary">verified</span>
+                                CEFR Accredited
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Card Action Buttons Bar */}
+                          <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-outline-variant">
+                            <button
+                              type="button"
+                              onClick={() => toggleAccordion(course.id)}
+                              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors border ${isExpanded
+                                ? "bg-secondary/15 hover:bg-secondary/25 text-secondary border-secondary/40 font-bold"
+                                : "bg-surface-container hover:bg-surface-container-high text-on-surface border-outline-variant"
+                                }`}
+                            >
+                              <span className="material-symbols-outlined text-[18px]">
+                                {isExpanded ? "expand_less" : "menu_book"}
+                              </span>
+                              <span>{isExpanded ? "Hide Curriculum Modules" : `Explore Syllabus (${moduleItems.length} Modules)`}</span>
+                            </button>
+
+                            <div className="flex items-center gap-2.5">
+                              <button
+                                type="button"
+                                onClick={handleDownload}
+                                className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-surface-container-lowest hover:bg-surface-container text-on-surface border border-outline-variant transition-colors"
+                              >
+                                <span className="material-symbols-outlined text-[16px]">download</span>
+                                <span>Brochure</span>
+                              </button>
+
+                              <Link
+                                href={`/book-counselling?course=${encodeURIComponent(course.title)}`}
+                                className="inline-flex items-center gap-1.5 bg-secondary hover:bg-on-secondary-container text-on-secondary text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg transition-colors shadow-2xs"
+                              >
+                                <span>Enroll in Cohort</span>
+                                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                              </Link>
+                            </div>
+                          </div>
+
+                        </div>
                       </div>
 
-                      {course.level && (
-                        <div className="absolute bottom-3 left-3 z-10 pointer-events-none">
-                          <span className="px-2.5 py-1 rounded text-[11px] font-bold bg-primary/95 backdrop-blur-sm text-on-primary shadow-xs">
-                            {course.level}
-                          </span>
+                      {/* Expanded Syllabus Section */}
+                      {isExpanded && (
+                        <div className="border-t border-outline-variant bg-surface-container-low/60 p-6 sm:p-8 animate-in fade-in duration-200">
+                          <div className="flex flex-col gap-6">
+
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                              <h3 className="text-sm sm:text-base font-extrabold uppercase tracking-wider text-primary">
+                                Curriculum &amp; Key Learning Modules
+                              </h3>
+                              <span className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+                                Format: {course.format || "Campus & Hybrid"} • {course.cohortCap || "Strict Cohort Ratio (1:12)"}
+                              </span>
+                            </div>
+
+                            {/* Modules Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                              {moduleItems.map((moduleItem, mIdx) => (
+                                <div
+                                  key={mIdx}
+                                  className="flex items-start gap-3 bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/70 shadow-2xs"
+                                >
+                                  <span className="w-6 h-6 rounded-full bg-secondary/15 text-secondary font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 border border-secondary/25">
+                                    {mIdx + 1}
+                                  </span>
+                                  <span className="text-sm text-on-surface font-medium leading-relaxed">
+                                    {moduleItem}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Action Bar */}
+                            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-outline-variant mt-2">
+                              <div className="flex items-center gap-2 text-on-surface-variant text-xs sm:text-sm font-medium">
+                                <span className="material-symbols-outlined text-secondary text-[20px]">verified</span>
+                                <span>Includes ISO 9001:2015 Accredited Completion Diploma &amp; Audio Scorecard</span>
+                              </div>
+
+                              <div className="flex items-center gap-3">
+                                <button
+                                  type="button"
+                                  onClick={handleDownload}
+                                  className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-on-surface hover:text-secondary px-4 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest hover:bg-surface-container transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+                                >
+                                  <span className="material-symbols-outlined text-[16px]">download</span>
+                                  <span>Syllabus PDF</span>
+                                </button>
+
+                                <Link
+                                  href={`/book-counselling?course=${encodeURIComponent(course.title)}`}
+                                  className="inline-flex items-center justify-center gap-1.5 bg-secondary hover:bg-on-secondary-container text-on-secondary text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+                                >
+                                  <span>Enquire for Batch</span>
+                                  <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                                </Link>
+                              </div>
+                            </div>
+
+                          </div>
                         </div>
                       )}
                     </div>
-
-                    {/* 2. Course Details: Title, Description, Specs & Actions */}
-                    <div className="flex-1 p-6 sm:p-8 flex flex-col justify-between gap-5">
-                      <div className="flex flex-col gap-3">
-                        
-                        {/* Track Code & Duration Bar */}
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-outline-variant/60 pb-2">
-                          <div className="flex items-center gap-2">
-                            {course.code && (
-                              <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-surface-container text-on-surface-variant border border-outline-variant/60">
-                                {course.code}
-                              </span>
-                            )}
-                            <span className="text-xs font-bold uppercase tracking-wider text-secondary">
-                              {course.category} Track
-                            </span>
-                          </div>
-
-                          <div className="flex items-center gap-4 text-xs font-semibold text-on-surface-variant">
-                            <span className="flex items-center gap-1.5">
-                              <span className="material-symbols-outlined text-[16px] text-secondary">schedule</span>
-                              {course.duration || "6–8 Weeks"}
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                              <span className="material-symbols-outlined text-[16px] text-secondary">groups</span>
-                              {course.cohortCap || "12 Scholars"}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Course Title */}
-                        <h2 className="text-xl sm:text-2xl font-extrabold text-on-surface tracking-tight leading-snug">
-                          {course.title}
-                        </h2>
-
-                        {/* Course Short Description */}
-                        <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed font-normal">
-                          {course.shortDescription}
-                        </p>
-
-                        {/* Specifications Pills */}
-                        <div className="flex flex-wrap items-center gap-2 pt-1">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-surface-container text-on-surface border border-outline-variant/60">
-                            <span className="material-symbols-outlined text-[15px] text-secondary">apartment</span>
-                            {course.format || "Classroom & Hybrid"}
-                          </span>
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-surface-container text-on-surface border border-outline-variant/60">
-                            <span className="material-symbols-outlined text-[15px] text-secondary">format_list_numbered</span>
-                            {moduleItems.length} Curriculum Modules
-                          </span>
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-surface-container text-on-surface border border-outline-variant/60">
-                            <span className="material-symbols-outlined text-[15px] text-secondary">verified</span>
-                            CEFR Accredited
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Card Action Buttons Bar */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-outline-variant">
-                        <button
-                          type="button"
-                          onClick={() => toggleAccordion(course.id)}
-                          className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors border ${
-                            isExpanded
-                              ? "bg-secondary/15 hover:bg-secondary/25 text-secondary border-secondary/40 font-bold"
-                              : "bg-surface-container hover:bg-surface-container-high text-on-surface border-outline-variant"
-                          }`}
-                        >
-                          <span className="material-symbols-outlined text-[18px]">
-                            {isExpanded ? "expand_less" : "menu_book"}
-                          </span>
-                          <span>{isExpanded ? "Hide Curriculum Modules" : `Explore Syllabus (${moduleItems.length} Modules)`}</span>
-                        </button>
-
-                        <div className="flex items-center gap-2.5">
-                          <button
-                            type="button"
-                            onClick={handleDownload}
-                            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-surface-container-lowest hover:bg-surface-container text-on-surface border border-outline-variant transition-colors"
-                          >
-                            <span className="material-symbols-outlined text-[16px]">download</span>
-                            <span>Brochure</span>
-                          </button>
-
-                          <Link
-                            href={`/book-counselling?course=${encodeURIComponent(course.title)}`}
-                            className="inline-flex items-center gap-1.5 bg-secondary hover:bg-on-secondary-container text-on-secondary text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg transition-colors shadow-2xs"
-                          >
-                            <span>Enroll in Cohort</span>
-                            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-                          </Link>
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-
-                  {/* Expanded Syllabus Section */}
-                  {isExpanded && (
-                    <div className="border-t border-outline-variant bg-surface-container-low/60 p-6 sm:p-8 animate-in fade-in duration-200">
-                      <div className="flex flex-col gap-6">
-                        
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                          <h3 className="text-sm sm:text-base font-extrabold uppercase tracking-wider text-primary">
-                            Curriculum &amp; Key Learning Modules
-                          </h3>
-                          <span className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
-                            Format: {course.format || "Campus & Hybrid"} • {course.cohortCap || "Strict Cohort Ratio (1:12)"}
-                          </span>
-                        </div>
-
-                        {/* Modules Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                          {moduleItems.map((moduleItem, mIdx) => (
-                            <div
-                              key={mIdx}
-                              className="flex items-start gap-3 bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/70 shadow-2xs"
-                            >
-                              <span className="w-6 h-6 rounded-full bg-secondary/15 text-secondary font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 border border-secondary/25">
-                                {mIdx + 1}
-                              </span>
-                              <span className="text-sm text-on-surface font-medium leading-relaxed">
-                                {moduleItem}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Action Bar */}
-                        <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-outline-variant mt-2">
-                          <div className="flex items-center gap-2 text-on-surface-variant text-xs sm:text-sm font-medium">
-                            <span className="material-symbols-outlined text-secondary text-[20px]">verified</span>
-                            <span>Includes ISO 9001:2015 Accredited Completion Diploma &amp; Audio Scorecard</span>
-                          </div>
-
-                          <div className="flex items-center gap-3">
-                            <button
-                              type="button"
-                              onClick={handleDownload}
-                              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-on-surface hover:text-secondary px-4 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest hover:bg-surface-container transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
-                            >
-                              <span className="material-symbols-outlined text-[16px]">download</span>
-                              <span>Syllabus PDF</span>
-                            </button>
-
-                            <Link
-                              href={`/book-counselling?course=${encodeURIComponent(course.title)}`}
-                              className="inline-flex items-center justify-center gap-1.5 bg-secondary hover:bg-on-secondary-container text-on-secondary text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
-                            >
-                              <span>Enquire for Batch</span>
-                              <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-                            </Link>
-                          </div>
-                        </div>
-
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </ScrollReveal>
-            );
-            })
-          )}
+                  </ScrollReveal>
+                );
+              })
+            )}
           </div>
 
         </div>
@@ -678,7 +674,7 @@ export function CoursesContent() {
       <section className="w-full bg-[#0B132B] dark:bg-[#111C33] text-white py-14 md:py-20 border-t border-slate-800 transition-colors">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
-            
+
             <div className="flex flex-col gap-3 max-w-2xl text-center lg:text-left">
               <div className="inline-flex items-center gap-2 text-amber-400 text-xs uppercase tracking-widest font-bold self-center lg:self-start">
                 <span className="material-symbols-outlined text-[18px]">verified</span>

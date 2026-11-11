@@ -11,6 +11,8 @@ import {
   useAddSectionMutation,
 } from "@/lib/features/api/apiSlice";
 import DualImageInput from "@/components/admin/DualImageInput";
+import { DEFAULT_STATS_CONTENT, StatsSection, type StatItem } from "@/components/home/StatsSection";
+import { parseCounterValue } from "@/components/ui/AnimatedCounter";
 
 export default function AdminHomePageCms() {
   const { data: pagesResponse, isLoading: loadingPages } = useGetAdminPagesQuery(undefined);
@@ -49,6 +51,21 @@ export default function AdminHomePageCms() {
     { label: "Pillar 03", title: "Personal Attention", description: "Strictly capped micro-cohorts of 12 peers." },
     { label: "Pillar 04", title: "Career-Focused", description: "Interview panels, GD mastery, and boardroom articulation." },
   ]);
+
+  const [stats, setStats] = useState<{
+    enabled: boolean;
+    badge: string;
+    heading: string;
+    subheading: string;
+    items: StatItem[];
+  }>({
+    enabled: true,
+    badge: DEFAULT_STATS_CONTENT.badge,
+    heading: DEFAULT_STATS_CONTENT.heading,
+    subheading: DEFAULT_STATS_CONTENT.subheading,
+    items: DEFAULT_STATS_CONTENT.items.map((item) => ({ ...item })),
+  });
+  const [previewReplayKey, setPreviewReplayKey] = useState(0);
 
   const [aboutPreview, setAboutPreview] = useState<any>({
     label: "Pedagogical Framework",
@@ -92,7 +109,7 @@ export default function AdminHomePageCms() {
     secondaryCtaUrl: "/contact",
   });
 
-  const [activeTab, setActiveTab] = useState<"hero" | "pillars" | "about" | "courses" | "diagnostic" | "cta">("hero");
+  const [activeTab, setActiveTab] = useState<"hero" | "pillars" | "stats" | "about" | "courses" | "diagnostic" | "cta">("hero");
   const [toastMessage, setToastMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -109,6 +126,18 @@ export default function AdminHomePageCms() {
         if (s.type === "hero") setHero((prev: any) => ({ ...prev, ...content }));
         if (s.type === "pillars" && Array.isArray(content.items) && content.items.length > 0) {
           setPillars(content.items);
+        }
+        if (s.type === "stats") {
+          setStats({
+            enabled: s.isVisible !== false && content.enabled !== false,
+            badge: content.badge || DEFAULT_STATS_CONTENT.badge,
+            heading: content.heading || DEFAULT_STATS_CONTENT.heading,
+            subheading: content.subheading || DEFAULT_STATS_CONTENT.subheading,
+            items:
+              Array.isArray(content.items) && content.items.length > 0
+                ? content.items
+                : DEFAULT_STATS_CONTENT.items.map((item) => ({ ...item })),
+          });
         }
         if (s.type === "about_preview") setAboutPreview((prev: any) => ({ ...prev, ...content }));
         if (s.type === "courses_preview") setCoursesPreview((prev: any) => ({ ...prev, ...content }));
@@ -143,9 +172,10 @@ export default function AdminHomePageCms() {
         sectionMap[s.type] = s.id;
       }
 
-      const updates: { type: string; content: any }[] = [
+      const updates: { type: string; content: any; isVisible?: boolean }[] = [
         { type: "hero", content: hero },
         { type: "pillars", content: { items: pillars } },
+        { type: "stats", content: stats, isVisible: stats.enabled !== false },
         { type: "about_preview", content: aboutPreview },
         { type: "courses_preview", content: coursesPreview },
         { type: "certificate_faq", content: diagnosticFaq },
@@ -154,10 +184,11 @@ export default function AdminHomePageCms() {
 
       for (const item of updates) {
         const existingSectionId = sectionMap[item.type];
+        const visibilityPatch = item.isVisible !== undefined ? { isVisible: item.isVisible } : {};
         if (existingSectionId) {
-          await updateSection({ sectionId: existingSectionId, content: item.content }).unwrap();
+          await updateSection({ sectionId: existingSectionId, content: item.content, ...visibilityPatch }).unwrap();
         } else {
-          await addSection({ pageId, type: item.type, content: item.content }).unwrap();
+          await addSection({ pageId, type: item.type, content: item.content, ...visibilityPatch }).unwrap();
         }
       }
 
@@ -177,6 +208,48 @@ export default function AdminHomePageCms() {
       const next = [...prev];
       next[index] = { ...next[index], [field]: val };
       return next;
+    });
+  };
+
+  const handleStatChange = (index: number, field: keyof StatItem, val: string) => {
+    setStats((prev) => {
+      const next = [...prev.items];
+      next[index] = { ...next[index], [field]: val };
+      return { ...prev, items: next };
+    });
+  };
+
+  const handleAddStat = () => {
+    setStats((prev) => ({
+      ...prev,
+      items: [
+        ...prev.items,
+        {
+          value: "100+",
+          label: "New Milestone",
+          detail: "Short description of student achievement or outcome.",
+          icon: "verified",
+          accent: "amber",
+        },
+      ],
+    }));
+  };
+
+  const handleRemoveStat = (index: number) => {
+    setStats((prev) => ({
+      ...prev,
+      items: prev.items.filter((_, idx) => idx !== index),
+    }));
+  };
+
+  const handleMoveStat = (index: number, dir: -1 | 1) => {
+    setStats((prev) => {
+      const target = index + dir;
+      if (target < 0 || target >= prev.items.length) return prev;
+      const next = [...prev.items];
+      const [moved] = next.splice(index, 1);
+      if (moved) next.splice(target, 0, moved);
+      return { ...prev, items: next };
     });
   };
 
@@ -234,6 +307,7 @@ export default function AdminHomePageCms() {
         {[
           { key: "hero", label: "Hero Banner", icon: "view_carousel" },
           { key: "pillars", label: "Pedagogical Pillars", icon: "view_column" },
+          { key: "stats", label: "Impact Counters", icon: "analytics" },
           { key: "about", label: "About Preview", icon: "auto_stories" },
           { key: "courses", label: "Courses Preview", icon: "school" },
           { key: "diagnostic", label: "Diagnostic & Attestation", icon: "verified" },
@@ -395,6 +469,264 @@ export default function AdminHomePageCms() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* 2B. IMPACT COUNTERS / ANIMATED STATS CMS */}
+        {activeTab === "stats" && (
+          <div className="flex flex-col gap-6 animate-in fade-in duration-200">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-outline-variant pb-4">
+              <div>
+                <h2 className="text-lg font-bold text-on-surface flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary text-[22px]">analytics</span>
+                  <span>Animated Impact Counters</span>
+                </h2>
+                <p className="text-xs text-on-surface-variant mt-0.5">
+                  Control animated milestone counters, labels, supporting details, icons, and visibility on the homepage.
+                </p>
+              </div>
+
+              <label className="inline-flex items-center gap-2.5 bg-surface-container-low border border-outline-variant px-4 py-2 rounded-xl text-xs font-bold text-on-surface cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={stats.enabled !== false}
+                  onChange={(e) => setStats({ ...stats, enabled: e.target.checked })}
+                  className="w-4 h-4 text-secondary rounded cursor-pointer"
+                />
+                <span>Show Section on Homepage</span>
+              </label>
+            </div>
+
+            {/* Section Header Fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Eyebrow Badge</label>
+                <input
+                  type="text"
+                  value={stats.badge || ""}
+                  onChange={(e) => setStats({ ...stats, badge: e.target.value })}
+                  className="bg-surface-container-low border border-outline-variant px-4 py-2.5 rounded-xl text-sm font-semibold text-on-surface focus:outline-none"
+                  placeholder="OUR MILESTONES"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Section Heading</label>
+                <input
+                  type="text"
+                  value={stats.heading || ""}
+                  onChange={(e) => setStats({ ...stats, heading: e.target.value })}
+                  className="bg-surface-container-low border border-outline-variant px-4 py-2.5 rounded-xl text-sm font-bold text-on-surface focus:outline-none"
+                  placeholder="Proven Results That Speak For Themselves"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5 sm:col-span-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Section Subheading</label>
+                <textarea
+                  rows={2}
+                  value={stats.subheading || ""}
+                  onChange={(e) => setStats({ ...stats, subheading: e.target.value })}
+                  className="bg-surface-container-low border border-outline-variant p-3.5 rounded-xl text-sm text-on-surface leading-relaxed focus:outline-none resize-none"
+                  placeholder="Short overview above the milestone cards..."
+                />
+              </div>
+            </div>
+
+            {/* Stat Cards List Editor */}
+            <div className="flex items-center justify-between pt-2 border-t border-outline-variant/60">
+              <div>
+                <h3 className="text-sm font-bold text-on-surface">Milestone Cards ({stats.items.length})</h3>
+                <p className="text-[11px] text-on-surface-variant">
+                  Supports formats like <span className="font-mono">370+</span>, <span className="font-mono">95%</span>, <span className="font-mono">1,200+</span>, or <span className="font-mono">4.9★</span>.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleAddStat}
+                className="inline-flex items-center gap-1.5 bg-secondary text-on-secondary px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-on-secondary-container transition-colors shadow-xs"
+              >
+                <span className="material-symbols-outlined text-[16px]">add</span>
+                <span>Add Counter</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {stats.items.map((item, idx) => {
+                const parsed = parseCounterValue(item.value);
+                return (
+                  <div
+                    key={idx}
+                    className="bg-surface-container-low p-5 rounded-xl border border-outline-variant flex flex-col gap-3.5"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+                          <span className="material-symbols-outlined text-[18px]">
+                            {item.icon || "verified"}
+                          </span>
+                        </span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-secondary">
+                          Counter 0{idx + 1}
+                        </span>
+                        {parsed.isNumeric && (
+                          <span className="text-[10px] font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                            Counts 0 → {parsed.raw}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleMoveStat(idx, -1)}
+                          disabled={idx === 0}
+                          className="p-1 rounded-md text-on-surface-variant hover:text-primary disabled:opacity-30"
+                          title="Move Left / Up"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">arrow_upward</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleMoveStat(idx, 1)}
+                          disabled={idx === stats.items.length - 1}
+                          className="p-1 rounded-md text-on-surface-variant hover:text-primary disabled:opacity-30"
+                          title="Move Right / Down"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">arrow_downward</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveStat(idx)}
+                          disabled={stats.items.length <= 1}
+                          className="p-1 rounded-md text-red-600 hover:bg-red-500/10 disabled:opacity-30"
+                          title="Delete Counter"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                          Counter Value *
+                        </label>
+                        <input
+                          type="text"
+                          value={item.value || ""}
+                          onChange={(e) => handleStatChange(idx, "value", e.target.value)}
+                          placeholder="370+"
+                          className="bg-surface-container-lowest border border-outline-variant px-3 py-2 rounded-lg text-sm font-extrabold text-on-surface focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                          Title / Label *
+                        </label>
+                        <input
+                          type="text"
+                          value={item.label || ""}
+                          onChange={(e) => handleStatChange(idx, "label", e.target.value)}
+                          placeholder="Students Trained"
+                          className="bg-surface-container-lowest border border-outline-variant px-3 py-2 rounded-lg text-sm font-bold text-on-surface focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                          Icon (Material Symbol)
+                        </label>
+                        <input
+                          type="text"
+                          value={item.icon || ""}
+                          onChange={(e) => handleStatChange(idx, "icon", e.target.value)}
+                          placeholder="groups"
+                          className="bg-surface-container-lowest border border-outline-variant px-3 py-2 rounded-lg text-xs font-mono text-on-surface focus:outline-none"
+                        />
+                        <div className="flex flex-wrap gap-1 pt-0.5">
+                          {["groups", "psychology", "workspace_premium", "trending_up", "school", "verified"].map(
+                            (preset) => (
+                              <button
+                                key={preset}
+                                type="button"
+                                onClick={() => handleStatChange(idx, "icon", preset)}
+                                className={`p-1 rounded border text-[14px] transition-colors ${
+                                  item.icon === preset
+                                    ? "bg-secondary text-on-secondary border-secondary"
+                                    : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/70 hover:text-on-surface"
+                                }`}
+                                title={preset}
+                              >
+                                <span className="material-symbols-outlined text-[15px]">{preset}</span>
+                              </button>
+                            )
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                          Accent Theme
+                        </label>
+                        <select
+                          value={item.accent || "amber"}
+                          onChange={(e) => handleStatChange(idx, "accent", e.target.value)}
+                          className="bg-surface-container-lowest border border-outline-variant px-3 py-2 rounded-lg text-xs font-semibold text-on-surface focus:outline-none cursor-pointer"
+                        >
+                          <option value="amber">Amber Gold</option>
+                          <option value="blue">Royal Blue</option>
+                          <option value="emerald">Emerald Green</option>
+                          <option value="indigo">Indigo Violet</option>
+                          <option value="rose">Crimson Rose</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                        Supporting Detail Description
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={item.detail || ""}
+                        onChange={(e) => handleStatChange(idx, "detail", e.target.value)}
+                        placeholder="Short detail explaining this milestone..."
+                        className="bg-surface-container-lowest border border-outline-variant p-3 rounded-lg text-xs text-on-surface leading-relaxed focus:outline-none resize-none"
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Live Animation Preview */}
+            <div className="border border-outline-variant rounded-2xl overflow-hidden bg-surface">
+              <div className="flex items-center justify-between px-4 py-3 bg-surface-container border-b border-outline-variant">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary text-[18px]">play_circle</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-on-surface">
+                    Live Animated Preview
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPreviewReplayKey((k) => k + 1)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container-low border border-outline-variant text-xs font-bold text-on-surface transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[15px]">replay</span>
+                  <span>Replay Count Animation</span>
+                </button>
+              </div>
+              {stats.enabled === false ? (
+                <div className="p-8 text-center text-xs font-semibold text-on-surface-variant">
+                  Section is currently hidden on the homepage. Enable the toggle above to render it live.
+                </div>
+              ) : (
+                <StatsSection content={stats} replayKey={previewReplayKey} />
+              )}
             </div>
           </div>
         )}

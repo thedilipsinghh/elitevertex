@@ -78,7 +78,7 @@ export function GalleryContent() {
       </section>
 
       {/* Filter Index Navigation Bar */}
-      <section className="sticky top-16 md:top-20 z-40 w-full bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline-variant/40 shadow-xs">
+      <section className="sticky top-16 sm:top-[72px] md:top-20 lg:top-[88px] xl:top-24 z-40 w-full bg-surface-container-lowest border-b border-outline-variant shadow-sm">
         <div className="max-w-[1280px] mx-auto px-gutter-mobile md:px-gutter-tablet lg:px-gutter-desktop">
           <div className="flex items-center justify-between py-3 overflow-x-auto no-scrollbar gap-4">
             <div className="flex items-center gap-2 shrink-0">

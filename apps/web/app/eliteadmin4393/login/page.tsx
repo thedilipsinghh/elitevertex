@@ -72,11 +72,11 @@ export default function AdminLogin() {
           
           {/* Brand Header */}
           <div className="flex flex-col items-center text-center mb-8">
-            <div className="flex items-center justify-center mb-5 p-2 rounded-xl bg-surface-container dark:bg-white/95 border border-outline-variant shadow-2xs transition-all hover:scale-105">
+            <div className="flex items-center justify-center mb-5 px-3 py-2 rounded-xl bg-surface-container dark:bg-white/95 border border-outline-variant shadow-2xs max-w-full transition-all hover:scale-105">
               <img
                 src={logoSrc}
                 alt="Elite Vertex Brand Logo"
-                className="h-9 sm:h-10 w-auto object-contain"
+                className="h-11 sm:h-14 w-auto max-w-full object-contain"
               />
             </div>
 

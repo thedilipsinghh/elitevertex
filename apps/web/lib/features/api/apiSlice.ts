@@ -514,6 +514,7 @@ export const apiSlice = createApi({
     getPublicPage: builder.query({
       query: (slug) => `/pages/${slug}`,
       providesTags: ['Pages'],
+      keepUnusedDataFor: 5,
     }),
     getPublicNavigation: builder.query({
       query: (location) => `/navigation/${location}`,

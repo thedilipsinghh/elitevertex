@@ -94,6 +94,7 @@ export const getPage = async (req: AuthenticatedRequest, res: Response, next: Ne
     const hasUnpublishedChanges = sections.some(
       (s: any) => JSON.stringify(s.draftContent ?? {}) !== JSON.stringify(s.publishedContent ?? {})
     );
+    res.setHeader("Cache-Control", "no-store, max-age=0");
     return res.status(200).json({
       success: true,
       data: { ...page, sections, hasUnpublishedChanges },
@@ -332,6 +333,7 @@ export const previewPage = async (req: AuthenticatedRequest, res: Response, next
       where: and(eq(pageSections.pageId, page.id), eq(pageSections.isVisible, true)),
       orderBy: [sql`sort_order asc`, sql`created_at asc`],
     });
+    res.setHeader("Cache-Control", "no-store, max-age=0");
     return res.status(200).json({
       success: true,
       data: {
@@ -362,6 +364,7 @@ export const getPublishedPage = async (req: Request, res: Response, next: NextFu
       where: and(eq(pageSections.pageId, page.id), eq(pageSections.isVisible, true)),
       orderBy: [sql`sort_order asc`, sql`created_at asc`],
     });
+    res.setHeader("Cache-Control", "no-store, max-age=0");
     return res.status(200).json({
       success: true,
       message: "Page fetched successfully",

@@ -355,7 +355,7 @@ export function CoursesContent() {
       </section>
 
       {/* ── 2. Category Navigation Bar ── */}
-      <section className="w-full bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline-variant sticky top-16 md:top-20 z-40">
+      <section className="w-full bg-surface-container-lowest border-b border-outline-variant sticky top-16 sm:top-[72px] md:top-20 lg:top-[88px] xl:top-24 z-40 shadow-sm">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-none" style={{ scrollbarWidth: "none" }}>
             <button

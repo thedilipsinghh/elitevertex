@@ -71,18 +71,21 @@ export function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-200 bg-surface-container-lowest border-b border-outline-variant ${isScrolled ? "shadow-sm py-1" : "py-0"
-        }`}
+      className={`fixed top-0 left-0 w-full z-50 transition-shadow duration-200 bg-surface-container-lowest border-b border-outline-variant ${
+        isScrolled
+          ? "shadow-[0_4px_20px_-4px_rgba(15,23,42,0.08)] dark:shadow-[0_4px_24px_-4px_rgba(0,0,0,0.45)]"
+          : "shadow-none"
+      }`}
     >
-      <div className="h-16 md:h-20 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 transition-all duration-200">
+      <div className="h-16 sm:h-[72px] md:h-20 lg:h-[88px] xl:h-24 max-w-[1280px] mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4 transition-all duration-200">
 
         {/* Brand / Logo */}
-        <div className="flex items-center gap-3 shrink-0">
-          <Link href="/" className="flex items-center" aria-label="Elite Vertex Home">
-            <div className="flex items-center dark:bg-white dark:rounded-lg dark:p-1.5 transition-all">
+        <div className="flex items-center min-w-0 shrink-0">
+          <Link href="/" className="flex items-center group" aria-label="Elite Vertex Home">
+            <div className="flex items-center dark:bg-white dark:rounded-lg dark:px-1.5 dark:py-1 sm:dark:px-2 sm:dark:py-1.5 transition-all">
               <img
                 alt="Elite Vertex Brand Logo"
-                className="h-8 md:h-10 w-auto object-contain transition-all"
+                className="h-10 min-[420px]:h-11 sm:h-12 md:h-14 lg:h-14 xl:h-16 w-auto max-w-[calc(100vw-13rem)] sm:max-w-[260px] lg:max-w-[240px] xl:max-w-[280px] object-contain object-left transition-all duration-200"
                 src={logoSrc}
               />
             </div>
@@ -90,7 +93,7 @@ export function Navbar() {
         </div>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
+        <nav className="hidden lg:flex items-center gap-5 xl:gap-8">
           {navItems.map((item) => {
             const active = isLinkActive(item.href);
             const children = (item as { children?: NavNode[] }).children || [];
@@ -99,7 +102,7 @@ export function Navbar() {
                 <div key={item.href} className="relative group">
                   <Link
                     href={item.href}
-                    className={`font-semibold text-xs uppercase tracking-wider transition-colors py-2 flex items-center gap-1 ${active
+                    className={`whitespace-nowrap font-semibold text-xs uppercase tracking-wider transition-colors py-2 flex items-center gap-1 ${active
                       ? "text-primary font-bold"
                       : "text-on-surface-variant hover:text-primary"
                       }`}
@@ -129,7 +132,7 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`font-semibold text-xs uppercase tracking-wider py-2 nav-link-anim transition-colors duration-200 ${active
+                className={`whitespace-nowrap font-semibold text-xs uppercase tracking-wider py-2 nav-link-anim transition-colors duration-200 ${active
                   ? "text-primary font-bold active-link"
                   : "text-on-surface-variant hover:text-primary"
                   }`}

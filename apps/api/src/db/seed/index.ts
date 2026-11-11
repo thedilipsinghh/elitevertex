@@ -373,9 +373,51 @@ async function runSeed() {
         },
       },
       {
+        type: "stats",
+        title: "Impact Counters",
+        sortOrder: 3,
+        content: {
+          enabled: true,
+          badge: "OUR MILESTONES",
+          heading: "Proven Results That Speak For Themselves",
+          subheading:
+            "Real student outcomes built through intensive spoken practice, dedicated mentorship, and career-focused training.",
+          items: [
+            {
+              value: "370+",
+              label: "Students Trained",
+              detail: "Confident communicators coached across spoken English, fluency, and executive speaking.",
+              icon: "groups",
+              accent: "amber",
+            },
+            {
+              value: "50+",
+              label: "Expert Mentors",
+              detail: "Dedicated language coaches, phonetic trainers, and mock-interview specialists.",
+              icon: "psychology",
+              accent: "blue",
+            },
+            {
+              value: "100+",
+              label: "Courses Completed",
+              detail: "Structured cohorts delivered across PFE, daily fluency, GD panels, and leadership tracks.",
+              icon: "workspace_premium",
+              accent: "emerald",
+            },
+            {
+              value: "95%",
+              label: "Placement Assistance",
+              detail: "Dedicated resume clinics, mock interview boards, and career communication mentoring.",
+              icon: "trending_up",
+              accent: "indigo",
+            },
+          ],
+        },
+      },
+      {
         type: "about_preview",
         title: "About Preview",
-        sortOrder: 3,
+        sortOrder: 4,
         content: {
           label: "Pedagogical Framework",
           heading: "More Than English. We Build Confidence.",
@@ -393,7 +435,7 @@ async function runSeed() {
       {
         type: "courses_preview",
         title: "Courses Preview",
-        sortOrder: 4,
+        sortOrder: 5,
         content: {
           label: "Curriculum Tracks",
           heading: "Learn Skills That Move You Forward.",
@@ -410,7 +452,7 @@ async function runSeed() {
       {
         type: "testimonials",
         title: "Testimonials",
-        sortOrder: 5,
+        sortOrder: 6,
         content: {
           badge: "STUDENT LOVE",
           heading: "Loved By Many Students",
@@ -421,7 +463,7 @@ async function runSeed() {
       {
         type: "gallery",
         title: "Gallery",
-        sortOrder: 6,
+        sortOrder: 7,
         content: {
           heading: "Be A Part Of Our Thriving Community",
           subheading:
@@ -431,7 +473,7 @@ async function runSeed() {
       {
         type: "certificate_faq",
         title: "Certificate & FAQ",
-        sortOrder: 7,
+        sortOrder: 8,
         content: {
           certificateCardTitle: "Official Attestation",
           certificateCardText: "Verify any alumni completion credential or serial number online.",
@@ -451,7 +493,7 @@ async function runSeed() {
       {
         type: "cta",
         title: "Final CTA",
-        sortOrder: 8,
+        sortOrder: 9,
         content: {
           label: "Admissions Open For Next Cohort",
           heading: "Your Next Opportunity Starts With Better Communication.",
@@ -476,7 +518,7 @@ async function runSeed() {
         isVisible: true,
       }))
     );
-    console.log("✅ Seeded Home page with 8 sections");
+    console.log("✅ Seeded Home page with 9 sections");
   }
 
   // Seed CMS: Navigation menus

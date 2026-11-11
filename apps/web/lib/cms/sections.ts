@@ -83,6 +83,29 @@ export const SECTION_TYPES: SectionTypeDef[] = [
     ],
   },
   {
+    type: "stats",
+    label: "Impact Counters & Stats",
+    description: "Animated milestone counters (e.g., Students Trained, Mentors, Placement).",
+    fields: [
+      { key: "enabled", label: "Show Section on Page", type: "boolean" },
+      { key: "badge", label: "Eyebrow Badge", type: "text" },
+      { key: "heading", label: "Heading", type: "text" },
+      { key: "subheading", label: "Subheading", type: "textarea" },
+      {
+        key: "items",
+        label: "Milestone Counters",
+        type: "list",
+        itemFields: [
+          { key: "value", label: "Count / Value (e.g. 370+, 95%)", type: "text" },
+          { key: "label", label: "Title (e.g. Students Trained)", type: "text" },
+          { key: "detail", label: "Detail Description", type: "textarea" },
+          { key: "icon", label: "Material Icon Name (e.g. groups, psychology)", type: "text" },
+          { key: "accent", label: "Accent (amber, blue, emerald, indigo, rose)", type: "text" },
+        ],
+      },
+    ],
+  },
+  {
     type: "about_preview",
     label: "About Preview",
     description: "Image plus narrative paragraphs and a CTA link.",

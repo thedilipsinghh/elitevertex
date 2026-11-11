@@ -7,6 +7,7 @@ import type { SectionContent } from "@/lib/cms/sections";
 const FALLBACK_SECTIONS: { type: string; content: SectionContent }[] = [
   { type: "hero", content: {} },
   { type: "pillars", content: {} },
+  { type: "stats", content: {} },
   { type: "about_preview", content: {} },
   { type: "courses_preview", content: {} },
   { type: "testimonials", content: {} },
@@ -16,7 +17,10 @@ const FALLBACK_SECTIONS: { type: string; content: SectionContent }[] = [
 ];
 
 export function HomeContent() {
-  const { data: response, isLoading, isError } = useGetPublicPageQuery("home");
+  const { data: response, isLoading, isError } = useGetPublicPageQuery("home", {
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  });
   const page = response?.data;
 
   // While loading or if the CMS page is unavailable, render the built-in

@@ -10,6 +10,7 @@ import {
 } from "@/lib/features/api/apiSlice";
 import { galleryItems as fallbackGalleryItems } from "@/data/gallery";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { StatsSection } from "@/components/home/StatsSection";
 
 const str = (v: unknown, fallback = ""): string =>
   typeof v === "string" && v.length > 0 ? v : fallback;
@@ -817,9 +818,10 @@ function UnknownSection({ content }: RenderProps) {
   );
 }
 
-export const SECTION_RENDERERS: Record<string, (props: RenderProps) => React.ReactElement> = {
+export const SECTION_RENDERERS: Record<string, (props: RenderProps) => React.ReactElement | null> = {
   hero: HeroSection,
   pillars: PillarsSection,
+  stats: StatsSection,
   about_preview: AboutPreviewSection,
   courses_preview: CoursesPreviewSection,
   testimonials: TestimonialsSection,

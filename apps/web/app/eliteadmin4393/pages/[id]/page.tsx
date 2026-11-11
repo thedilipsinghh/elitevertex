@@ -414,6 +414,20 @@ function FieldEditor({
 
   const label = <span className="font-label-md text-on-surface">{field.label}</span>;
 
+  if (field.type === "boolean") {
+    return (
+      <label className="flex items-center gap-2.5 py-1 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={value !== false}
+          onChange={(e) => onChange(e.target.checked)}
+          className="w-4 h-4 text-secondary rounded cursor-pointer"
+        />
+        {label}
+      </label>
+    );
+  }
+
   if (field.type === "textarea") {
     return (
       <label className="flex flex-col gap-1">
